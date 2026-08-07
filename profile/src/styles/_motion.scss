@@ -1,0 +1,68 @@
+// =============================================================================
+// MOTION MIXINS — emits nothing.
+//
+// The global reveal states, keyframes and the prefers-reduced-motion reset all
+// live in _motion-global.scss, loaded once from styles.scss.
+//
+// Keeping them apart is not cosmetic: _index.scss forwards this file into every
+// component, and forwarding a module that emits CSS copies the whole
+// reduced-motion `*` reset into every compiled component stylesheet — bloating
+// each one and putting a universal selector inside Angular's emulated
+// encapsulation, where it does not belong.
+//
+// Source of truth: docs/BRAND-SYSTEM.md §6.
+// =============================================================================
+
+@use 'breakpoints' as bp;
+
+/// Diagonal wipe along the monogram's own leg axis. In RTL the angle is negated
+/// so the wipe always travels with the reading direction.
+@mixin angled-wipe {
+  transform: scaleX(0) skewX(calc(var(--brand-angle) * -1));
+  transform-origin: left center;
+  transition: transform var(--dur-fast) var(--ease-out);
+
+  [dir='rtl'] & {
+    transform: scaleX(0) skewX(var(--brand-angle));
+    transform-origin: right center;
+  }
+}
+
+@mixin angled-wipe-active {
+  transform: scaleX(1) skewX(calc(var(--brand-angle) * -1));
+
+  [dir='rtl'] & {
+    transform: scaleX(1) skewX(var(--brand-angle));
+  }
+}
+
+/// Linear skeleton sweep. Linear, not eased, and never a pulse — a pulse reads
+/// organic, and this brand is drafted.
+///
+/// Relies on the global `skeleton-sweep` keyframes in _motion-global.scss.
+/// Angular does not rewrite @keyframes names under emulated encapsulation, so a
+/// globally-declared animation is reachable from component styles.
+@mixin skeleton {
+  position: relative;
+  overflow: hidden;
+  background: var(--color-surface-sunken);
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      var(--brand-angle),
+      transparent 0%,
+      rgb(255 255 255 / 55%) 50%,
+      transparent 100%
+    );
+    animation: skeleton-sweep 1.4s var(--ease-linear) infinite;
+  }
+
+  @include bp.mq-reduced-motion {
+    &::after {
+      animation: none;
+    }
+  }
+}

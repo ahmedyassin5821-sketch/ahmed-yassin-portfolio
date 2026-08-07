@@ -25,13 +25,32 @@ const angularApp = new AngularNodeAppEngine();
  */
 
 /**
- * Serve static files from /browser
+ * Serve static files from /browser, including prerendered documents.
+ *
+ * `index: 'index.html'` matters and differs from the CLI default.
+ *
+ * Every known route is `RenderMode.Prerender`, so its HTML already exists on
+ * disk — `/` is `browser/index.html`, `/foo` is `browser/foo/index.html`. With
+ * the CLI's default `index: false`, a request for `/` never resolves to that
+ * file, falls through to the Angular engine, and gets answered with
+ * `index.csr.html` — an empty `<app-root>`. The page then only appears after
+ * client-side JavaScript boots, which silently discards every benefit of
+ * prerendering: no server HTML for crawlers, and a blank first paint.
+ *
+ * Caching is split by type. Content-hashed assets are immutable and get a year;
+ * HTML must not be, or a deploy never reaches anyone still holding a cached
+ * document.
  */
 app.use(
   express.static(browserDistFolder, {
-    maxAge: '1y',
-    index: false,
+    index: 'index.html',
     redirect: false,
+    maxAge: '1y',
+    setHeaders: (res, filePath) => {
+      if (filePath.endsWith('.html')) {
+        res.setHeader('Cache-Control', 'no-cache');
+      }
+    },
   }),
 );
 

@@ -1,0 +1,92 @@
+// =============================================================================
+// COMPONENT TOKENS — Layer 3 of 3.
+//
+// Per-component knobs that resolve to semantic tokens. This layer exists so a
+// component's appearance can be retuned in one place without touching its
+// stylesheet, and so two components that must agree (button height vs input
+// height, say) share a single source.
+//
+// Source of truth: docs/BRAND-SYSTEM.md §5.
+// =============================================================================
+
+:root {
+  // ---------------------------------------------------------------------------
+  // Button — press feedback is opacity, never scale. Scaling a rigid Didone-
+  // derived form contradicts the mark; the brand system bans it explicitly.
+  // ---------------------------------------------------------------------------
+  --btn-radius: var(--radius-xs);
+  --btn-height-sm: 36px;
+  --btn-height-md: 44px; // the minimum touch target
+  --btn-height-lg: 52px;
+  --btn-padding-inline-sm: var(--space-3);
+  --btn-padding-inline-md: var(--space-4);
+  --btn-padding-inline-lg: var(--space-6);
+  --btn-border-width: var(--border-hairline);
+  --btn-transition: var(--dur-fast) var(--ease-out);
+  --btn-pressed-opacity: 0.72;
+  --btn-disabled-opacity: 0.42;
+
+  // ---------------------------------------------------------------------------
+  // Card — 0 radius. Hover promotes the border and lifts 2px; no shadow bloom.
+  // ---------------------------------------------------------------------------
+  --card-radius: var(--radius-none);
+  --card-padding: var(--space-6);
+  --card-background: var(--color-surface);
+  --card-border: var(--border-hairline) solid var(--color-border);
+  --card-border-hover: var(--border-hairline) solid var(--color-border-interactive);
+  --card-lift: -2px;
+  --card-transition: var(--dur-base) var(--ease-out);
+
+  // ---------------------------------------------------------------------------
+  // Input — 48px and a 16px floor so iOS never zooms the viewport on focus.
+  // Border is --color-border-interactive (3.32:1), not --color-border (1.26:1),
+  // because a field boundary is a UI component under WCAG 1.4.11.
+  // ---------------------------------------------------------------------------
+  --input-radius: var(--radius-xs);
+  --input-height: 48px;
+  --input-padding-inline: var(--space-3);
+  --input-background: var(--color-background);
+  --input-border-width: var(--border-hairline);
+  --input-border-color: var(--color-border-interactive);
+  --input-border-color-hover: var(--color-text-secondary);
+  --input-border-color-invalid: var(--color-error-border);
+  --input-border-width-invalid: var(--border-emphasis);
+  --input-placeholder-color: var(--color-text-muted);
+
+  // ---------------------------------------------------------------------------
+  // Badge
+  // ---------------------------------------------------------------------------
+  --badge-radius: var(--radius-xs);
+  --badge-padding-inline: var(--space-2);
+  --badge-padding-block: 3px;
+  --badge-border: var(--border-hairline) solid var(--color-border-interactive);
+
+  // ---------------------------------------------------------------------------
+  // Divider
+  // ---------------------------------------------------------------------------
+  --divider-color: var(--color-divider);
+  --divider-width: var(--border-hairline);
+
+  // ---------------------------------------------------------------------------
+  // Icon — stroke echoes the monogram's STEM (9% of height), not its hairline
+  // (2.6%), which at 24px would be 0.6px and would vanish. Optical sizing keeps
+  // perceived weight constant as the box grows.
+  // ---------------------------------------------------------------------------
+  --icon-size-sm: 16px;
+  --icon-size-md: 24px;
+  --icon-size-lg: 32px;
+  --icon-size-xl: 48px;
+  --icon-stroke-sm: 1.25;
+  --icon-stroke-md: 1.5;
+  --icon-stroke-lg: 2;
+  --icon-stroke-xl: 2.5;
+
+  // ---------------------------------------------------------------------------
+  // Logo — below this threshold the Logo component swaps to the thickened
+  // small-size mark, because the true hairlines fall under one device pixel.
+  // ---------------------------------------------------------------------------
+  --logo-size-sm: 32px;
+  --logo-size-md: 48px;
+  --logo-size-lg: 96px;
+  --logo-small-variant-threshold: 48;
+}

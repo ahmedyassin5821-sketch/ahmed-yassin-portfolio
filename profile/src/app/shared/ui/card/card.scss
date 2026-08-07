@@ -1,0 +1,53 @@
+@use 'index' as ds;
+
+:host {
+  position: relative;
+  display: block;
+  border-radius: var(--card-radius);
+  border: var(--card-border);
+  background-color: var(--card-background);
+  padding: var(--card-padding);
+  transition:
+    border-color var(--card-transition),
+    translate var(--card-transition);
+}
+
+:host(.is-flush) {
+  padding: 0;
+}
+
+// -----------------------------------------------------------------------------
+// Interactive
+//
+// A 2px lift and a border promotion. No shadow bloom and no scale: depth in this
+// system comes from the hairline border, per the brand system's elevation rules.
+// `translate` rather than `transform` so it cannot fight any other transform.
+// -----------------------------------------------------------------------------
+:host(.is-interactive):hover {
+  border: var(--card-border-hover);
+  translate: 0 var(--card-lift);
+}
+
+// The ring belongs on the card, not on the invisible overlay anchor.
+:host(.is-interactive):focus-within {
+  @include ds.focus-ring;
+}
+
+.card__overlay {
+  position: absolute;
+  inset: 0;
+  // z-index left at auto so genuine inner links (which get their own stacking
+  // context) still sit above this and remain clickable.
+  border-radius: inherit;
+
+  // The card already renders the focus ring via :focus-within.
+  &:focus-visible {
+    outline: none;
+  }
+}
+
+@include ds.mq-forced-colors {
+  :host {
+    border: var(--border-hairline) solid CanvasText;
+  }
+}

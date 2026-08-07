@@ -1,0 +1,128 @@
+// =============================================================================
+// SEMANTIC TOKENS — what a value MEANS. Layer 2 of 3.
+//
+// This is the only layer a future theme swaps. Components reference these
+// (or component tokens) and never primitives, so adding a dark theme later
+// means redefining this block — not touching a single component.
+//
+// Naming follows the Sprint 2 brief, which is canonical.
+// Source of truth: docs/BRAND-SYSTEM.md §2.
+// =============================================================================
+
+:root {
+  // ---------------------------------------------------------------------------
+  // Surfaces
+  //
+  // The ramp gets *darker* as content nests, which is the paper metaphor:
+  // background is the lightest thing on the page. `elevated` is the exception —
+  // floating surfaces (dropdowns, modals) return to the lightest value and are
+  // separated by shadow rather than by tint, because in a light theme a
+  // *darker* overlay reads as recessed.
+  // ---------------------------------------------------------------------------
+  --color-background: var(--warm-50);
+  --color-surface: var(--warm-100);
+  --color-surface-nested: var(--warm-150);
+  --color-surface-sunken: var(--warm-200);
+  --color-surface-elevated: var(--warm-50);
+
+  // ---------------------------------------------------------------------------
+  // Text — ratios against --color-background
+  // ---------------------------------------------------------------------------
+  --color-text-primary: var(--warm-800); // 13.41:1  AAA
+  --color-text-secondary: var(--warm-700); //  7.85:1  AAA
+  --color-text-muted: var(--warm-600); //  5.04:1  AA
+  --color-text-inverse: var(--warm-50);
+
+  // ---------------------------------------------------------------------------
+  // Lines
+  //
+  // --color-border is a visual seam at 1.26:1 — it is NOT a control boundary.
+  // Anything that identifies an interactive control must use
+  // --color-border-interactive, which is verified at 3.32:1 (WCAG 1.4.11).
+  // ---------------------------------------------------------------------------
+  --color-border: var(--warm-250);
+  --color-border-interactive: var(--warm-500); // 3.32:1
+  --color-border-strong: var(--warm-800);
+  --color-divider: var(--warm-300);
+
+  // ---------------------------------------------------------------------------
+  // The mark
+  //
+  // Pure ink is reserved for the logo. Body text stops at --warm-800 (13.41:1)
+  // while the mark gets --warm-950 (19.33:1), so nothing on any page is ever as
+  // dark as the monogram. The brief's requirement that the logo stay the
+  // strongest visual element is enforced here, in tokens — not by discipline.
+  // ---------------------------------------------------------------------------
+  --color-brand-mark: var(--warm-950);
+
+  // ---------------------------------------------------------------------------
+  // Focus — 19.33:1 against every surface in the ramp
+  // ---------------------------------------------------------------------------
+  --color-focus: var(--warm-950);
+
+  // ---------------------------------------------------------------------------
+  // Status — monochrome by decision (Sprint 2).
+  //
+  // The identity is achromatic, so status is carried by ICON + TEXT + BORDER
+  // WEIGHT. That is also what WCAG 1.4.1 requires: colour may never be the only
+  // means of conveying information. Introducing real hues later is an edit to
+  // these nine lines and nothing else.
+  // ---------------------------------------------------------------------------
+  --color-success: var(--warm-800);
+  --color-success-surface: var(--warm-200);
+  --color-success-border: var(--warm-800);
+
+  --color-warning: var(--warm-800);
+  --color-warning-surface: var(--warm-200);
+  --color-warning-border: var(--warm-800);
+
+  --color-error: var(--warm-800);
+  --color-error-surface: var(--warm-200);
+  --color-error-border: var(--warm-800);
+
+  // ---------------------------------------------------------------------------
+  // Accent — deferred, but every component already consumes it.
+  //
+  // Today these resolve to neutrals, so the site is genuinely monochrome. When
+  // a brand colour is chosen, redefine these five and the whole portfolio
+  // follows with NO component changes. Required contrast for any future value:
+  //   --color-accent as text on background   >= 4.5:1
+  //   --color-on-accent on accent fill       >= 4.5:1
+  //   --color-accent as a non-text indicator >= 3:1
+  // ---------------------------------------------------------------------------
+  --color-accent: var(--warm-800);
+  --color-accent-hover: var(--warm-950);
+  --color-accent-muted: var(--warm-150);
+  --color-on-accent: var(--warm-50);
+
+  // ---------------------------------------------------------------------------
+  // Elevation — a composite of surface + border + shadow, never shadow alone
+  // ---------------------------------------------------------------------------
+  --elevation-0-shadow: var(--shadow-0);
+  --elevation-1-shadow: var(--shadow-0);
+  --elevation-2-shadow: var(--shadow-1);
+  --elevation-3-shadow: var(--shadow-3);
+  --elevation-4-shadow: var(--shadow-4);
+
+  // ---------------------------------------------------------------------------
+  // Layout
+  // ---------------------------------------------------------------------------
+  --container-max: 75rem; // 1200px — raised per breakpoint in _layout.scss
+
+  // `min(..., 100%)` rather than a bare ch value.
+  //
+  // 68ch is roughly 540px, which is wider than a 390px phone — so a bare cap
+  // silently overflows the viewport on every mobile screen. Capping at the
+  // container width here fixes it once, for every consumer, instead of leaving
+  // each component to remember.
+  --measure-prose: min(68ch, 100%);
+  --measure-display: min(20ch, 100%);
+
+  // Vertical rhythm derives from the mark's 2:1 cap-to-descender ratio:
+  // one relationship governs the whole page.
+  --space-block: clamp(2rem, 1.25rem + 3vw, 4rem);
+  --space-section: calc(var(--space-block) * var(--brand-rhythm));
+
+  --gutter: clamp(1rem, 0.5rem + 2vw, 4rem);
+  --grid-gap: var(--space-6);
+}

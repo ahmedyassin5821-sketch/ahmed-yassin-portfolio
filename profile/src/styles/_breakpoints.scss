@@ -1,0 +1,84 @@
+// =============================================================================
+// BREAKPOINTS — emits nothing. Mixins only.
+//
+// Queries are em-based so they honour the browser's font size. A px query
+// silently breaks for anyone who has raised their default text size, which is
+// one of the most common real accessibility settings.
+//
+// Source of truth: docs/BRAND-SYSTEM.md §8.
+// =============================================================================
+
+@use 'sass:map';
+
+$breakpoints: (
+  'xs': 20em,
+  // 320px — floor, base styles target this
+  'sm': 23.4375em,
+  // 375px
+  'smx': 24.375em,
+  // 390px
+  'md': 48em,
+  // 768px
+  'lg': 64em,
+  // 1024px
+  'xl': 80em,
+  // 1280px
+  'xxl': 90em,
+  // 1440px
+  'hd': 120em,
+  // 1920px
+  'ultra': 160em,
+  // 2560px
+);
+
+/// Mobile-first min-width query.
+/// @example @include mq(md) { ... }
+@mixin mq($name) {
+  @if not map.has-key($breakpoints, $name) {
+    @error "Unknown breakpoint `#{$name}`. Available: #{map.keys($breakpoints)}.";
+  }
+
+  @media (width >= #{map.get($breakpoints, $name)}) {
+    @content;
+  }
+}
+
+/// Max-width query. Use sparingly — this system is mobile-first, so a max-width
+/// query usually means a base style is wrong.
+@mixin mq-below($name) {
+  @if not map.has-key($breakpoints, $name) {
+    @error "Unknown breakpoint `#{$name}`. Available: #{map.keys($breakpoints)}.";
+  }
+
+  @media (width < #{map.get($breakpoints, $name)}) {
+    @content;
+  }
+}
+
+/// Short landscape phones. The hero must release any min-height lock here or
+/// content clips — a real failure mode that portrait-only testing never catches.
+@mixin mq-landscape-short {
+  @media (orientation: landscape) and (height <= 31.25em) {
+    @content;
+  }
+}
+
+/// Devices whose primary pointer can hover accurately. Gate cursor-dependent
+/// affordances (magnetic buttons, tilt) behind this — never behind width.
+@mixin mq-fine-pointer {
+  @media (hover: hover) and (pointer: fine) {
+    @content;
+  }
+}
+
+@mixin mq-reduced-motion {
+  @media (prefers-reduced-motion: reduce) {
+    @content;
+  }
+}
+
+@mixin mq-forced-colors {
+  @media (forced-colors: active) {
+    @content;
+  }
+}

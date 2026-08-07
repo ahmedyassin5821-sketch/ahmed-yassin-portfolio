@@ -1,0 +1,35 @@
+:host {
+  display: block;
+  border: 0;
+  background-color: var(--divider-color);
+  // Both axes are logical, so a vertical rule sits correctly in RTL without an
+  // override and a horizontal one spans the inline axis whichever way it runs.
+  flex: none;
+}
+
+:host(.divider--horizontal) {
+  inline-size: 100%;
+  block-size: var(--divider-width);
+}
+
+:host(.divider--vertical) {
+  inline-size: var(--divider-width);
+  block-size: auto;
+  align-self: stretch;
+}
+
+// The brand angle, applied as a clip so the rule's ends match the monogram's leg
+// axis. Mirrored in RTL: a physical angle would otherwise run against the text.
+:host(.divider--angled.divider--horizontal) {
+  clip-path: polygon(0 0, 100% 0, calc(100% - 6px) 100%, 6px 100%);
+}
+
+:host-context([dir='rtl']).divider--angled.divider--horizontal {
+  clip-path: polygon(6px 0, calc(100% - 6px) 0, 100% 100%, 0 100%);
+}
+
+@media (forced-colors: active) {
+  :host {
+    background-color: CanvasText;
+  }
+}

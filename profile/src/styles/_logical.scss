@@ -1,0 +1,44 @@
+// =============================================================================
+// LOGICAL / DIRECTION HELPERS
+//
+// CSS logical properties (margin-inline, inset-inline, border-inline) are native
+// and need no helper — use them directly; stylelint enforces it. This file
+// covers only the cases CSS logical properties DON'T reach: transforms,
+// gradients and angles, all of which are physical and must be mirrored by hand.
+//
+// Source of truth: docs/BRAND-SYSTEM.md §9.
+// =============================================================================
+
+/// Mirrors a directional glyph. Applied by the Icon component's `flipInRtl`
+/// input — arrows and chevrons flip, logos and checkmarks must not.
+@mixin flip-in-rtl {
+  [dir='rtl'] & {
+    scale: -1 1;
+  }
+}
+
+/// A horizontal translation that follows reading direction.
+/// `translateX(1rem)` moves right in both directions, which is wrong in RTL;
+/// this moves toward the inline-end edge in whichever direction applies.
+@mixin translate-inline($distance) {
+  translate: #{$distance} 0;
+
+  [dir='rtl'] & {
+    translate: calc(#{$distance} * -1) 0;
+  }
+}
+
+/// The brand angle, mirrored. Gradients and skews take a physical angle, so a
+/// 24° sweep in LTR must become -24° in RTL to keep travelling with the text.
+@mixin brand-angle-directional($property: '--angle') {
+  #{$property}: var(--brand-angle);
+
+  [dir='rtl'] & {
+    #{$property}: calc(var(--brand-angle) * -1);
+  }
+}
+
+/// Border on the inline-start edge — for timeline rails and quote marks.
+@mixin rail($width: var(--border-hairline), $color: var(--color-border)) {
+  border-inline-start: #{$width} solid #{$color};
+}

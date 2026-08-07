@@ -1,0 +1,32 @@
+@use 'index' as ds;
+
+.not-found {
+  @include ds.container;
+
+  display: flex;
+  min-block-size: 70dvh;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  text-align: center;
+}
+
+// The one sanctioned baseline break.
+//
+// The monogram's Y stem drops half a cap-height below the A's baseline, which
+// licenses exactly one element per view to cross its grid line. Here it is the
+// 404 numeral, set in the display weight and tabular so the digits align.
+.not-found__code {
+  @include ds.display-1;
+  @include ds.tabular;
+
+  margin-block-end: calc(var(--space-6) * -1);
+  color: var(--color-text-muted);
+}
+
+.not-found__title {
+  @include ds.heading-1;
+
+  color: var(--color-text-primary);
+}

@@ -1,0 +1,31 @@
+// =============================================================================
+// COMPONENT-FACING BARREL
+//
+// Component stylesheets import this and nothing else:
+//
+//     @use 'index' as ds;
+//     .btn { @include ds.label; padding-inline: var(--space-4); }
+//
+// ## Every module forwarded here MUST be emission-free
+//
+// Angular compiles each component stylesheet separately, so anything a forwarded
+// module *emits* is duplicated into every component that uses the barrel. That
+// bloats each file past its 4KB budget and, worse, drops global selectors like
+// the reduced-motion `*` reset inside Angular's emulated encapsulation.
+//
+// So the split is strict:
+//   mixins/functions  -> _typography, _a11y, _layout, _motion, _breakpoints, _logical  (here)
+//   emitted CSS       -> _typography-vars, _utilities, _motion-global, _reset, tokens  (styles.scss)
+//
+// Tokens are not forwarded either. They are `:root` declarations loaded once
+// globally, and components reach them as plain `var(--token)`.
+//
+// If you add a module here, verify it emits nothing.
+// =============================================================================
+
+@forward 'breakpoints';
+@forward 'typography';
+@forward 'a11y';
+@forward 'layout';
+@forward 'motion';
+@forward 'logical';

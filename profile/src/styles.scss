@@ -1,1 +1,28 @@
-/* You can add global styles to this file, and also import other style files */
+// =============================================================================
+// GLOBAL STYLE ENTRY
+//
+// The ONLY file that emits global CSS. Order matters:
+//   1. fonts            @font-face must precede anything referencing a family
+//   2. tokens           primitive -> semantic -> typography vars -> component,
+//                       each layer building on the previous
+//   3. reset            consumes the tokens above
+//   4. motion-global    reveal states + the reduced-motion override, which must
+//                       follow reset so its !important rules win
+//   5. utilities        opt-in global classes
+//
+// Everything else is component-scoped. Components import 'index' for mixins and
+// must never @use a token or utility file directly — see _index.scss for why.
+//
+// Implements: docs/BRAND-SYSTEM.md
+// =============================================================================
+
+@use 'fonts';
+
+@use 'tokens-primitive';
+@use 'tokens-semantic';
+@use 'typography-vars';
+@use 'tokens-component';
+
+@use 'reset';
+@use 'motion-global';
+@use 'utilities';

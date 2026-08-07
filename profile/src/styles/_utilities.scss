@@ -1,0 +1,81 @@
+// =============================================================================
+// GLOBAL UTILITY CLASSES — emits CSS. Loaded once, from styles.scss.
+//
+// A deliberately tiny set. This is not a utility framework: only patterns that
+// (a) recur everywhere and (b) would be wrong to duplicate.
+//
+// NOT forwarded through _index.scss — components consume the underlying mixins,
+// so nothing here is ever duplicated into a component stylesheet.
+// =============================================================================
+
+@use 'a11y';
+@use 'layout';
+@use 'typography' as type;
+
+// -----------------------------------------------------------------------------
+// Accessibility
+// -----------------------------------------------------------------------------
+.sr-only {
+  @include a11y.sr-only;
+}
+
+/// Hidden until focused — for skip links.
+.sr-only-focusable:not(:focus, :focus-within) {
+  @include a11y.sr-only;
+}
+
+// -----------------------------------------------------------------------------
+// Layout
+// -----------------------------------------------------------------------------
+.container {
+  @include layout.container;
+}
+
+.grid {
+  @include layout.grid;
+}
+
+.section {
+  @include layout.section;
+}
+
+.text-prose {
+  @include layout.prose;
+}
+
+// -----------------------------------------------------------------------------
+// Bidirectional text
+// -----------------------------------------------------------------------------
+
+/// Isolates embedded Latin inside Arabic text.
+///
+/// Without this, the bidi algorithm reorders runs like "Angular 21" or a phone
+/// number when they sit inside an Arabic sentence — digits and trailing
+/// punctuation end up on the wrong side. `unicode-bidi: isolate` scopes the run
+/// so it renders LTR internally while flowing correctly in the RTL paragraph.
+.ltr-isolate {
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+
+/// Forces a whole block LTR regardless of document direction — for code, where
+/// mirroring would be actively wrong.
+.force-ltr {
+  direction: ltr;
+  text-align: start;
+}
+
+// -----------------------------------------------------------------------------
+// Typography
+// -----------------------------------------------------------------------------
+.tabular {
+  @include type.tabular;
+}
+
+.label {
+  @include type.label;
+}
+
+.mono {
+  @include type.mono;
+}

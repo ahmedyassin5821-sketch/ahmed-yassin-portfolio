@@ -1,0 +1,62 @@
+{
+  "extends": ["stylelint-config-standard-scss"],
+  "plugins": ["stylelint-use-logical"],
+  "rules": {
+    "csstools/use-logical": "always",
+
+    "selector-class-pattern": [
+      "^[a-z]([a-z0-9]*)(-[a-z0-9]+)*(__[a-z0-9]+(-[a-z0-9]+)*)?(--[a-z0-9]+(-[a-z0-9]+)*)?$",
+      {
+        "message": "Expected class selector to be kebab-case BEM (block__element--modifier)"
+      }
+    ],
+
+    "at-rule-empty-line-before": null,
+    "custom-property-empty-line-before": null,
+    "declaration-empty-line-before": null,
+    "comment-empty-line-before": null,
+    "scss/double-slash-comment-empty-line-before": null,
+    "scss/comment-no-empty": null,
+
+    "no-descending-specificity": null,
+
+    "scss/at-rule-no-unknown": [
+      true,
+      {
+        "ignoreAtRules": [
+          "forward",
+          "use",
+          "each",
+          "mixin",
+          "include",
+          "if",
+          "else",
+          "function",
+          "return",
+          "container"
+        ]
+      }
+    ]
+  },
+  "overrides": [
+    {
+      "files": ["src/app/**/*.scss"],
+      "rules": {
+        "color-no-hex": true,
+        "color-named": "never",
+        "function-disallowed-list": [
+          "rgb",
+          "rgba",
+          "hsl",
+          "hsla",
+          "hwb",
+          "lab",
+          "lch",
+          "oklab",
+          "oklch",
+          "color"
+        ]
+      }
+    }
+  ]
+}

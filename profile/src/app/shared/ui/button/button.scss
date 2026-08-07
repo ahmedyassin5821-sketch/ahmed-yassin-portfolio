@@ -1,0 +1,137 @@
+@use 'index' as ds;
+
+:host {
+  display: inline-flex;
+}
+
+.btn {
+  @include ds.label;
+  @include ds.focus-visible;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  border-radius: var(--btn-radius);
+  border: var(--btn-border-width) solid transparent;
+  transition:
+    background-color var(--btn-transition),
+    border-color var(--btn-transition),
+    color var(--btn-transition),
+    opacity var(--btn-transition);
+
+  // Logical, so RTL needs no override.
+  padding-inline: var(--btn-padding-inline-md);
+  min-block-size: var(--btn-height-md);
+
+  &:disabled {
+    opacity: var(--btn-disabled-opacity);
+  }
+
+  // Opacity only. No scale — see the component comment.
+  &:not(:disabled):active {
+    opacity: var(--btn-pressed-opacity);
+  }
+
+  // Borders vanish in forced-colors mode, leaving variants indistinguishable.
+  @include ds.mq-forced-colors {
+    border-color: ButtonBorder;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Sizes
+// -----------------------------------------------------------------------------
+.btn--sm {
+  min-block-size: var(--btn-height-sm);
+  padding-inline: var(--btn-padding-inline-sm);
+}
+
+.btn--lg {
+  min-block-size: var(--btn-height-lg);
+  padding-inline: var(--btn-padding-inline-lg);
+  font-size: var(--fs-caption);
+}
+
+// -----------------------------------------------------------------------------
+// Variants — every colour comes from a semantic token, so a future accent or
+// dark theme changes these without the file being touched.
+// -----------------------------------------------------------------------------
+.btn--primary {
+  background-color: var(--color-accent);
+  color: var(--color-on-accent);
+
+  &:not(:disabled):hover {
+    background-color: var(--color-accent-hover);
+  }
+}
+
+.btn--secondary {
+  border-color: var(--color-border-interactive);
+  color: var(--color-text-primary);
+
+  &:not(:disabled):hover {
+    border-color: var(--color-text-primary);
+    background-color: var(--color-surface);
+  }
+}
+
+// Ghost carries the brand angle: the underline wipes in along the monogram's own
+// leg axis (24°), mirrored in RTL so it always travels with the reading direction.
+.btn--ghost {
+  position: relative;
+  padding-inline: var(--space-1);
+  color: var(--color-text-primary);
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset-block-end: calc(var(--space-1) * -1);
+    inset-inline: var(--space-1);
+    block-size: var(--border-emphasis);
+    background-color: currentcolor;
+    transform: scaleX(0) skewX(calc(var(--brand-angle) * -1));
+    transform-origin: left center;
+    transition: transform var(--dur-fast) var(--ease-out);
+  }
+
+  &:not(:disabled):hover::after,
+  &:not(:disabled):focus-visible::after {
+    transform: scaleX(1) skewX(calc(var(--brand-angle) * -1));
+  }
+}
+
+:host-context([dir='rtl']) .btn--ghost::after {
+  transform: scaleX(0) skewX(var(--brand-angle));
+  transform-origin: right center;
+}
+
+:host-context([dir='rtl']) .btn--ghost:not(:disabled):hover::after,
+:host-context([dir='rtl']) .btn--ghost:not(:disabled):focus-visible::after {
+  transform: scaleX(1) skewX(var(--brand-angle));
+}
+
+// -----------------------------------------------------------------------------
+// Loading
+//
+// A linear rotation, not an eased or pulsing one. Occupies the leading icon slot
+// so the button never changes width between states.
+// -----------------------------------------------------------------------------
+.btn__spinner {
+  inline-size: 1em;
+  block-size: 1em;
+  border: var(--border-emphasis) solid currentcolor;
+  border-block-start-color: transparent;
+  border-radius: var(--radius-full);
+  animation: btn-spin 0.7s var(--ease-linear) infinite;
+}
+
+@keyframes btn-spin {
+  to {
+    rotate: 360deg;
+  }
+}
+
+.btn__label:empty {
+  display: none;
+}

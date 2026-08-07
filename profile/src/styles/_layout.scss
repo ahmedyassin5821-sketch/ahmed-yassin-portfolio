@@ -1,0 +1,91 @@
+// =============================================================================
+// LAYOUT MIXINS — emits nothing.
+//
+// The `.container` / `.grid` / `.section` utility classes live in
+// _utilities.scss. _index.scss forwards this file into every component, so it
+// must stay emission-free.
+//
+// Container widths step up per breakpoint and then STOP at 1440px. Letting
+// content stretch on an ultra-wide display destroys both the measure and the
+// negative space the mark depends on — beyond 2560px the container stays fixed
+// and the canvas simply extends.
+//
+// Source of truth: docs/BRAND-SYSTEM.md §8.
+// =============================================================================
+
+@use 'breakpoints' as bp;
+
+/// Page container. Gutters are logical, so RTL needs no override.
+@mixin container {
+  inline-size: 100%;
+  max-inline-size: var(--container-w, 100%);
+  margin-inline: auto;
+  padding-inline: var(--gutter-w, var(--space-4));
+
+  --gutter-w: var(--space-4); // 320
+  @include bp.mq(sm) {
+    --gutter-w: var(--space-5);
+  } // 375 / 390
+  @include bp.mq(md) {
+    --gutter-w: var(--space-8);
+  } // 768
+  @include bp.mq(lg) {
+    --gutter-w: var(--space-10);
+    --container-w: 60rem;
+  } // 1024 -> 960px
+  @include bp.mq(xl) {
+    --gutter-w: var(--space-12);
+    --container-w: 71.25rem;
+  } // 1280 -> 1140px
+  @include bp.mq(xxl) {
+    --gutter-w: var(--space-16);
+    --container-w: 80rem;
+  } // 1440 -> 1280px
+  @include bp.mq(hd) {
+    --container-w: 85rem;
+  } // 1920 -> 1360px
+  @include bp.mq(ultra) {
+    --container-w: 90rem;
+  } // 2560 -> 1440px, capped
+}
+
+/// 4 / 8 / 12 column grid.
+@mixin grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-3);
+
+  @include bp.mq(md) {
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+    gap: var(--space-4);
+  }
+
+  @include bp.mq(lg) {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: var(--grid-gap);
+  }
+}
+
+/// Vertical rhythm. Section gap is always 2× block gap — the mark's own
+/// cap-to-descender ratio, so one relationship governs the page.
+@mixin section {
+  padding-block: var(--space-section);
+}
+
+@mixin stack($gap: var(--space-block)) {
+  display: flex;
+  flex-direction: column;
+  gap: $gap;
+}
+
+/// Readable measure for prose.
+@mixin prose {
+  max-inline-size: var(--measure-prose);
+}
+
+/// Aspect-locked media frame at the monogram's own 7:8 portrait ratio.
+@mixin media-frame($ratio: var(--brand-ratio)) {
+  aspect-ratio: #{$ratio};
+  overflow: hidden;
+  background: var(--color-surface-sunken);
+}

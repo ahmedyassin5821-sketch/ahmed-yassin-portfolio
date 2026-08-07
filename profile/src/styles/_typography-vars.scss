@@ -1,0 +1,101 @@
+// =============================================================================
+// TYPOGRAPHY TOKENS — emits :root custom properties.
+//
+// Reproduces the monogram's 3.8:1 stroke contrast as a deliberate WEIGHT GAP:
+// display is light and enormous (the hairline), headings are semibold (the
+// stem), labels are mono and tracked out (the serif). Nothing sits in between,
+// because the mark has no mid-weights.
+//
+// Source of truth: docs/BRAND-SYSTEM.md §3.
+// =============================================================================
+
+:root {
+  // ---------------------------------------------------------------------------
+  // Fluid scale — 1.25 ratio at UI sizes, widening toward 1.333 at display
+  // ---------------------------------------------------------------------------
+  --fs-display-1: clamp(3rem, 1.5rem + 7.5vw, 8.75rem);
+  --fs-display-2: clamp(2.5rem, 1.6rem + 4.5vw, 5rem);
+  --fs-h1: clamp(2rem, 1.4rem + 3vw, 3.25rem);
+  --fs-h2: clamp(1.5rem, 1.2rem + 1.5vw, 2.25rem);
+  --fs-h3: 1.375rem;
+  --fs-body-lg: 1.125rem;
+  --fs-body: 1rem; // never lower for prose
+  --fs-body-sm: 0.9375rem;
+  --fs-caption: 0.8125rem; // UI only, never prose
+  --fs-label: 0.75rem;
+
+  // ---------------------------------------------------------------------------
+  // Line heights — Latin
+  // ---------------------------------------------------------------------------
+  --lh-display-1: 0.94;
+  --lh-display-2: 1;
+  --lh-h1: 1.1;
+  --lh-h2: 1.2;
+  --lh-h3: 1.3;
+  --lh-body: 1.65;
+  --lh-body-sm: 1.6;
+  --lh-caption: 1.5;
+  --lh-label: 1.4;
+
+  // ---------------------------------------------------------------------------
+  // Tracking — Latin. Negative at display sizes only.
+  // ---------------------------------------------------------------------------
+  --ls-display-1: -0.03em;
+  --ls-display-2: -0.025em;
+  --ls-h1: -0.02em;
+  --ls-h2: -0.015em;
+  --ls-h3: -0.01em;
+  --ls-body: 0;
+  --ls-label: 0.08em;
+}
+
+// =============================================================================
+// ARABIC OVERRIDES — mandatory, not stylistic.
+//
+// Two things break Arabic if left at Latin values:
+//   1. Negative letter-spacing severs the joins between letters, which is not a
+//      cosmetic issue — it renders words incorrectly.
+//   2. Amiri's Naskh ascenders and descenders are far taller than Geist's, so
+//      Latin line-heights collide.
+//
+// Enforced here, once, so no component author can reintroduce either mistake.
+// =============================================================================
+:root:lang(ar),
+[lang='ar'],
+[lang^='ar-'] {
+  // All tracking neutralised.
+  --ls-display-1: 0;
+  --ls-display-2: 0;
+  --ls-h1: 0;
+  --ls-h2: 0;
+  --ls-h3: 0;
+  --ls-body: 0;
+  --ls-label: 0;
+
+  // ~+0.25 throughout.
+  --lh-display-1: 1.35;
+  --lh-display-2: 1.4;
+  --lh-h1: 1.5;
+  --lh-h2: 1.55;
+  --lh-h3: 1.6;
+  --lh-body: 1.9;
+  --lh-body-sm: 1.85;
+  --lh-caption: 1.75;
+  --lh-label: 1.6;
+}
+
+// Arabic is a unicase script: `text-transform` has no uppercase to apply and
+// `font-variant-caps` can trigger synthetic distortion. Both are neutralised
+// wholesale so a shared component that uppercases its label in English simply
+// renders normally in Arabic.
+[lang='ar'],
+[lang^='ar-'] {
+  *,
+  *::before,
+  *::after {
+    text-transform: none !important;
+    font-variant-caps: normal !important;
+    letter-spacing: normal !important;
+  }
+}
+

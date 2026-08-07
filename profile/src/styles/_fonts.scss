@@ -1,0 +1,115 @@
+// =============================================================================
+// FONTS
+//
+// Self-hosted through @fontsource npm packages — versioned, reproducible, and
+// no request ever leaves the origin. Every @fontsource stylesheet carries
+// `unicode-range` per subset, so the browser downloads only the subsets a page
+// actually needs; importing a family's full stylesheet costs nothing at runtime.
+//
+// Source of truth: docs/BRAND-SYSTEM.md §3.
+// =============================================================================
+
+// -----------------------------------------------------------------------------
+// Latin — Geist (variable, 100–900).
+// The system uses 300 (display) / 400 (body) / 500 (UI) / 600 (headings).
+// 700+ is deliberately unused: heaviness would compete with the monogram.
+// -----------------------------------------------------------------------------
+// Explicit namespaces throughout: several packages ship identically-named
+// subset files (latin-400.css), which collide on Sass's default namespace.
+@use '@fontsource-variable/geist/wght.css' as geist-wght;
+
+// -----------------------------------------------------------------------------
+// Mono — IBM Plex Mono 400/500, latin only (code and labels are always LTR).
+// Chosen over Geist Mono because Plex Mono and IBM Plex Sans Arabic are one
+// designed superfamily, so the Arabic build stays typographically coherent.
+// -----------------------------------------------------------------------------
+@use '@fontsource/ibm-plex-mono/latin-400.css' as mono-400;
+@use '@fontsource/ibm-plex-mono/latin-500.css' as mono-500;
+
+// -----------------------------------------------------------------------------
+// Arabic body/UI — IBM Plex Sans Arabic.
+// Both `arabic` and `latin` subsets are loaded: Arabic copy routinely embeds
+// English terms ("Angular 21", "Magento 2") and they must render in a matched
+// face rather than falling back.
+// -----------------------------------------------------------------------------
+@use '@fontsource/ibm-plex-sans-arabic/arabic-400.css' as psa-ar-400;
+@use '@fontsource/ibm-plex-sans-arabic/arabic-500.css' as psa-ar-500;
+@use '@fontsource/ibm-plex-sans-arabic/arabic-600.css' as psa-ar-600;
+@use '@fontsource/ibm-plex-sans-arabic/latin-400.css' as psa-la-400;
+@use '@fontsource/ibm-plex-sans-arabic/latin-500.css' as psa-la-500;
+@use '@fontsource/ibm-plex-sans-arabic/latin-600.css' as psa-la-600;
+
+// -----------------------------------------------------------------------------
+// Arabic display — Amiri (400/700 only, non-variable).
+// A classical Naskh with genuine thick/thin modulation: the closest Arabic
+// analogue to the monogram's Didone contrast. Never used below 32px, where its
+// contrast collapses — see _typography.scss.
+//
+// Its `latin` subset is deliberately NOT loaded. Amiri's Latin companion is a
+// serif, so loading it puts serif Latin into Arabic headlines and breaks the
+// system's central rule that the monogram is the only serif. Latin glyphs inside
+// Arabic display resolve to Geist instead, via the stack order below.
+// -----------------------------------------------------------------------------
+@use '@fontsource/amiri/arabic-400.css' as amiri-ar-400;
+
+// -----------------------------------------------------------------------------
+// ALTERNATE Arabic display — Readex Pro (variable).
+// Installed but not loaded. The brief requires the Arabic face stay comparable
+// rather than permanently baked in: to evaluate it, uncomment this import and
+// point --font-arabic-display at 'Readex Pro Variable' below. No install step.
+// -----------------------------------------------------------------------------
+// @use '@fontsource-variable/readex-pro/wght.css' as readex-wght;
+
+:root {
+  // Latin stacks, named separately so the per-language blocks below can restore
+  // them. Fallbacks are metric-adjacent system faces to keep the swap cheap.
+  --font-latin-body: 'Geist Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI',
+    sans-serif;
+  --font-latin-display: var(--font-latin-body);
+
+  // The tokens every component actually consumes. Repointed by language below.
+  --font-body: var(--font-latin-body);
+  --font-display: var(--font-latin-display);
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', 'Cascadia Mono', monospace;
+
+  // Arabic faces are tokens precisely so they can be swapped for comparison.
+  //
+  // Font fallback resolves PER GLYPH, so stack order is how each script is
+  // routed. IBM Plex Sans Arabic leads the body stack because its Latin is a
+  // designed companion and should handle embedded English.
+  --font-arabic-body: 'IBM Plex Sans Arabic', 'Geist Variable', sans-serif;
+  //
+  // Display puts Geist FIRST on purpose. Geist has no Arabic coverage, so Arabic
+  // falls through to Amiri, while Latin inside an Arabic headline stays in the
+  // sans — keeping the monogram the only serif on the page.
+  --font-arabic-display: 'Geist Variable', 'Amiri', serif;
+  // Alternate for comparison (see the commented @use above):
+  // --font-arabic-display: 'Readex Pro Variable', 'IBM Plex Sans Arabic', sans-serif;
+
+  // Weights. 700+ intentionally absent for Latin.
+  --weight-light: 300;
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+}
+
+// The family tokens are repointed by language, once, here. Every component keeps
+// using --font-body / --font-display and needs no locale awareness at all —
+// which is what stops RTL from becoming a component fork.
+[lang='ar'],
+[lang^='ar-'] {
+  --font-body: var(--font-arabic-body);
+  --font-display: var(--font-arabic-display);
+}
+
+// Both directions are declared, not just the Arabic one.
+//
+// Custom properties inherit, so an English block nested inside an Arabic page
+// would otherwise keep the Arabic stack. That case is real — a quoted English
+// sentence, a code sample, or the Latin specimens in the design-system
+// playground — so the mapping has to be symmetric.
+[lang='en'],
+[lang^='en-'] {
+  --font-body: var(--font-latin-body);
+  --font-display: var(--font-latin-display);
+}

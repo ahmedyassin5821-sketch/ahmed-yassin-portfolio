@@ -74,19 +74,42 @@ Primitives are never referenced by a component.
 
 ### Semantic tokens
 
-| Token | Value | on canvas | on surface | Role |
+Names are as implemented in `src/styles/_tokens-semantic.scss` (Sprint 2 renamed
+these from `--color-canvas` / `--color-text-1` for legibility; **values are
+unchanged** and every ratio below still holds).
+
+| Token | Value | on background | on surface-nested | Role |
 | --- | --- | --- | --- | --- |
-| `--color-canvas` | `#FDFCFB` | — | — | Page background |
-| `--color-raised` | `#F8F7F5` | 1.04 | — | Cards, header |
-| `--color-surface` | `#F2F1EE` | 1.10 | — | Nested panels, code blocks |
-| `--color-sunken` | `#ECEAE6` | 1.17 | 1.06 | Inset wells, media placeholders |
+| `--color-background` | `#FDFCFB` | — | — | Page |
+| `--color-surface` | `#F8F7F5` | 1.04 | — | Cards, header |
+| `--color-surface-nested` | `#F2F1EE` | 1.10 | — | Nested panels, code blocks |
+| `--color-surface-sunken` | `#ECEAE6` | 1.17 | 1.06 | Inset wells, media placeholders |
+| `--color-surface-elevated` | `#FDFCFB` + `--shadow-3` | — | — | Overlays, modals |
 | `--color-divider` | `#EDEBE7` | 1.16 | 1.05 | Decorative rules |
-| `--color-border-subtle` | `#E4E2DD` | 1.26 | 1.15 | Card and section edges |
+| `--color-border` | `#E4E2DD` | 1.26 | 1.15 | Card and section edges — seam only |
 | `--color-border-interactive` | `#8C8B8A` | **3.32** | **3.01** | Control boundaries — WCAG 1.4.11 |
-| `--color-text-3` | `#6E6D6C` | **5.04** | **4.57** | Muted, metadata |
-| `--color-text-2` | `#51504F` | **7.85** | **7.12** | Secondary body |
-| `--color-text-1` | `#2E2D2C` | **13.41** | **12.17** | Primary text |
-| `--color-ink` | `#0A0A09` | **19.33** | **17.54** | **The logo alone** |
+| `--color-text-muted` | `#6E6D6C` | **5.04** | **4.57** | Muted, metadata |
+| `--color-text-secondary` | `#51504F` | **7.85** | **7.12** | Secondary body |
+| `--color-text-primary` | `#2E2D2C` | **13.41** | **12.17** | Primary text |
+| `--color-brand-mark` | `#0A0A09` | **19.33** | **17.54** | **The logo alone** |
+
+`--color-surface-elevated` returns to the lightest paper value rather than
+continuing darker: in a light theme a *darker* floating surface reads as
+recessed, so overlays are separated by shadow instead of tint.
+
+### Status tokens — monochrome
+
+The identity is achromatic, so status is carried by **icon + text + border
+weight**, which is also what WCAG 1.4.1 requires. All nine resolve to neutrals
+today:
+
+```
+--color-{success,warning,error}          → --color-text-primary
+--color-{success,warning,error}-surface  → --color-surface-sunken
+--color-{success,warning,error}-border   → --color-text-primary
+```
+
+Introducing real hues later is an edit to these nine lines and no components.
 
 ### Three rules that fall out of the numbers
 
@@ -179,6 +202,14 @@ Fluid `clamp()`; 1.25 ratio at UI sizes widening to 1.333 at display.
 Amiri ships **400 and 700 only**, non-variable, so the light-display strategy cannot cross over. Arabic display uses Amiri 400 as its lightest available voice, in the same slots and at the same sizes where English uses Geist 300.
 
 **Amiri is never used below 32px** — its contrast collapses at text sizes. Everything under 32px in Arabic is IBM Plex Sans Arabic.
+
+**Amiri's Latin subset is deliberately not loaded** (Sprint 2 finding). Amiri's Latin companion is a serif, so loading it put serif Latin into Arabic headlines — breaking the rule that the monogram is the only serif in the system. Latin glyphs inside Arabic display now resolve to Geist instead, via stack order:
+
+```
+--font-arabic-display: 'Geist Variable', 'Amiri', serif;
+```
+
+Font fallback resolves per glyph and Geist has no Arabic coverage, so Arabic falls through to Amiri while Latin stays in the sans. The language→font mapping is declared in **both** directions (`[lang='ar']` and `[lang='en']`), because custom properties inherit — an English block nested inside an Arabic page would otherwise keep the Arabic stack.
 
 ### Loading
 

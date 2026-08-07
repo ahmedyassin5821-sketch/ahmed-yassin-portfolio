@@ -1,0 +1,107 @@
+@use 'index' as ds;
+
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.field__label {
+  @include ds.label;
+
+  color: var(--color-text-secondary);
+  // The label must be clickable to focus the field, and comfortably so.
+  inline-size: fit-content;
+  cursor: pointer;
+}
+
+.field__required {
+  margin-inline-start: 0.15em;
+  color: var(--color-text-primary);
+}
+
+.field__hint {
+  @include ds.caption;
+
+  margin-block-start: calc(var(--space-1) * -1);
+  color: var(--color-text-muted);
+}
+
+.field__control {
+  display: flex;
+}
+
+.field__input {
+  @include ds.body;
+  @include ds.focus-visible;
+
+  inline-size: 100%;
+  min-block-size: var(--input-height);
+  border: var(--input-border-width) solid var(--input-border-color);
+  border-radius: var(--input-radius);
+  background-color: var(--input-background);
+  color: var(--color-text-primary);
+  padding-inline: var(--input-padding-inline);
+  padding-block: var(--space-2);
+  transition:
+    border-color var(--dur-fast) var(--ease-out),
+    background-color var(--dur-fast) var(--ease-out);
+
+  &::placeholder {
+    color: var(--input-placeholder-color);
+    // Never a label substitute — see the component comment.
+    opacity: 1;
+  }
+
+  &:hover:not(:disabled) {
+    border-color: var(--input-border-color-hover);
+  }
+
+  &:disabled {
+    background-color: var(--color-surface-nested);
+    color: var(--color-text-muted);
+    cursor: not-allowed;
+  }
+}
+
+textarea.field__input {
+  resize: vertical;
+  min-block-size: calc(var(--input-height) * 2);
+}
+
+// -----------------------------------------------------------------------------
+// Invalid
+//
+// Three simultaneous signals, none of them colour: the border doubles in weight,
+// an icon appears, and message text is announced. In a monochrome system this is
+// not a nicety — it is the only thing that makes the state perceivable.
+// -----------------------------------------------------------------------------
+:host(.is-invalid) .field__input {
+  border-width: var(--input-border-width-invalid);
+  border-color: var(--input-border-color-invalid);
+}
+
+.field__error {
+  @include ds.caption;
+
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-1);
+  color: var(--color-error);
+  font-weight: var(--weight-medium);
+}
+
+.field__error app-icon {
+  // Nudged to sit on the first text line rather than the box centre.
+  margin-block-start: 0.1em;
+}
+
+@include ds.mq-forced-colors {
+  .field__input {
+    border-color: ButtonBorder;
+  }
+
+  :host(.is-invalid) .field__input {
+    border-color: LinkText;
+  }
+}

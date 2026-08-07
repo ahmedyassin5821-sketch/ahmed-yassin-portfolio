@@ -1,0 +1,96 @@
+// =============================================================================
+// TYPOGRAPHY MIXINS — emits nothing.
+//
+// The custom properties these reference live in _typography-vars.scss, which is
+// loaded once from styles.scss. Keeping them apart matters: _index.scss forwards
+// this file into every component, and forwarding a module that emits CSS would
+// duplicate the whole token block into every compiled component stylesheet.
+// =============================================================================
+
+// =============================================================================
+// TYPE CLASSES
+// =============================================================================
+
+@mixin display-1 {
+  font-family: var(--font-display);
+  font-size: var(--fs-display-1);
+  font-weight: var(--weight-light);
+  line-height: var(--lh-display-1);
+  letter-spacing: var(--ls-display-1);
+  text-wrap: balance;
+}
+
+@mixin display-2 {
+  font-family: var(--font-display);
+  font-size: var(--fs-display-2);
+  font-weight: var(--weight-light);
+  line-height: var(--lh-display-2);
+  letter-spacing: var(--ls-display-2);
+  text-wrap: balance;
+}
+
+@mixin heading-1 {
+  font-family: var(--font-display);
+  font-size: var(--fs-h1);
+  font-weight: var(--weight-semibold);
+  line-height: var(--lh-h1);
+  letter-spacing: var(--ls-h1);
+  text-wrap: balance;
+}
+
+@mixin heading-2 {
+  font-family: var(--font-display);
+  font-size: var(--fs-h2);
+  font-weight: var(--weight-semibold);
+  line-height: var(--lh-h2);
+  letter-spacing: var(--ls-h2);
+  text-wrap: balance;
+}
+
+@mixin heading-3 {
+  font-family: var(--font-display);
+  font-size: var(--fs-h3);
+  font-weight: var(--weight-semibold);
+  line-height: var(--lh-h3);
+  letter-spacing: var(--ls-h3);
+}
+
+@mixin body {
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
+  font-weight: var(--weight-regular);
+  line-height: var(--lh-body);
+  letter-spacing: var(--ls-body);
+}
+
+@mixin caption {
+  font-family: var(--font-body);
+  font-size: var(--fs-caption);
+  font-weight: var(--weight-regular);
+  line-height: var(--lh-caption);
+}
+
+/// Mono, uppercase, tracked out — the "serif" register of the type system.
+/// The uppercase is neutralised automatically in Arabic (see above).
+@mixin label {
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  font-weight: var(--weight-medium);
+  line-height: var(--lh-label);
+  letter-spacing: var(--ls-label);
+  text-transform: uppercase;
+}
+
+@mixin mono {
+  font-family: var(--font-mono);
+  font-size: var(--fs-body-sm);
+  font-weight: var(--weight-regular);
+  line-height: var(--lh-body-sm);
+  font-variant-ligatures: none;
+}
+
+/// Tabular figures. Required on every stat, date and metric so numbers don't
+/// jitter as they change width.
+@mixin tabular {
+  font-variant-numeric: tabular-nums;
+}

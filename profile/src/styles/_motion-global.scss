@@ -1,0 +1,93 @@
+// =============================================================================
+// GLOBAL MOTION RULES — emits CSS. Loaded once, from styles.scss.
+//
+// Source of truth: docs/BRAND-SYSTEM.md §6.
+// =============================================================================
+
+@use 'breakpoints' as bp;
+
+// -----------------------------------------------------------------------------
+// Reveal
+//
+// The staged state is scoped to `html.js`, which an inline script in index.html
+// sets before first paint. If scripting is unavailable the selector never
+// matches and content is simply visible — nothing is ever stranded at
+// opacity: 0, which is the usual way scroll-reveal breaks a page.
+// -----------------------------------------------------------------------------
+.js [data-reveal] {
+  opacity: 0;
+  transform: translateY(1rem);
+  transition:
+    opacity var(--dur-slow) var(--ease-out),
+    transform var(--dur-slow) var(--ease-out);
+  transition-delay: var(--reveal-delay, 0ms);
+  will-change: opacity, transform;
+}
+
+.js [data-reveal='shown'] {
+  opacity: 1;
+  transform: none;
+  will-change: auto;
+}
+
+@keyframes skeleton-sweep {
+  from {
+    translate: -100% 0;
+  }
+
+  to {
+    translate: 100% 0;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// View transitions
+//
+// The router's native View Transitions are suppressed here rather than by
+// branching in TypeScript, so there is one place that governs it.
+// -----------------------------------------------------------------------------
+@include bp.mq-reduced-motion {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}
+
+// =============================================================================
+// REDUCED MOTION
+//
+// Everything collapses to its final state. Reduced-motion users get a fully
+// functional site, not a degraded one: reveals are simply already visible.
+//
+// 0.01ms rather than 0s is deliberate — it keeps `transitionend` firing, so any
+// logic awaiting that event still resolves instead of hanging.
+// =============================================================================
+@include bp.mq-reduced-motion {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .js [data-reveal] {
+    opacity: 1;
+    transform: none;
+  }
+
+  // Functional indicators are exempt, and only these.
+  //
+  // WCAG 2.3.3 concerns motion used for decoration or interpretation. A loading
+  // spinner communicates state, so freezing it removes information rather than
+  // discomfort — it is slowed instead. Higher specificity than the `*` reset
+  // above, so this wins.
+  //
+  // Reserved for genuine state indicators. Not an escape hatch.
+  [data-motion-essential] {
+    animation-duration: 1.6s !important;
+    animation-iteration-count: infinite !important;
+  }
+}

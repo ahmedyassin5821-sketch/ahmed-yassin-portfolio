@@ -1,0 +1,22 @@
+node_modules
+dist
+.angular
+# Vendored agent-skill mirrors — not our source
+.agents
+.augment
+.claude
+.codebuddy
+.codewhale
+.continue
+.cursor
+.factory
+.gemini
+.github
+.kilocode
+.kiro
+.opencode
+.qoder
+.roo
+.trae
+.warp
+.windsurf

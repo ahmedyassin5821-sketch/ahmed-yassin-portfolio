@@ -1,0 +1,197 @@
+// =============================================================================
+// RESET
+//
+// Opinionated and small. Only what this system actually relies on.
+// Source of truth: docs/BRAND-SYSTEM.md, Sprint 2 brief §9.
+// =============================================================================
+
+@use 'breakpoints' as bp;
+@use 'typography' as type;
+@use 'a11y';
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  // Never disable zoom, and never let iOS silently inflate text.
+  text-size-adjust: 100%;
+  // `smooth` only when the user hasn't asked for less motion; _motion.scss
+  // forces it back to `auto` under prefers-reduced-motion.
+  scroll-behavior: smooth;
+  // Keeps in-page anchors clear of any future sticky header.
+  scroll-padding-block-start: var(--space-16);
+  // Tells the UA to render form controls and scrollbars for a light UI.
+  color-scheme: light;
+}
+
+body {
+  @include type.body;
+
+  min-block-size: 100dvh;
+  background-color: var(--color-background);
+  color: var(--color-text-primary);
+  // The mark's hairlines depend on crisp rendering; disable synthetic weights.
+  font-synthesis-weight: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  // No horizontal scroll, ever. `clip` rather than `hidden` so it doesn't
+  // create a scroll container and break position: sticky further down the tree.
+  overflow-x: clip;
+}
+
+// -----------------------------------------------------------------------------
+// Headings inherit from the type system rather than UA defaults. Sizes come
+// from explicit classes/mixins so heading LEVEL stays a semantic decision,
+// decoupled from visual size.
+// -----------------------------------------------------------------------------
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-display);
+  font-size: inherit;
+  font-weight: var(--weight-semibold);
+  line-height: var(--lh-h2);
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+// Long unbreakable strings — token names, URLs, identifiers — are one of the
+// most common causes of horizontal overflow on narrow screens, because they
+// cannot wrap at a space. Allow them to break rather than push the layout wide.
+code,
+kbd,
+samp,
+pre {
+  overflow-wrap: anywhere;
+}
+
+// -----------------------------------------------------------------------------
+// Media
+// -----------------------------------------------------------------------------
+img,
+picture,
+video,
+canvas,
+svg {
+  display: block;
+  max-inline-size: 100%;
+}
+
+img,
+video {
+  block-size: auto;
+}
+
+svg {
+  // Lets every icon and the logo inherit colour from the cascade, which is what
+  // makes `currentColor` assets themeable without a single hardcoded value.
+  fill: currentcolor;
+}
+
+// -----------------------------------------------------------------------------
+// Forms — inherit typography instead of UA defaults
+// -----------------------------------------------------------------------------
+input,
+button,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+  letter-spacing: inherit;
+}
+
+button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  // Removes the 300ms tap delay without disabling pinch-zoom.
+  touch-action: manipulation;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+textarea {
+  resize: vertical;
+  field-sizing: content;
+}
+
+// iOS zooms the viewport when a focused input's text is under 16px. Enforce the
+// floor rather than relying on every component to remember.
+input,
+textarea,
+select {
+  font-size: max(1rem, var(--fs-body));
+}
+
+// -----------------------------------------------------------------------------
+// Links — underlines are a legibility feature, not decoration
+// -----------------------------------------------------------------------------
+a {
+  color: inherit;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+}
+
+// -----------------------------------------------------------------------------
+// Lists that are semantic-only (nav, timelines) opt out of markers explicitly.
+// -----------------------------------------------------------------------------
+:where(ul, ol)[role='list'] {
+  list-style: none;
+}
+
+// -----------------------------------------------------------------------------
+// Focus
+//
+// A global default so a new element can never ship focus-invisible. Components
+// may refine the offset but must not remove the ring.
+// -----------------------------------------------------------------------------
+:focus-visible {
+  @include a11y.focus-ring;
+}
+
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+// -----------------------------------------------------------------------------
+// Selection, caret, scrollbar — small details, disproportionate effect
+// -----------------------------------------------------------------------------
+::selection {
+  background-color: var(--color-text-primary);
+  color: var(--color-text-inverse);
+}
+
+:root {
+  accent-color: var(--color-accent);
+  caret-color: var(--color-text-primary);
+  scrollbar-color: var(--color-border-interactive) transparent;
+  scrollbar-width: thin;
+}
+
+// -----------------------------------------------------------------------------
+// Anything hidden must be hidden from everyone, including assistive tech.
+// -----------------------------------------------------------------------------
+[hidden] {
+  display: none !important;
+}
+
+[inert] {
+  cursor: default;
+  user-select: none;
+}

@@ -1,0 +1,35 @@
+@use 'index' as ds;
+
+:host {
+  @include ds.label;
+
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  border-radius: var(--badge-radius);
+  padding-inline: var(--badge-padding-inline);
+  padding-block: var(--badge-padding-block);
+  white-space: nowrap;
+}
+
+:host(.badge--default) {
+  background-color: var(--color-surface-nested);
+  color: var(--color-text-secondary);
+}
+
+:host(.badge--outline) {
+  border: var(--badge-border);
+  color: var(--color-text-secondary);
+}
+
+:host(.badge--status) {
+  border: var(--border-hairline) solid var(--color-border-strong);
+  background-color: var(--color-surface-sunken);
+  color: var(--color-text-primary);
+}
+
+@include ds.mq-forced-colors {
+  :host {
+    border: var(--border-hairline) solid CanvasText;
+  }
+}

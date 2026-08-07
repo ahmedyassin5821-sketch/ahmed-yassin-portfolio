@@ -1,0 +1,38 @@
+@use 'index' as ds;
+
+:host {
+  display: block;
+  min-block-size: 100dvh;
+}
+
+// The first focusable element on every page. Visually hidden until focused, at
+// which point it must be unmistakably visible — a skip link that stays subtle is
+// a skip link nobody finds.
+.skip-link {
+  @include ds.label;
+
+  position: absolute;
+  z-index: var(--z-skip-link);
+  inset-block-start: var(--space-2);
+  inset-inline-start: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  border: var(--border-emphasis) solid var(--color-focus);
+  border-radius: var(--radius-xs);
+  background-color: var(--color-background);
+  color: var(--color-text-primary);
+  text-decoration: none;
+  // Parked off-screen along the block axis rather than with `display: none`, so
+  // it stays in the tab order and in the accessibility tree.
+  translate: 0 -200%;
+  transition: translate var(--dur-fast) var(--ease-out);
+
+  &:focus-visible {
+    translate: 0 0;
+  }
+}
+
+// `tabindex="-1"` makes <main> programmatically focusable for the skip link and
+// for post-navigation focus moves. It must never show a ring from a mouse click.
+main:focus {
+  outline: none;
+}
