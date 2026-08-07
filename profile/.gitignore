@@ -41,3 +41,26 @@ __screenshots__/
 # System files
 .DS_Store
 Thumbs.db
+
+# Vendored multi-tool agent skill mirrors (installed by `npx skills`).
+# The canonical copy lives in .claude/skills; the other 17 are duplicates.
+.agents/
+.augment/
+.codebuddy/
+.codewhale/
+.continue/
+.cursor/
+.factory/
+.gemini/
+.github/prompts/
+.kilocode/
+.kiro/
+.opencode/
+.qoder/
+.roo/
+.trae/
+.warp/
+.windsurf/
+
+# Source documents (CV, logo). Shipped assets live in public/.
+/Attachments
