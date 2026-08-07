@@ -688,3 +688,28 @@ All five questions raised by Sprint 1 are closed and recorded as ADR-013 through
 1. **Permission requests** to 2B and the seven clients. Start now — they run in parallel with Sprint 2 and gate launch, not development.
 2. **Arabic copy** for `messages.ar.xlf`. `i18nMissingTranslation: "error"` means a gap fails the build rather than shipping English silently.
 3. **Skills curation** — the CV's 28 tags need to become three pillars plus a secondary list (Risk 8). A proposal will come with Sprint 2 step 7 for review.
+
+---
+
+## 11. Development tooling: agent skills
+
+**Not part of the Angular application.** This section documents `.claude/skills/`, a directory of reference material for AI coding agents (Claude Code and similar tools) working on this repository. It has no relationship to the portfolio's runtime, build, or SSR pipeline — it is recorded here only so a future contributor doesn't mistake it for either dead application code or an accidental commit.
+
+### What happened
+
+A multi-tool skill installer (`npx skills`) wrote one copy of the same 7 reference skills into 18 tool-specific locations — `.claude/skills`, `.cursor/skills`, `.windsurf/skills`, `.github/prompts`, `.kiro/steering`, and 13 others, each named for a different AI tool's convention. The repository's first commit (`8a9eaf5`) swept all of them in via an unqualified `git add .`. A repository-hygiene review ahead of Sprint 3 found this and corrected it:
+
+- The 17 tool-specific mirrors were removed from git tracking (`e0f67ca`) and later deleted from the working tree entirely. They are regenerable at any time with `npx skills` and are now gitignored so they cannot be re-added by accident.
+- Of the 7 skills, only **`ui-ux-pro-max`** was ever used by this project — and only its `data/*.csv` files, read directly (see below). The other six (`banner-design`, `brand`, `design`, `design-system`, `slides`, `ui-styling`) were untracked from `.claude/skills` and gitignored. They may still exist on disk for local agent use; they are simply no longer part of the repository.
+
+### Why `ui-ux-pro-max` is the one exception
+
+Its dataset is **documented provenance**, not incidental tooling. [BRAND-SYSTEM.md](./BRAND-SYSTEM.md) §8 cites specific rows from this dataset — product type 11 (*Portfolio/Personal*), styles 7 and 15 (*Dark Mode*, *Motion-Driven*), palette 81 (*Developer Tool/IDE*), landing patterns 27 and 32 — as the sourcing for the approved visual direction. Sprint 1.5 read `colors.csv`, `styles.csv`, `typography.csv`, `google-fonts.csv`, `products.csv`, `landing.csv`, `motion.csv`, and `ux-guidelines.csv` directly, because the skill's own `scripts/search.py` requires Python, which is not installed in this environment.
+
+Removing this dataset would sever the ability to verify or re-derive a decision already recorded as approved. It stays tracked for that reason alone — not because the skill is used at runtime, which it never is.
+
+### What this is not
+
+- **Not read by the Angular CLI, TypeScript compiler, or SSR server.** `tsconfig.app.json` includes `src/**/*.ts` only; `angular.json` copies assets from `public/` only. Nothing under `.claude/` is on either path.
+- **Not a dependency.** No `import` in `src/` references anything under `.claude/skills`. Removing the six unused skills required no application code change, no dependency change, and no design-system change.
+- **Not secret.** The tracked files are markdown and CSV reference data with no credentials, tokens, or personal data.

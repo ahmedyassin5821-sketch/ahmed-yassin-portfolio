@@ -43,7 +43,10 @@ __screenshots__/
 Thumbs.db
 
 # Vendored multi-tool agent skill mirrors (installed by `npx skills`).
-# The canonical copy lives in .claude/skills; the other 17 are duplicates.
+# The canonical location is .claude/skills; the other 17 tool-specific copies
+# are near-duplicates (same 7 skills, different SKILL.md per tool convention)
+# and are not required by this project. See docs/ARCHITECTURE.md, "Development
+# tooling: agent skills" for the full rationale.
 .agents/
 .augment/
 .codebuddy/
@@ -61,6 +64,17 @@ Thumbs.db
 .trae/
 .warp/
 .windsurf/
+
+# Unused skills under .claude/skills. Only ui-ux-pro-max is tracked — its
+# dataset is cited as documented provenance for the design direction in
+# BRAND-SYSTEM.md. These may exist on disk (available to agents locally) but
+# must not be re-added to git. See docs/ARCHITECTURE.md for the rationale.
+.claude/skills/banner-design/
+.claude/skills/brand/
+.claude/skills/design/
+.claude/skills/design-system/
+.claude/skills/slides/
+.claude/skills/ui-styling/
 
 # Source documents (CV, logo). Shipped assets live in public/.
 /Attachments
