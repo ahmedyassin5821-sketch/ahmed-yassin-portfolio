@@ -1,0 +1,11 @@
+<section class="transition">
+  <div class="transition__inner">
+    <p class="transition__title" appReveal>{{ title() }}</p>
+
+    <a class="transition__cta" routerLink="/work" appReveal [revealIndex]="1">
+      <span class="transition__cta-label">{{ c().cta }}</span>
+      <!-- Directional: mirrors in RTL via the Icon component's own rules. -->
+      <app-icon name="arrow-right" size="md" />
+    </a>
+  </div>
+</section>

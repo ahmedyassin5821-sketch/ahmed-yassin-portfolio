@@ -1,0 +1,15 @@
+:host {
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+}
+
+.canvas {
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+  // The scene is behind the text and must never intercept a click, a text
+  // selection, or a touch-scroll gesture. Pointer parallax listens on the
+  // document, so nothing is lost by making the canvas itself inert to input.
+  pointer-events: none;
+}

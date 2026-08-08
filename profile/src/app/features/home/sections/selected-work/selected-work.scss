@@ -1,0 +1,69 @@
+@use 'index' as ds;
+
+:host {
+  display: block;
+  // Sits on the raised surface so the work section reads as a distinct stratum
+  // in the page, separated by hairlines rather than by a shadowed container.
+  background-color: var(--color-surface);
+  border-block: var(--border-hairline) solid var(--color-border);
+}
+
+.work {
+  @include ds.container;
+  @include ds.section;
+}
+
+.work__head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  max-inline-size: 52rem;
+  margin-block-end: var(--space-12);
+}
+
+.work__index {
+  @include ds.label;
+  @include ds.tabular;
+
+  color: var(--color-text-muted);
+}
+
+.work__title {
+  @include ds.display-2;
+
+  color: var(--color-text-primary);
+}
+
+.work__lede {
+  @include ds.body;
+
+  max-inline-size: 52ch;
+  color: var(--color-text-secondary);
+  text-wrap: pretty;
+}
+
+// -----------------------------------------------------------------------------
+// Grid
+//
+// `auto-fit` with a minimum rather than fixed breakpoint columns: the surfaces
+// keep their 7:8 proportion at any width, and the layout never produces a lone
+// stretched item on an awkward viewport.
+// -----------------------------------------------------------------------------
+.work__grid {
+  display: grid;
+  gap: var(--space-10) var(--space-6);
+  grid-template-columns: 1fr;
+
+  @include ds.mq(sm) {
+    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  }
+
+  @include ds.mq(xl) {
+    gap: var(--space-12) var(--space-8);
+  }
+}
+
+.work__item {
+  display: block;
+  min-inline-size: 0;
+}

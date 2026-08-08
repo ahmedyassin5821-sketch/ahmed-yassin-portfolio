@@ -100,23 +100,32 @@ ahmed-yassin-portfolio/                 ← repo root (app promoted here, see AD
 │       │   │   (theme-toggle/ deferred — light-only per BRAND-SYSTEM.md)
 │       │
 │       ├── features/                   ← lazy route boundaries
-│       │   ├── home/
-│       │   │   ├── home.ts  home.routes.ts
-│       │   │   └── sections/  hero/ proof-strip/ pillars/ featured-work/
-│       │   │                  experience/ tech-stack/ services/ contact-cta/
+│       │   ├── home/                   BUILT — Sprint 4
+│       │   │   ├── home.ts | .html | .scss
+│       │   │   ├── sections/  hero/ strata-index/ selected-work/ work-transition/
+│       │   │   ├── animation/ home-progress.ts   ← the ONLY DOM↔WebGL contract
+│       │   │   │              home-choreography.ts  ← every ScrollTrigger, one file
+│       │   │   └── webgl/     strata-scene.ts      ← framework-free Three.js
+│       │   │                  strata-canvas/       ← Angular wrapper, gating + lifecycle
+│       │   │                  strata-poster/       ← static SVG fallback
 │       │   ├── work/         work.routes.ts · work-list/ · work-detail/ · components/
 │       │   ├── about/        about.routes.ts · sections/
 │       │   ├── services/     services.routes.ts
 │       │   ├── contact/      contact.routes.ts
 │       │   └── not-found/
 │       │
-│       ├── data/                       ← content-as-code, typed, $localize'd
+│       ├── data/                       ← content-as-code, typed, bilingual
 │       │   ├── models/       project.model.ts · experience.model.ts · skill.model.ts · …
-│       │   ├── projects.data.ts   experience.data.ts   skills.data.ts
+│       │   ├── projects.data.ts   home.content.ts     ← BUILT
+│       │   ├── experience.data.ts skills.data.ts
 │       │   ├── education.data.ts  certifications.data.ts  profile.data.ts
 │       │   └── content.service.ts      ← signal selectors + filters
 │       │
-│       └── three/                      ← WebGL. Reachable ONLY via dynamic import()
+│       └── three/                      ← superseded: WebGL now lives beside the
+│                                          feature that owns it, in
+│                                          features/home/webgl/. Scene files stay
+│                                          framework-free and are still reachable
+│                                          ONLY via dynamic import().
 │           ├── hero-field/        hero-field.ts (component) · hero-field.scene.ts (pure three)
 │           ├── stack-constellation/
 │           └── shared/            renderer.factory.ts · raf-loop.ts · shaders/
@@ -163,6 +172,33 @@ features  ──▶  shared  ──▶  core
 | `three/` | `core/`, `three/` | Be imported statically from anywhere |
 
 Enforced by ESLint `no-restricted-imports` zones — a violation fails CI, not review.
+
+### Angular template convention
+
+**Components use external `.html` templates and `.scss` stylesheets. TypeScript files contain component logic, state, configuration, dependency injection, animation orchestration, and types — not markup.**
+
+This is a permanent project convention, not a per-sprint preference. It applies to every component created from Sprint 4 onward.
+
+```
+home/
+├── home.ts        logic, state, DI, types
+├── home.html      markup
+└── home.scss      styles
+```
+
+| Rule | |
+| --- | --- |
+| Substantial HTML | Never inside a `template:` literal |
+| Large SVG markup | Never inside TypeScript — see `logo-path.ts` for the pattern: geometry as a constant, markup in the template |
+| Complex styles | Never inside `styles: [...]` |
+| Inline templates | Acceptable **only** for genuinely trivial structural components, where extracting a file would add a file and no clarity |
+
+Two practical reasons beyond tidiness, both encountered in this project:
+
+1. **Backticks inside a template literal terminate the string.** A comment containing `` `inert` `` or `` `currentColor` `` produces "Incorrect number of arguments to @Component decorator" — an error that points nowhere near the real cause. External templates cannot fail this way.
+2. **Editors format, lint, and autocomplete `.html` properly.** Angular's own language service is markedly better in a real template file than inside a string.
+
+When modifying an existing component, do not rewrite unrelated components purely to satisfy this rule — but if you are already working in a substantial inline template, move it to an external file.
 
 ### Component rules
 

@@ -1,0 +1,11 @@
+:host {
+  display: block;
+}
+
+.home {
+  display: block;
+  // The hero's visual layer is absolutely positioned and can extend past the
+  // gutter. `clip` rather than `hidden` so it does not create a scroll container
+  // and break the sticky header above it.
+  overflow-x: clip;
+}

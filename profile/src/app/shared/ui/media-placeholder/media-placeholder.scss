@@ -1,0 +1,61 @@
+@use 'index' as ds;
+
+:host {
+  display: block;
+}
+
+.placeholder {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-start;
+  // The mark's own 7:8 portrait ratio, so an empty frame still sits on the
+  // system's proportions rather than inventing one.
+  aspect-ratio: var(--brand-ratio);
+  overflow: hidden;
+  background-color: var(--color-surface-sunken);
+  border: var(--border-hairline) solid var(--color-border);
+  padding: var(--space-4);
+}
+
+// A hairline rule at the brand angle. Enough to signal "frame, intentionally
+// empty" without decorating it into something that competes with real work.
+.placeholder::before {
+  content: '';
+  position: absolute;
+  inset-block: -20%;
+  inset-inline-start: 50%;
+  inline-size: var(--border-hairline);
+  background-color: var(--color-border);
+  rotate: var(--brand-angle);
+}
+
+:host-context([dir='rtl']) .placeholder::before {
+  rotate: calc(var(--brand-angle) * -1);
+}
+
+.placeholder__caption {
+  @include ds.display-2;
+
+  position: absolute;
+  inset-block-start: var(--space-4);
+  inset-inline-start: var(--space-4);
+  inline-size: calc(100% - var(--space-8));
+  color: var(--color-text-muted);
+  // Deliberately faint: it is a watermark identifying the slot, not content.
+  opacity: 0.16;
+  overflow-wrap: anywhere;
+}
+
+.placeholder__label {
+  @include ds.label;
+
+  position: relative;
+  color: var(--color-text-muted);
+}
+
+@include ds.mq-forced-colors {
+  .placeholder {
+    border-color: CanvasText;
+  }
+}

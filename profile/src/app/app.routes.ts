@@ -16,9 +16,7 @@ const STUB = (heading: string, note: string) => ({
 export const routes: Routes = [
   {
     path: '',
-    // Eager, not lazy. This is the LCP page; a loadChildren round-trip buys
-    // nothing against prerendered HTML.
-    loadComponent: () => import('./placeholder/placeholder').then((m) => m.Placeholder),
+    loadComponent: () => import('./features/home/home').then((m) => m.Home),
     title: 'Ahmed Yassin — Front-End & eCommerce Engineer',
   },
   {

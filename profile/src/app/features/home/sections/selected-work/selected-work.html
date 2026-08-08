@@ -1,0 +1,21 @@
+<section class="work" aria-labelledby="work-title">
+  <header class="work__head">
+    <p class="work__index">{{ c().index }}</p>
+    <h2 id="work-title" class="work__title" appReveal>{{ c().title }}</h2>
+    <p class="work__lede" appReveal [revealIndex]="1">{{ c().lede }}</p>
+  </header>
+
+  <ul class="work__grid" role="list">
+    @for (project of projects(); track project.slug; let i = $index) {
+      <!-- Stagger repeats every third item so a long grid never accumulates a
+           delay long enough to feel like a wait. -->
+      <li class="work__item" appReveal [revealIndex]="i % 3">
+        <app-project-surface
+          [project]="project"
+          [index]="i"
+          [placeholderLabel]="c().placeholderLabel"
+        />
+      </li>
+    }
+  </ul>
+</section>

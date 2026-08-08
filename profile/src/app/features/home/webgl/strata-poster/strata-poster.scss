@@ -1,0 +1,31 @@
+@use 'index' as ds;
+
+:host {
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+}
+
+.poster {
+  inline-size: 100%;
+  block-size: 100%;
+  // Pure ink, the mark's own colour. Depth is expressed entirely through the
+  // per-layer opacity set in the component — no second colour is introduced.
+  color: var(--color-brand-mark);
+  fill: currentcolor;
+  // The monogram is a Latin AY ligature and must never mirror, so the RTL
+  // handling lives in the layer offsets rather than a transform on the artwork.
+  transform: none;
+}
+
+// System colours replace the palette wholesale, and stacked translucent layers
+// collapse into an unreadable smear. Show the front layer only.
+@include ds.mq-forced-colors {
+  .poster {
+    color: CanvasText;
+  }
+
+  .poster g:not(:last-child) {
+    display: none;
+  }
+}

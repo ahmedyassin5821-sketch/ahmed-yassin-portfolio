@@ -1,0 +1,17 @@
+<!--
+  Decorative. Every fact this composition gestures at is stated in text
+  elsewhere on the page, so hiding it from assistive technology loses nothing.
+-->
+<svg
+  class="poster"
+  [attr.viewBox]="viewBox"
+  preserveAspectRatio="xMidYMid meet"
+  aria-hidden="true"
+  focusable="false"
+>
+  @for (layer of strata(); track layer.index) {
+    <g [attr.transform]="'translate(' + layer.x + ' ' + layer.y + ')'" [attr.opacity]="layer.opacity">
+      <path [attr.d]="markPath" />
+    </g>
+  }
+</svg>

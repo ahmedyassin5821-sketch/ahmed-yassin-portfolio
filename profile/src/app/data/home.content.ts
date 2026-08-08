@@ -1,0 +1,132 @@
+import { Localized } from '@core/i18n/localized';
+
+/**
+ * Every user-facing string on the Home page, in both languages.
+ *
+ * Kept out of templates so translation is a data concern rather than a markup
+ * concern, and so a missing Arabic value fails to compile. Sections resolve one
+ * block each through `localizedContent()` and stay locale-unaware.
+ *
+ * Latin product names (Angular, Magento, Shopify, 2B) stay Latin inside Arabic
+ * copy — they are proper nouns. Where they appear mid-sentence the template
+ * wraps them in `.ltr-isolate` so the bidi algorithm does not reorder trailing
+ * punctuation.
+ */
+
+export interface HomeContent {
+  readonly hero: {
+    readonly eyebrow: Localized;
+    readonly name: Localized;
+    readonly role: Localized;
+    readonly lede: Localized;
+    readonly meta: readonly { readonly label: Localized; readonly value: Localized }[];
+    readonly scrollHint: Localized;
+  };
+  readonly strata: {
+    readonly index: Localized;
+    readonly title: Localized;
+    readonly lede: Localized;
+  };
+  readonly work: {
+    readonly index: Localized;
+    readonly title: Localized;
+    readonly lede: Localized;
+    readonly placeholderLabel: Localized;
+  };
+  readonly transition: {
+    readonly title: Localized;
+    readonly cta: Localized;
+  };
+  readonly visual: {
+    readonly caption: Localized;
+    readonly description: Localized;
+  };
+}
+
+export const HOME_CONTENT: HomeContent = {
+  hero: {
+    eyebrow: {
+      en: 'Cairo, Egypt — available for freelance',
+      ar: 'القاهرة، مصر — متاح للعمل الحر',
+    },
+    name: {
+      en: 'Ahmed Yassin',
+      ar: 'أحمد ياسين',
+    },
+    role: {
+      en: 'Front-End & eCommerce Engineer',
+      ar: 'مهندس واجهات أمامية وتجارة إلكترونية',
+    },
+    lede: {
+      en: 'I build enterprise Angular applications at 2B, customise Magento 2 storefronts at scale, and develop Shopify themes for independent brands.',
+      ar: 'أبني تطبيقات Angular مؤسسية في 2B، وأخصّص متاجر Magento 2 على نطاق واسع، وأطوّر قوالب Shopify لعلامات تجارية مستقلة.',
+    },
+    meta: [
+      {
+        label: { en: 'Currently', ar: 'حالياً' },
+        value: { en: 'Front-End Developer at 2B', ar: 'مطوّر واجهات أمامية في 2B' },
+      },
+      {
+        label: { en: 'Focus', ar: 'التخصص' },
+        value: { en: 'Angular · Magento · Shopify', ar: 'Angular · Magento · Shopify' },
+      },
+      {
+        label: { en: 'Languages', ar: 'اللغات' },
+        value: { en: 'Arabic · English', ar: 'العربية · الإنجليزية' },
+      },
+    ],
+    scrollHint: {
+      en: 'Scroll',
+      ar: 'مرّر',
+    },
+  },
+  strata: {
+    index: { en: '01', ar: '01' },
+    title: {
+      en: 'Composed of three platforms',
+      ar: 'مبنيّ على ثلاث منصّات',
+    },
+    lede: {
+      en: 'The mark separates into the layers it is made of. Each one is a platform I ship production work on.',
+      ar: 'ينفصل الشعار إلى الطبقات التي يتكوّن منها. كل طبقة منصّة أعمل عليها في بيئة إنتاج حقيقية.',
+    },
+  },
+  work: {
+    index: { en: '02', ar: '02' },
+    title: {
+      en: 'Selected work',
+      ar: 'أعمال مختارة',
+    },
+    lede: {
+      en: 'Production storefronts and enterprise applications, shipped with teams and independently.',
+      ar: 'متاجر إلكترونية وتطبيقات مؤسسية في بيئة الإنتاج، أنجزتها ضمن فرق وبشكل مستقل.',
+    },
+    placeholderLabel: {
+      en: 'Image coming soon',
+      ar: 'الصورة قريباً',
+    },
+  },
+  transition: {
+    // {count} is substituted from the project data at render time. Spelling the
+    // number out in the copy would let the page contradict its own list the
+    // moment a project is added.
+    title: {
+      en: '{count} projects across three platforms.',
+      ar: '{count} مشاريع عبر ثلاث منصّات.',
+    },
+    cta: {
+      en: 'See all work',
+      ar: 'اطّلع على جميع الأعمال',
+    },
+  },
+  visual: {
+    caption: {
+      en: 'The AY monogram, separated into its layers',
+      ar: 'شعار AY، مفصولاً إلى طبقاته',
+    },
+    description: {
+      en: 'A decorative composition of the AY monogram repeated in depth. All information on this page is available as text.',
+      ar: 'تكوين زخرفي لشعار AY مكرّراً في العمق. جميع المعلومات في هذه الصفحة متاحة كنص.',
+    },
+  },
+};

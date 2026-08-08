@@ -1,0 +1,58 @@
+<article class="surface">
+  <div class="surface__media">
+    @if (hasImage()) {
+      <img
+        class="surface__image"
+        [src]="project().screenshot!.src!"
+        [alt]="project().screenshot!.alt ?? project().name"
+        loading="lazy"
+        decoding="async"
+      />
+    } @else {
+      <app-media-placeholder [caption]="project().name" [label]="placeholderLabel()" />
+    }
+  </div>
+
+  <div class="surface__body">
+    <p class="surface__index" aria-hidden="true">{{ indexLabel() }}</p>
+
+    <h3 class="surface__name">
+      @if (project().url) {
+        <!--
+          One anchor, stretched over the surface by ::after. Wrapping the whole
+          article in a link would nest the badges inside it and collapse the
+          accessible name into an unreadable run-on.
+        -->
+        <a class="surface__link" [href]="project().url!" target="_blank" rel="noopener noreferrer">
+          {{ project().name }}
+          <span class="sr-only">(opens in a new tab)</span>
+        </a>
+      } @else {
+        {{ project().name }}
+      }
+    </h3>
+
+    @if (project().role) {
+      <p class="surface__role">{{ project().role }}</p>
+    }
+
+    <p class="surface__summary">{{ project().summary }}</p>
+
+    @if (project().technology.length) {
+      <ul class="surface__tech" role="list">
+        @for (tech of project().technology; track tech) {
+          <li>
+            <!-- Latin technology names stay LTR inside Arabic copy. -->
+            <app-badge variant="outline"><span class="ltr-isolate">{{ tech }}</span></app-badge>
+          </li>
+        }
+      </ul>
+    }
+
+    @if (project().url) {
+      <span class="surface__cue" aria-hidden="true">
+        <app-icon name="arrow-right" size="sm" />
+      </span>
+    }
+  </div>
+</article>
