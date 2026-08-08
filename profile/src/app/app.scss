@@ -1,8 +1,24 @@
 @use 'index' as ds;
 
+// Shell layout.
+//
+// A column with the content region flexing, so the footer sits at the bottom of
+// the viewport on short pages instead of riding up under the header. `100dvh`
+// rather than `vh` so mobile browser chrome does not clip it.
 :host {
-  display: block;
+  display: flex;
+  flex-direction: column;
   min-block-size: 100dvh;
+}
+
+main {
+  flex: 1;
+}
+
+// `tabindex="-1"` makes <main> programmatically focusable for the skip link and
+// for the post-navigation focus move. It must never show a ring from a click.
+main:focus {
+  outline: none;
 }
 
 // The first focusable element on every page. Visually hidden until focused, at
@@ -29,10 +45,4 @@
   &:focus-visible {
     translate: 0 0;
   }
-}
-
-// `tabindex="-1"` makes <main> programmatically focusable for the skip link and
-// for post-navigation focus moves. It must never show a ring from a mouse click.
-main:focus {
-  outline: none;
 }

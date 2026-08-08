@@ -1,0 +1,32 @@
+@use 'index' as ds;
+
+.stub {
+  @include ds.container;
+  @include ds.section;
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  // Enough height that the header's pinned state is reachable by scrolling on
+  // every route, which is what makes the shell behaviour testable here.
+  min-block-size: 70dvh;
+}
+
+.stub__eyebrow {
+  @include ds.label;
+
+  color: var(--color-text-muted);
+}
+
+.stub__heading {
+  @include ds.display-2;
+
+  color: var(--color-text-primary);
+}
+
+.stub__note {
+  @include ds.body;
+  @include ds.prose;
+
+  color: var(--color-text-secondary);
+}

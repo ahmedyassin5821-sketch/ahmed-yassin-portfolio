@@ -23,6 +23,14 @@ export const serverRoutes: ServerRoute[] = [
     renderMode: RenderMode.Prerender,
   },
 
+  // Shell routes. Prerendered because the set is finite and known at build time.
+  // Each MUST be listed: without an entry it falls through to the `**` rule below
+  // and answers 404 while still rendering its content correctly.
+  { path: 'work', renderMode: RenderMode.Prerender },
+  { path: 'about', renderMode: RenderMode.Prerender },
+  { path: 'cv', renderMode: RenderMode.Prerender },
+  { path: 'contact', renderMode: RenderMode.Prerender },
+
   // Empty in production — see dev/dev.routes.prod.ts.
   ...DEV_SERVER_ROUTES,
 

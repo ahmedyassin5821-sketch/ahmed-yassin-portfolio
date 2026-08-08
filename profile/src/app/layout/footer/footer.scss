@@ -1,0 +1,117 @@
+@use 'index' as ds;
+
+:host {
+  display: block;
+  // Lifts the footer out of the root view-transition snapshot so it holds still
+  // while page content cross-fades. Safe here because the footer is statically
+  // positioned — see _motion-global.scss for why the sticky header is not named.
+  view-transition-name: shell-footer;
+}
+
+.footer {
+  background-color: var(--color-surface);
+  border-block-start: var(--border-hairline) solid var(--color-border);
+}
+
+.footer__inner {
+  @include ds.container;
+
+  display: grid;
+  gap: var(--space-10);
+  padding-block: var(--space-16);
+  grid-template-columns: 1fr;
+
+  // Brand column takes the extra room; the two link columns stay compact so the
+  // labels sit close to what they label.
+  @include ds.mq(md) {
+    grid-template-columns: 1.5fr 1fr 1fr;
+    gap: var(--space-8);
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Brand
+// -----------------------------------------------------------------------------
+.footer__brand {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  align-items: flex-start;
+}
+
+.footer__role {
+  @include ds.body;
+
+  color: var(--color-text-secondary);
+}
+
+.footer__location {
+  @include ds.caption;
+
+  color: var(--color-text-muted);
+}
+
+// -----------------------------------------------------------------------------
+// Columns
+// -----------------------------------------------------------------------------
+.footer__heading {
+  @include ds.label;
+
+  margin-block-end: var(--space-4);
+  color: var(--color-text-muted);
+}
+
+.footer__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.footer__link {
+  @include ds.body;
+  @include ds.focus-visible;
+
+  display: inline-block;
+  color: var(--color-text-secondary);
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: 0.2em;
+  // Meets the 44px target requirement without inflating the visual row height.
+  padding-block: var(--space-1);
+  transition:
+    color var(--dur-fast) var(--ease-out),
+    text-decoration-color var(--dur-fast) var(--ease-out);
+
+  &:hover {
+    color: var(--color-text-primary);
+    text-decoration-color: currentcolor;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Base row
+// -----------------------------------------------------------------------------
+.footer__base {
+  @include ds.container;
+
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding-block: var(--space-5);
+  border-block-start: var(--border-hairline) solid var(--color-border);
+}
+
+.footer__copyright {
+  @include ds.caption;
+  @include ds.tabular;
+
+  color: var(--color-text-muted);
+}
+
+@include ds.mq-forced-colors {
+  .footer {
+    border-block-start-color: CanvasText;
+  }
+}

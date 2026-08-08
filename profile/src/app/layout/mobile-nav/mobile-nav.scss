@@ -1,0 +1,131 @@
+@use 'index' as ds;
+
+:host {
+  display: contents;
+}
+
+.panel {
+  position: fixed;
+  z-index: var(--z-overlay);
+  // Logical inset: fills the viewport in either direction with no override.
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  // Opaque, not a scrim. A translucent panel over scrolling content undermines
+  // the "quiet" register and hurts legibility.
+  background-color: var(--color-background);
+  padding-block: var(--space-4) var(--space-8);
+  // 100dvh, not vh — mobile browser chrome would otherwise clip the footer row.
+  block-size: 100dvh;
+  overflow-y: auto;
+  animation: panel-in var(--dur-slow) var(--ease-out);
+
+  // Above md the desktop navigation applies. Hidden here as a safety net in case
+  // the viewport is resized while the panel is open.
+  @include ds.mq(md) {
+    display: none;
+  }
+}
+
+@keyframes panel-in {
+  from {
+    opacity: 0;
+    // A short rise, not a slide-in from the edge: the panel arrives in place
+    // rather than travelling, which keeps it from reading as a drawer.
+    translate: 0 -0.75rem;
+  }
+
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+// The global reduced-motion block in _motion-global.scss already collapses this
+// animation to ~0ms; stated explicitly so the intent is legible here too.
+@include ds.mq-reduced-motion {
+  .panel {
+    animation: none;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Top row — mirrors the header's own geometry so nothing shifts on open
+// -----------------------------------------------------------------------------
+.panel__top {
+  @include ds.container;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  min-block-size: 3.5rem;
+  flex: none;
+}
+
+.panel__close {
+  @include ds.focus-visible;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: 44px;
+  block-size: 44px;
+  border-radius: var(--radius-xs);
+  color: var(--color-text-primary);
+}
+
+// -----------------------------------------------------------------------------
+// Links — display scale, so targets clear 44px without padding tricks
+// -----------------------------------------------------------------------------
+.panel__nav {
+  @include ds.container;
+
+  display: flex;
+  flex: 1;
+  align-items: center;
+  padding-block: var(--space-8);
+}
+
+.panel__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  inline-size: 100%;
+}
+
+.panel__link {
+  @include ds.display-2;
+  @include ds.focus-visible;
+
+  display: block;
+  // Aligns to the reading edge in both directions.
+  text-align: start;
+  color: var(--color-text-muted);
+  text-decoration: none;
+  padding-block: var(--space-1);
+  transition: color var(--dur-fast) var(--ease-out);
+
+  &:hover {
+    color: var(--color-text-secondary);
+  }
+
+  // Active page marked by weight and colour together, plus aria-current in the
+  // template — never colour alone.
+  &.is-active {
+    color: var(--color-text-primary);
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Foot — switcher, separated by a hairline
+// -----------------------------------------------------------------------------
+.panel__foot {
+  @include ds.container;
+
+  display: flex;
+  flex: none;
+  align-items: center;
+  padding-block-start: var(--space-5);
+  border-block-start: var(--border-hairline) solid var(--color-border);
+}

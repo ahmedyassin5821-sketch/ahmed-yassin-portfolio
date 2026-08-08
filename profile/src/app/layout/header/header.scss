@@ -1,0 +1,206 @@
+@use 'index' as ds;
+
+:host {
+  display: block;
+}
+
+// Zero-height marker in normal flow, above the sticky header. Its only job is to
+// tell the IntersectionObserver whether the page has scrolled.
+.header__sentinel {
+  block-size: 1px;
+  margin-block-end: -1px;
+}
+
+.header {
+  position: sticky;
+  z-index: var(--z-header);
+  inset-block-start: 0;
+  // Transparent and borderless at rest, so the header dissolves into the page
+  // rather than boxing in the opening view.
+  background-color: transparent;
+  border-block-end: var(--border-hairline) solid transparent;
+  transition:
+    background-color var(--dur-base) var(--ease-out),
+    border-color var(--dur-base) var(--ease-out);
+}
+
+// The pinned state. A hairline and a translucent surface — no height change, no
+// shadow, no movement. backdrop-filter is sanctioned for sticky chrome only
+// (BRAND-SYSTEM.md §5); it is the one place in the system that uses it.
+//
+// ## Why the blur is on a pseudo-element and not on .header
+//
+// A non-`none` backdrop-filter makes an element a containing block for its
+// fixed-position descendants — the same behaviour `filter` has. The mobile panel
+// is `position: fixed; inset: 0`, and it lives inside <header> so it stays
+// outside the region marked inert. Putting the blur on .header directly would
+// therefore resolve the panel against the header's 4.5rem box instead of the
+// viewport: scroll down, open the menu, and the panel is squashed into the header
+// strip. Only visible after scrolling, which is exactly how it reaches production.
+//
+// Painting the blur on ::before keeps .header a plain sticky box.
+.header.is-pinned {
+  border-block-end-color: var(--color-border);
+}
+
+.header.is-pinned::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  // Behind the header's own content, above the page beneath it.
+  z-index: -1;
+  background-color: color-mix(in srgb, var(--color-surface) 88%, transparent);
+  backdrop-filter: blur(var(--blur-3));
+}
+
+// Solid fallback where backdrop-filter is unsupported: a translucent bar over
+// scrolling text is unreadable without the blur.
+@supports not (backdrop-filter: blur(1px)) {
+  .header.is-pinned::before {
+    background-color: var(--color-surface);
+  }
+}
+
+.header__inner {
+  @include ds.container;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  // Comfortably clears the 44px minimum without the logo touching the edges.
+  min-block-size: 4.5rem;
+}
+
+.header__brand {
+  @include ds.focus-visible;
+
+  display: inline-flex;
+  align-items: center;
+  flex: none;
+  border-radius: var(--radius-xs);
+  // The mark must never mirror — it is a Latin AY ligature. Logo's own styles
+  // enforce this; repeated here because the header is the most likely place for
+  // someone to add a directional transform later.
+  transform: none;
+}
+
+// -----------------------------------------------------------------------------
+// Desktop navigation
+// -----------------------------------------------------------------------------
+.header__nav {
+  // Hidden below md, where the mobile panel takes over. `display: none` also
+  // removes it from the accessibility tree, so the two navigations are never
+  // both exposed.
+  display: none;
+
+  @include ds.mq(md) {
+    display: block;
+  }
+}
+
+.header__list {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+}
+
+.header__link {
+  @include ds.label;
+  @include ds.focus-visible;
+
+  // The wipe's skew and origin are physical, so they are held in local custom
+  // properties and flipped once for RTL below. Duplicating the transform rules
+  // per direction instead would triple them and drift the moment one is edited.
+  --wipe-skew: calc(var(--brand-angle) * -1);
+  --wipe-origin: left;
+
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-block-size: 44px;
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  transition: color var(--dur-fast) var(--ease-out);
+
+  &:hover {
+    color: var(--color-text-primary);
+  }
+
+  // Hover underline, wiping in along the monogram's own 24° leg axis.
+  &::after {
+    content: '';
+    position: absolute;
+    inset-block-end: var(--space-3);
+    inset-inline: 0;
+    block-size: var(--border-emphasis);
+    background-color: currentcolor;
+    transform: scaleX(0) skewX(var(--wipe-skew));
+    transform-origin: var(--wipe-origin) center;
+    transition: transform var(--dur-fast) var(--ease-out);
+  }
+
+  // Active page is marked by the same 2px underline, held open. Not a colour
+  // change alone — colour may never be the sole carrier of state, and
+  // `aria-current="page"` carries it for assistive tech.
+  &:hover::after,
+  &.is-active::after {
+    transform: scaleX(1) skewX(var(--wipe-skew));
+  }
+
+  &.is-active {
+    color: var(--color-text-primary);
+  }
+}
+
+:host-context([dir='rtl']) .header__link {
+  --wipe-skew: var(--brand-angle);
+  --wipe-origin: right;
+}
+
+// -----------------------------------------------------------------------------
+// Actions
+// -----------------------------------------------------------------------------
+.header__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  flex: none;
+}
+
+// The switcher moves into the mobile panel below md, so it is not duplicated in
+// the accessibility tree.
+.header__switcher {
+  display: none;
+
+  @include ds.mq(md) {
+    display: block;
+  }
+}
+
+.header__trigger {
+  @include ds.focus-visible;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: 44px;
+  block-size: 44px;
+  border-radius: var(--radius-xs);
+  color: var(--color-text-primary);
+  transition: background-color var(--dur-fast) var(--ease-out);
+
+  &:hover {
+    background-color: var(--color-surface-nested);
+  }
+
+  @include ds.mq(md) {
+    display: none;
+  }
+}
+
+@include ds.mq-forced-colors {
+  .header.is-pinned {
+    border-block-end-color: CanvasText;
+  }
+}

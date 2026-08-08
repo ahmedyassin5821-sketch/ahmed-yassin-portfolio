@@ -1,0 +1,77 @@
+@use 'index' as ds;
+
+:host {
+  display: block;
+}
+
+.switcher {
+  display: flex;
+  align-items: center;
+  // The separator is drawn with a border rather than a literal "/" character, so
+  // it never becomes part of the accessible name of either link.
+  gap: var(--space-2);
+}
+
+.switcher__item + .switcher__item {
+  padding-inline-start: var(--space-2);
+  border-inline-start: var(--border-hairline) solid var(--color-border);
+}
+
+// Target size comes from the link's own box, not from an overhanging hit-area
+// pseudo-element. The `min-target` mixin would extend the tappable region past
+// the painted bounds, and that overhang widens the ancestor's scrollWidth — it
+// was the cause of a 7px horizontal overflow at 768px in RTL, invisible to any
+// element-bounds check. See the caveat on the mixin in _a11y.scss.
+//
+// 44px on the block axis with inline padding gives a comfortable target while
+// keeping the two labels tight enough to read as one control.
+.switcher__link {
+  @include ds.label;
+  @include ds.focus-visible;
+
+  display: inline-flex;
+  align-items: center;
+  min-block-size: 44px;
+  padding-inline: var(--space-1);
+  color: var(--color-text-muted);
+  text-decoration: none;
+  transition: color var(--dur-fast) var(--ease-out);
+
+  &:hover {
+    color: var(--color-text-secondary);
+  }
+
+  &.is-active {
+    color: var(--color-text-primary);
+  }
+}
+
+// The Arabic label is set in the Arabic face via its own `lang` attribute, and
+// Arabic is unicase — the uppercase transform from the label mixin has nothing
+// to apply and tracking would sever letter joins. `_typography.scss` neutralises
+// both globally for `[lang^="ar"]`; this only corrects optical size, since Amiri
+// and IBM Plex Sans Arabic run visually smaller than mono Latin at the same em.
+.switcher__link[lang='ar'] {
+  font-size: var(--fs-caption);
+}
+
+// -----------------------------------------------------------------------------
+// Stacked — mobile panel. Larger targets, laid out along the block axis.
+// -----------------------------------------------------------------------------
+:host(.switcher-host--stacked) .switcher {
+  gap: var(--space-4);
+}
+
+:host(.switcher-host--stacked) .switcher__link {
+  font-size: var(--fs-body-sm);
+}
+
+:host(.switcher-host--stacked) .switcher__link[lang='ar'] {
+  font-size: var(--fs-body);
+}
+
+@include ds.mq-forced-colors {
+  .switcher__link.is-active {
+    color: Highlight;
+  }
+}

@@ -43,9 +43,36 @@
 // -----------------------------------------------------------------------------
 // View transitions
 //
-// The router's native View Transitions are suppressed here rather than by
-// branching in TypeScript, so there is one place that governs it.
+// The router's native View Transitions need restraint, not addition — the UA
+// default is already a cross-fade. The work here is capping its duration and
+// keeping the footer out of it.
+//
+// The root cross-fade is short on purpose. A page transition long enough to
+// notice is a page transition that delays reading, and the LCP heading is part of
+// the root snapshot: the faster this resolves, the less it can interfere.
 // -----------------------------------------------------------------------------
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: var(--dur-base);
+  animation-timing-function: var(--ease-out);
+}
+
+// The footer is named in footer.scss, which lifts it out of the root snapshot so
+// it holds still while content changes.
+//
+// The header is DELIBERATELY not named. `view-transition-name` promotes an
+// element into its own snapshot layer, which breaks `position: sticky` for the
+// duration of the transition — a visible jump on every navigation. Since the
+// header's content is identical across routes, cross-fading it with itself is a
+// visual no-op, so naming it would trade a real defect for no gain.
+::view-transition-old(shell-footer),
+::view-transition-new(shell-footer) {
+  // Held still rather than cross-faded: the footer is identical on every route,
+  // so animating it is pure cost.
+  animation: none;
+  mix-blend-mode: normal;
+}
+
 @include bp.mq-reduced-motion {
   ::view-transition-group(*),
   ::view-transition-old(*),

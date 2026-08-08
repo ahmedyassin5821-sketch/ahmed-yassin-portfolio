@@ -55,6 +55,17 @@
 
 /// Minimum interactive target. Extends the hit area without changing the
 /// painted bounds, so a visually small control is still 44px to a finger.
+///
+/// ## Caveat: this can widen the document
+///
+/// The hit area is an absolutely positioned pseudo-element, so when the visible
+/// control is narrower than `$size` the overhang contributes to the ancestor's
+/// `scrollWidth` — which can produce horizontal page overflow that no element
+/// bounding box explains. It cost real debugging time once already.
+///
+/// Prefer sizing the control's own box (`min-block-size` plus padding) when you
+/// can. Reach for this only where the painted bounds genuinely must stay small,
+/// and check for overflow at your narrowest breakpoint afterwards.
 @mixin min-target($size: 44px) {
   position: relative;
 
