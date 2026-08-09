@@ -49,6 +49,16 @@
   --brand-angle-alt: 30deg; // the Y's right arm (measured 30.37°)
   --brand-contrast: 3.8; // thick 27.5 ÷ hairline 7.3
   --brand-ratio: 0.875; // 7:8 portrait (measured 0.879)
+
+  // Project media has its own aspect: the portrait brand ratio would crop a
+  // desktop screenshot to ruins.
+  //
+  // The value is measured, not chosen. The six cover captures run 2.17–2.26,
+  // and `object-fit: cover` crops on whichever axis overflows — so a frame
+  // narrower than the widest capture crops the *sides*, which decapitates the
+  // site logo in the corner. Sitting just above the widest capture means every
+  // cover fills the frame edge to edge and loses only a sliver of its bottom.
+  --ratio-screenshot: 2.26;
   --brand-rhythm: 2; // cap height ÷ descender
 
   // ---------------------------------------------------------------------------

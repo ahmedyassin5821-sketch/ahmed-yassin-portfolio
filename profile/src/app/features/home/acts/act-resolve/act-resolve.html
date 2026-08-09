@@ -1,0 +1,11 @@
+<section class="resolve">
+  <div class="resolve__inner">
+    <p class="resolve__title" appReveal>{{ title() }}</p>
+
+    <a class="resolve__cta" routerLink="/work" appReveal [revealIndex]="1">
+      <span class="resolve__cta-label">{{ c().cta }}</span>
+      <!-- Directional: mirrors in RTL via the Icon component's own rules. -->
+      <app-icon name="arrow-right" size="md" />
+    </a>
+  </div>
+</section>

@@ -1,0 +1,28 @@
+<section class="work" aria-labelledby="work-title">
+  <header class="work__head">
+    <p class="work__eyebrow">{{ c().index.eyebrow }}</p>
+    <h1 id="work-title" class="work__title">{{ c().index.title }}</h1>
+    <p class="work__lede">{{ c().index.lede }}</p>
+    <p class="work__count">{{ countLabel() }}</p>
+  </header>
+
+  <ul class="work__grid" role="list">
+    @for (project of projects(); track project.slug; let i = $index) {
+      <!--
+        appReveal, not a new animation layer: the same IntersectionObserver
+        directive the rest of the site uses, staggered by index. It no-ops under
+        prefers-reduced-motion and when IntersectionObserver is unavailable.
+      -->
+      <li appReveal [revealIndex]="i">
+        <app-project-card
+          [project]="project"
+          [viewLabel]="viewLabel().replace('{name}', project.name)"
+          [privateLabel]="c().actions.private"
+          [dashboardLabel]="c().labels.dashboard"
+          [placeholderLabel]="c().labels.awaitingAssets"
+          [priority]="isPriority(i)"
+        />
+      </li>
+    }
+  </ul>
+</section>

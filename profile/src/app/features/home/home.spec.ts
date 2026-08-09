@@ -3,7 +3,8 @@ import { provideRouter } from '@angular/router';
 
 import { DirectionService } from '@core/i18n/direction.service';
 import { HOME_CONTENT } from '@data/home.content';
-import { FEATURED_PROJECTS, PLATFORM_GROUPS, PROJECTS } from '@data/projects.data';
+import { PLATFORM_GROUPS, PROJECTS, PROJECTS_SHIPPED } from '@data/projects.data';
+import { ACT_TIMELINE } from './animation/act-timeline';
 import { Home } from './home';
 
 describe('Home', () => {
@@ -43,9 +44,9 @@ describe('Home', () => {
     const { el } = await render();
     const h1 = el.querySelector('h1')!;
 
-    // The identity must never depend on WebGL, GSAP, or a deferred chunk. If a
-    // future change moves it inside @defer, this fails.
+    // The identity must never depend on WebGL, GSAP, or a deferred chunk.
     expect(h1.closest('app-strata-canvas')).toBeNull();
+    expect(h1.closest('.home__scene')).toBeNull();
     expect(h1.textContent?.trim().length).toBeGreaterThan(0);
   });
 
@@ -61,83 +62,88 @@ describe('Home', () => {
     }
   });
 
-  it('renders every platform group and its projects', async () => {
+  // ---------------------------------------------------------------------------
+  // The stage
+  // ---------------------------------------------------------------------------
+
+  it('lays out one element per act, each carrying its slice of the timeline', async () => {
+    const { el } = await render();
+    const acts = Array.from(el.querySelectorAll<HTMLElement>('.home__act'));
+
+    expect(acts.length).toBe(ACT_TIMELINE.length);
+
+    acts.forEach((element, i) => {
+      expect(element.dataset['act']).toBe(ACT_TIMELINE[i].id);
+      // The scene reads the same table. If these disagreed, the text and the
+      // camera would drift apart.
+      expect(element.style.getPropertyValue('--act-start')).toBe(String(ACT_TIMELINE[i].start));
+      expect(element.style.getPropertyValue('--act-end')).toBe(String(ACT_TIMELINE[i].end));
+    });
+  });
+
+  it('is not staged until the choreography actually starts', async () => {
+    const { el } = await render();
+    const stage = el.querySelector('.home')!;
+
+    // GSAP never loads in the test environment, which is the same path taken
+    // under prefers-reduced-motion. No class means no spacer and no scroll void.
+    expect(stage.classList.contains('is-staged')).toBe(false);
+    expect((stage as HTMLElement).style.getPropertyValue('--home-screens')).toBe('');
+  });
+
+  // ---------------------------------------------------------------------------
+  // Content — must be complete without the scene
+  // ---------------------------------------------------------------------------
+
+  it('names every platform and every project as real text', async () => {
     const { el } = await render();
     const text = el.textContent ?? '';
 
     for (const group of PLATFORM_GROUPS) {
       expect(text).toContain(group.label);
-      for (const project of group.projects) {
-        expect(text).toContain(project.name);
-      }
+    }
+    for (const project of PROJECTS) {
+      expect(text).toContain(project.name.en);
     }
   });
 
-  it('renders the featured projects in selected work', async () => {
+  it('states the career total, never the size of the showcase', async () => {
     const { el } = await render();
-    const surfaces = el.querySelectorAll('app-project-surface');
+    const text = el.textContent ?? '';
 
-    expect(surfaces.length).toBe(FEATURED_PROJECTS.length);
+    expect(text).toContain(`${PROJECTS_SHIPPED}+`);
+    // "7 projects" would misrepresent the body of work.
+    expect(text).not.toContain(`${PROJECTS.length} projects`);
+  });
+
+  it('renders a media frame for every project, real or pending', async () => {
+    const { el } = await render();
+    const images = el.querySelectorAll('.surface__image');
+    const placeholders = el.querySelectorAll('app-media-placeholder');
+
+    expect(images.length).toBe(PROJECTS.filter((p) => p.cover !== null).length);
+    expect(placeholders.length).toBe(PROJECTS.filter((p) => p.cover === null).length);
+    expect(images.length + placeholders.length).toBe(PROJECTS.length);
   });
 
   it('never renders a project link without a confirmed URL', async () => {
     const { el } = await render();
+    const anchors = Array.from(el.querySelectorAll('.surface__link'));
 
-    // Every project currently has url: null. A guessed URL in a portfolio is a
-    // broken link a recruiter clicks, so absence must render as plain text.
-    for (const anchor of Array.from(el.querySelectorAll('.surface__link'))) {
+    expect(anchors.length).toBe(PROJECTS.filter((p) => p.url !== null).length);
+    for (const anchor of anchors) {
       expect(anchor.getAttribute('href')).toBeTruthy();
     }
   });
 
-  it('shows the placeholder frame while real screenshots are missing', async () => {
-    const { el } = await render();
-
-    expect(el.querySelectorAll('app-media-placeholder').length).toBe(FEATURED_PROJECTS.length);
-  });
-
-  it('states a project total that matches the data', async () => {
-    const { el } = await render();
-    expect(el.textContent).toContain(String(PROJECTS.length));
-  });
-
-  it('switches every string to Arabic', async () => {
-    const { fixture, el } = await render();
-
-    direction.set('ar');
-    await fixture.whenStable();
-
-    const text = el.textContent ?? '';
-    expect(text).toContain(HOME_CONTENT.hero.name.ar);
-    expect(text).toContain(HOME_CONTENT.hero.role.ar);
-    expect(text).toContain(HOME_CONTENT.strata.title.ar);
-    expect(text).toContain(HOME_CONTENT.work.title.ar);
-
-    // And the English equivalents are gone.
-    expect(text).not.toContain(HOME_CONTENT.hero.role.en);
-    expect(text).not.toContain(HOME_CONTENT.strata.title.en);
-  });
-
-  it('keeps project and platform names Latin in Arabic, isolated for bidi', async () => {
-    const { fixture, el } = await render();
-
-    direction.set('ar');
-    await fixture.whenStable();
-
-    // Proper nouns stay Latin, but must be bidi-isolated or trailing
-    // punctuation jumps to the wrong side of the line.
-    const isolated = Array.from(el.querySelectorAll('.ltr-isolate')).map((n) =>
-      n.textContent?.trim(),
-    );
-    expect(isolated).toContain('Angular');
-    expect(isolated).toContain('Magento');
-    expect(isolated).toContain('Shopify');
-  });
+  // ---------------------------------------------------------------------------
+  // Fallbacks
+  // ---------------------------------------------------------------------------
 
   it('renders the static strata composition regardless of WebGL', async () => {
     const { el } = await render();
 
-    // In the test environment WebGL is unavailable, so this is the no-WebGL
+    // WebGL is unavailable in the test environment, so this is the no-WebGL
     // path: the poster must carry the composition on its own.
     expect(el.querySelector('app-strata-poster')).not.toBeNull();
     expect(el.querySelector('app-strata-canvas')).toBeNull();
@@ -152,9 +158,44 @@ describe('Home', () => {
     expect(paths[0].getAttribute('d')).toContain('M165.03 311.98');
   });
 
-  it('hides decorative visuals from assistive technology', async () => {
+  it('hides the decorative scene layer from assistive technology', async () => {
     const { el } = await render();
 
+    expect(el.querySelector('.home__scene')?.getAttribute('aria-hidden')).toBe('true');
     expect(el.querySelector('app-strata-poster svg')?.getAttribute('aria-hidden')).toBe('true');
+  });
+
+  // ---------------------------------------------------------------------------
+  // Language
+  // ---------------------------------------------------------------------------
+
+  it('switches every string to Arabic', async () => {
+    const { fixture, el } = await render();
+
+    direction.set('ar');
+    await fixture.whenStable();
+
+    const text = el.textContent ?? '';
+    expect(text).toContain(HOME_CONTENT.hero.name.ar);
+    expect(text).toContain(HOME_CONTENT.hero.role.ar);
+    expect(text).toContain(HOME_CONTENT.count.label.ar);
+    expect(text).toContain(HOME_CONTENT.count.eyebrow.ar);
+
+    expect(text).not.toContain(HOME_CONTENT.hero.role.en);
+    expect(text).not.toContain(HOME_CONTENT.count.label.en);
+  });
+
+  it('keeps platform names Latin in Arabic, isolated for bidi', async () => {
+    const { fixture, el } = await render();
+
+    direction.set('ar');
+    await fixture.whenStable();
+
+    const isolated = Array.from(el.querySelectorAll('.ltr-isolate')).map((n) =>
+      n.textContent?.trim(),
+    );
+    expect(isolated).toContain('Angular');
+    expect(isolated).toContain('Magento');
+    expect(isolated).toContain('Shopify');
   });
 });

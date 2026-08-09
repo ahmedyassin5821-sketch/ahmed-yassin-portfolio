@@ -1,0 +1,16 @@
+<section class="count" aria-labelledby="count-heading">
+  <p class="count__eyebrow">{{ c().eyebrow }}</p>
+
+  <!--
+    The figure is the heading, not decoration beside one. It is the largest type
+    on the page after the identity, and it is real text in every state — the
+    scene's matching type-plane is decorative and additive.
+  -->
+  <p class="count__figure" aria-hidden="true">{{ shipped }}</p>
+
+  <h2 id="count-heading" class="count__label">
+    <span class="sr-only">{{ shipped }} </span>{{ c().label }}
+  </h2>
+
+  <p class="count__lede">{{ c().lede }}</p>
+</section>

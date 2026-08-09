@@ -1,0 +1,84 @@
+<article class="card">
+  <div class="card__media">
+    @if (project().cover; as cover) {
+      <!--
+        AVIF is offered only for cover images, which are the LCP candidates on
+        this page. The WebP srcset is always present, so a browser without AVIF
+        still picks a right-sized file rather than the largest one.
+      -->
+      <picture>
+        @if (cover.avif) {
+          <source type="image/avif" [srcset]="cover.avif" [attr.sizes]="sizes" />
+        }
+        <img
+          class="card__image"
+          [src]="cover.src"
+          [attr.srcset]="cover.srcset"
+          [attr.sizes]="sizes"
+          [alt]="cover.alt"
+          [width]="cover.width"
+          [height]="cover.height"
+          [attr.loading]="priority() ? 'eager' : 'lazy'"
+          [attr.fetchpriority]="priority() ? 'high' : null"
+          decoding="async"
+        />
+      </picture>
+    } @else {
+      <!-- Assets not supplied yet. An honest empty frame, not stock imagery. -->
+      <app-media-placeholder [caption]="project().name" [label]="placeholderLabel()" />
+    }
+  </div>
+
+  <div class="card__body">
+    <div class="card__head">
+      @if (project().logo; as logo) {
+        <app-project-logo [logo]="logo" [slug]="project().slug" />
+      }
+
+      <p class="card__platform">{{ project().platformLabel }}</p>
+    </div>
+
+    <h3 class="card__name">
+      <!--
+        One anchor, stretched over the card by ::after. Wrapping the article
+        instead would fold the summary and every badge into the link name.
+      -->
+      <a class="card__link" [routerLink]="['/work', project().slug]">
+        <span dir="auto">{{ project().name }}</span>
+        <span class="sr-only">— {{ viewLabel() }}</span>
+      </a>
+    </h3>
+
+    <!-- What the product is, then what Ahmed did on it. Platform (what it was
+         built with) is already stated above, beside the logo. -->
+    <p class="card__type">{{ project().projectType }}</p>
+    <p class="card__role">{{ project().role }}</p>
+    <p class="card__summary">{{ project().summary }}</p>
+
+    <ul class="card__meta" role="list">
+      @for (tech of project().technology; track tech) {
+        <li>
+          <!-- Latin technology names stay LTR inside Arabic copy. -->
+          <app-badge variant="outline"><span class="ltr-isolate">{{ tech }}</span></app-badge>
+        </li>
+      }
+
+      @if (project().dashboard) {
+        <!-- Filled rather than outlined, so it reads as a fact about the work
+             rather than as another item in the technology list. -->
+        <li><app-badge variant="default">{{ dashboardLabel() }}</app-badge></li>
+      }
+    </ul>
+
+    <p class="card__foot">
+      @if (project().isPrivate) {
+        <!-- Not a link: there is no public address. Stating that is the point. -->
+        <span class="card__private">{{ privateLabel() }}</span>
+      }
+
+      <span class="card__cue" aria-hidden="true">
+        <app-icon name="arrow-right" size="sm" />
+      </span>
+    </p>
+  </div>
+</article>

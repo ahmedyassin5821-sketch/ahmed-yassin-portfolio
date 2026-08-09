@@ -1,0 +1,203 @@
+@use 'index' as ds;
+
+:host {
+  display: block;
+}
+
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  block-size: 100%;
+  border: var(--border-hairline) solid var(--color-border);
+  background-color: var(--color-background);
+  transition:
+    border-color var(--dur-quick) var(--ease-out),
+    transform var(--dur-quick) var(--ease-out);
+}
+
+// Hover and keyboard focus land on the same visual state, so the card does not
+// look inert to someone tabbing through it.
+.card:has(.card__link:hover),
+.card:has(.card__link:focus-visible) {
+  border-color: var(--color-border-interactive);
+  transform: translateY(-2px);
+}
+
+@include ds.mq-reduced-motion {
+  .card,
+  .card:has(.card__link:hover),
+  .card:has(.card__link:focus-visible) {
+    transform: none;
+    transition: none;
+  }
+}
+
+// The focus ring belongs on the card, not on the invisible stretched anchor —
+// an outline on a zero-height link is not a visible focus indicator.
+.card:has(.card__link:focus-visible) {
+  @include ds.focus-ring;
+}
+
+// -----------------------------------------------------------------------------
+// Media
+// -----------------------------------------------------------------------------
+.card__media {
+  @include ds.media-frame(var(--ratio-screenshot));
+
+  overflow: hidden;
+  border-block-end: var(--border-hairline) solid var(--color-border);
+  background-color: var(--color-surface-sunken);
+}
+
+// <picture> is inline by default, so it sizes to the image's own aspect and the
+// img's block-size: 100% resolves against nothing — leaving a band of empty
+// frame below every cover. It has to become the block-level box itself.
+.card__media picture {
+  display: block;
+  block-size: 100%;
+}
+
+.card__image {
+  inline-size: 100%;
+  block-size: 100%;
+  // Real captures are ~2.2:1; the frame is 16:10. Cover anchored to the top
+  // keeps the site header and hero visible and crops dead page bottom instead.
+  object-fit: cover;
+  object-position: top center;
+  transition: scale var(--dur-deliberate) var(--ease-out);
+}
+
+.card:has(.card__link:hover) .card__image {
+  scale: 1.02;
+}
+
+@include ds.mq-reduced-motion {
+  .card__image,
+  .card:has(.card__link:hover) .card__image {
+    scale: 1;
+    transition: none;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Body
+// -----------------------------------------------------------------------------
+.card__body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-5);
+}
+
+.card__head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-block-end: var(--space-1);
+}
+
+// The logo chip is `project-logo`, which owns its own styles — including the
+// dark ground that white-on-transparent artwork needs.
+
+.card__platform {
+  @include ds.label;
+
+  color: var(--color-text-muted);
+}
+
+.card__name {
+  @include ds.heading-3;
+
+  color: var(--color-text-primary);
+}
+
+.card__link {
+  color: inherit;
+  text-decoration: none;
+}
+
+// Stretches the link over the whole card without nesting the content inside it.
+.card__link::after {
+  position: absolute;
+  z-index: var(--z-raised);
+  inset: 0;
+  content: '';
+}
+
+.card__link:focus-visible {
+  // The visible ring is drawn on .card instead; see above.
+  outline: none;
+}
+
+.card__type {
+  @include ds.label;
+
+  color: var(--color-text-primary);
+}
+
+.card__role {
+  @include ds.caption;
+
+  color: var(--color-text-secondary);
+}
+
+.card__summary {
+  @include ds.body;
+
+  font-size: var(--fs-body-sm);
+  color: var(--color-text-secondary);
+  text-wrap: pretty;
+}
+
+.card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-block-start: var(--space-2);
+}
+
+.card__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  // Pins the row to the bottom so cards of unequal text length still align.
+  margin-block-start: auto;
+  padding-block-start: var(--space-4);
+}
+
+.card__private {
+  @include ds.label;
+
+  padding: var(--space-1) var(--space-2);
+  border: var(--border-hairline) dashed var(--color-border-interactive);
+  color: var(--color-text-muted);
+}
+
+.card__cue {
+  display: inline-flex;
+  // Pushed to the end when there is no private marker to sit beside.
+  margin-inline-start: auto;
+  color: var(--color-text-muted);
+  transition: translate var(--dur-quick) var(--ease-out);
+}
+
+.card:has(.card__link:hover) .card__cue {
+  // Logical, so it advances with the reading direction in both languages.
+  translate: var(--space-1) 0;
+  color: var(--color-text-primary);
+}
+
+:host-context([dir='rtl']) .card:has(.card__link:hover) .card__cue {
+  translate: calc(var(--space-1) * -1) 0;
+}
+
+@include ds.mq-reduced-motion {
+  .card__cue,
+  .card:has(.card__link:hover) .card__cue {
+    translate: none;
+    transition: none;
+  }
+}

@@ -12,7 +12,8 @@
     "logo:generate": "node scripts/generate-logo-assets.mjs",
     "lint": "npm run lint:styles",
     "serve:ssr": "node dist/profile/server/server.mjs",
-    "serve:ssr:profile": "node dist/profile/server/server.mjs"
+    "serve:ssr:profile": "node dist/profile/server/server.mjs",
+    "assets:projects": "node scripts/optimize-project-assets.mjs"
   },
   "prettier": {
     "printWidth": 100,
@@ -56,6 +57,7 @@
     "@types/node": "^20.17.19",
     "@types/three": "^0.185.4",
     "jsdom": "^27.1.0",
+    "sharp": "^0.35.3",
     "stylelint": "^17.14.1",
     "stylelint-config-standard-scss": "^17.0.0",
     "stylelint-use-logical": "^2.1.3",

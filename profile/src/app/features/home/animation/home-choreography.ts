@@ -2,84 +2,152 @@ import { DestroyRef, Injectable, inject } from '@angular/core';
 
 import { GsapService } from '@core/animation/gsap.service';
 import { isBrowser } from '@core/platform/is-browser';
+import { ViewportService } from '@core/platform/viewport.service';
 import { HomeProgress } from './home-progress';
 
 export interface ChoreographyTargets {
-  /** The element whose scroll span drives the whole narrative. */
-  readonly narrative: HTMLElement;
-  /** Platform rows; whichever is in view sets the active act. */
-  readonly acts: readonly HTMLElement[];
+  /**
+   * The outer element whose scroll span drives the narrative. Its height is the
+   * travel; the stage inside it is what sticks.
+   */
+  readonly stage: HTMLElement;
 }
+
+/**
+ * Desktop travels further than mobile — the mobile choreography settles at each
+ * gate rather than gliding, so it needs less distance to say the same thing, and
+ * a phone should not have to scroll twelve screens to reach the footer.
+ */
+const TRAVEL_SCREENS = { desktop: 12, mobile: 7 } as const;
 
 /**
  * All Home scroll choreography, in one place.
  *
- * ## Why GSAP is used here and nowhere else
+ * ## Exactly one ScrollTrigger
  *
- * Section entrances are handled by the existing `appReveal` directive —
- * IntersectionObserver, already tested, zero additional bytes. Reimplementing
- * them in GSAP would add a dependency to do a job that was already done.
+ * It reports scroll position. It does not animate anything. There are no GSAP
+ * tweens in this project by design: every visual result is derived from the one
+ * progress value — by the scene, which is a pure function of it, and by CSS,
+ * which reads it from a custom property.
  *
- * What IntersectionObserver genuinely cannot do is report *continuous* scroll
- * position, and that is the one thing the WebGL scene needs. So GSAP's entire
- * remit is the scrub below: one ScrollTrigger converting scroll into a
- * normalised 0→1 signal. That is the whole DOM↔WebGL contract.
+ * That is what keeps a large choreography understandable. Fifteen triggers each
+ * owning a fragment of the motion is how scroll work becomes unmaintainable and
+ * how the text ends up disagreeing with the scene.
  *
- * Everything is registered inside `gsap.context()` scoped to the narrative
- * element and reverted through `DestroyRef`. Leaked ScrollTriggers are the
- * classic GSAP-in-SPA defect; the context makes cleanup structural.
+ * ## Why the hold is CSS `position: sticky`, not GSAP `pin`
  *
- * If GSAP does not load — server, reduced motion, failed fetch — `setup()`
- * resolves having done nothing, the progress signal stays at 0, and the scene
- * (which will not exist in those cases anyway) is never asked for anything.
+ * They look identical to the reader; they are not identical to the application.
+ * GSAP's pin wraps the element in a generated spacer and switches it to fixed
+ * positioning at runtime. This app has three standing constraints that punish
+ * that: the router restores scroll position on back-navigation, incremental
+ * hydration means a `@defer` subtree can hydrate *after* a pin was measured, and
+ * the sticky header depends on no ancestor becoming a scroll container.
+ *
+ * A sticky stage over a tall spacer has none of those failure modes, is layout
+ * stable at first paint, and needs no `refresh()` after fonts load. GSAP keeps
+ * the job it is genuinely best at: reading scroll accurately.
+ *
+ * ## The CSS custom property
+ *
+ * DOM motion is driven by writing `--home-progress` once per update. One style
+ * write, and every act's stylesheet derives its own transform from it. The
+ * alternative — a tween per element — would multiply work per frame for no gain,
+ * and under zoneless change detection the single signal write is what keeps this
+ * off the change-detection path entirely.
+ *
+ * ## If GSAP never loads
+ *
+ * Server, reduced motion, or a failed fetch: `setup()` resolves having done
+ * nothing. `.is-staged` is never added, so the spacer collapses and the stage
+ * un-sticks — the page becomes an ordinary vertical document with every act
+ * readable in order. The fallback is the absence of this class, not a separate
+ * code path that could rot.
  */
 @Injectable()
 export class HomeChoreography {
   private readonly gsapService = inject(GsapService);
   private readonly progress = inject(HomeProgress);
+  private readonly viewport = inject(ViewportService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly browser = isBrowser();
 
   private context: { revert: () => void } | null = null;
+  private stage: HTMLElement | null = null;
 
   async setup(targets: ChoreographyTargets): Promise<void> {
     if (!this.browser) return;
 
     const bundle = await this.gsapService.load();
-    // null means SSR or reduced motion. Sections keep their resting CSS state,
-    // which is their final state, so the page is complete either way.
     if (!bundle) return;
 
     const { gsap, ScrollTrigger } = bundle;
+    this.stage = targets.stage;
+
+    // Only now is the tall spacer applied. Adding it before this point would
+    // open a scroll void on every path where the choreography never starts.
+    //
+    // The screen count is written as a custom property rather than duplicated in
+    // the stylesheet, so the CSS height and the trigger's travel below are two
+    // readings of one number instead of two constants that can drift apart.
+    targets.stage.style.setProperty('--home-screens', String(this.screens()));
+    targets.stage.classList.add('is-staged');
+    this.write(0);
 
     this.context = gsap.context(() => {
-      // The narrative scrub — the only thing the WebGL scene ever reads.
-      // Native scroll drives it; nothing is pinned and nothing is hijacked.
       ScrollTrigger.create({
-        trigger: targets.narrative,
+        trigger: targets.stage,
         start: 'top top',
-        end: 'bottom bottom',
-        onUpdate: (self) => this.progress.set(self.progress),
+        // Read as a function so a resize recomputes it rather than keeping a
+        // stale pixel value from whichever viewport happened to load first.
+        end: () => `+=${this.travel()}`,
+        // Deliberately no `scrub`. Scrub exists to smooth an *attached
+        // animation*, and there is none here — this trigger only reports a
+        // number. Smoothing belongs where the motion is: the scene damps toward
+        // the target in its own loop, and CSS transitions handle the DOM.
+        invalidateOnRefresh: true,
+        onUpdate: (self) => {
+          this.progress.set(self.progress);
+          this.write(self.progress);
+        },
       });
-
-      // Which platform stratum the reader is level with.
-      for (const [index, element] of targets.acts.entries()) {
-        ScrollTrigger.create({
-          trigger: element,
-          start: 'top 60%',
-          end: 'bottom 40%',
-          onEnter: () => this.progress.setAct(index),
-          onEnterBack: () => this.progress.setAct(index),
-        });
-      }
-    }, targets.narrative);
+    }, targets.stage);
 
     this.destroyRef.onDestroy(() => this.dispose());
+  }
+
+  private screens(): number {
+    return this.viewport.isDesktop() ? TRAVEL_SCREENS.desktop : TRAVEL_SCREENS.mobile;
+  }
+
+  /**
+   * How far the sticky viewport actually travels, in pixels.
+   *
+   * One screen shorter than the stage's height: a sticky element releases when
+   * its container's *bottom* reaches the viewport bottom, so a stage `n` screens
+   * tall holds for `n − 1`. Using the full height here would leave progress
+   * short of 1 by a whole screen and the final act would never resolve.
+   */
+  private travel(): number {
+    return globalThis.innerHeight * (this.screens() - 1);
+  }
+
+  /**
+   * The only DOM write in the choreography.
+   *
+   * Rounded to four decimals because a custom property change invalidates style
+   * for the subtree, and float noise at the 15th decimal would do that on frames
+   * where nothing has visibly moved.
+   */
+  private write(value: number): void {
+    this.stage?.style.setProperty('--home-progress', value.toFixed(4));
   }
 
   private dispose(): void {
     this.context?.revert();
     this.context = null;
+    this.stage?.classList.remove('is-staged');
+    this.stage?.style.removeProperty('--home-progress');
+    this.stage = null;
     this.progress.reset();
   }
 }

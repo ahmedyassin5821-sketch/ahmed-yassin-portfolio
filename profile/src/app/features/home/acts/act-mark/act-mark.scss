@@ -1,0 +1,94 @@
+@use 'index' as ds;
+
+:host {
+  display: block;
+}
+
+.mark {
+  @include ds.container;
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  max-inline-size: 44rem;
+}
+
+.mark__eyebrow {
+  @include ds.label;
+
+  color: var(--color-text-muted);
+}
+
+// The LCP element. No animation, no transform, no opacity transition — nothing
+// that could delay or obscure the first meaningful paint.
+.mark__name {
+  @include ds.display-1;
+
+  max-inline-size: var(--measure-display);
+  color: var(--color-text-primary);
+}
+
+.mark__role {
+  @include ds.heading-2;
+
+  color: var(--color-text-secondary);
+  font-weight: var(--weight-light);
+}
+
+.mark__lede {
+  @include ds.body;
+
+  max-inline-size: 46ch;
+  margin-block-start: var(--space-2);
+  color: var(--color-text-secondary);
+  text-wrap: pretty;
+}
+
+// -----------------------------------------------------------------------------
+// Meta rail
+// -----------------------------------------------------------------------------
+.mark__meta {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-block-start: var(--space-6);
+  padding-block-start: var(--space-5);
+  border-block-start: var(--border-hairline) solid var(--color-border);
+}
+
+.mark__meta-row {
+  display: grid;
+  gap: var(--space-1) var(--space-4);
+  grid-template-columns: 1fr;
+
+  @include ds.mq(sm) {
+    grid-template-columns: 8rem 1fr;
+    align-items: baseline;
+  }
+}
+
+.mark__meta-label {
+  @include ds.label;
+
+  color: var(--color-text-muted);
+}
+
+.mark__meta-value {
+  @include ds.body;
+
+  font-size: var(--fs-body-sm);
+  color: var(--color-text-secondary);
+  // dir="auto" on this element resolves each value's direction from its own
+  // content, which is what keeps mixed Arabic/Latin strings intact. The side
+  // effect is that an all-Latin value would align to ITS start rather than the
+  // page's. Grid alignment follows the grid's direction, not the item's, so
+  // this pins every value to the page's reading edge regardless.
+  justify-self: start;
+}
+
+.mark__scroll {
+  @include ds.label;
+
+  margin-block-start: var(--space-10);
+  color: var(--color-text-muted);
+}

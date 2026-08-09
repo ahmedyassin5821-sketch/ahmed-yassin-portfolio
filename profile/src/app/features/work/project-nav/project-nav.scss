@@ -1,0 +1,72 @@
+@use 'index' as ds;
+
+:host {
+  display: block;
+  margin-block-start: var(--space-16);
+  padding-block-start: var(--space-6);
+  border-block-start: var(--border-hairline) solid var(--color-border);
+}
+
+.nav {
+  display: grid;
+  gap: var(--space-4);
+  grid-template-columns: 1fr;
+
+  @include ds.mq(sm) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.nav__link {
+  @include ds.focus-visible;
+
+  display: flex;
+  min-inline-size: 0;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: var(--border-hairline) solid var(--color-border);
+  color: var(--color-text-primary);
+  text-decoration: none;
+  transition: border-color var(--dur-quick) var(--ease-out);
+}
+
+.nav__link:hover {
+  border-color: var(--color-border-interactive);
+}
+
+// justify-content follows the inline axis, so "next" sits at the reading end in
+// both directions without an RTL override.
+.nav__link.is-next {
+  justify-content: end;
+  text-align: end;
+}
+
+.nav__text {
+  display: flex;
+  min-inline-size: 0;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.nav__label {
+  @include ds.label;
+
+  color: var(--color-text-muted);
+}
+
+// A long project name must not widen the grid track — it truncates instead.
+.nav__name {
+  @include ds.body;
+
+  overflow: hidden;
+  font-size: var(--fs-body-sm);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.nav__cue {
+  display: inline-flex;
+  flex: none;
+  color: var(--color-text-muted);
+}

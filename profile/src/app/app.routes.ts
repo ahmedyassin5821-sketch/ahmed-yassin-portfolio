@@ -21,8 +21,16 @@ export const routes: Routes = [
   },
   {
     path: 'work',
-    ...STUB('Work', 'Case studies across Magento 2, Angular, and Shopify arrive in a later sprint.'),
+    loadComponent: () => import('./features/work/work').then((m) => m.Work),
     title: 'Work — Ahmed Yassin',
+  },
+  {
+    // `slug` binds straight to WorkDetail's required input through
+    // withComponentInputBinding(). The set is finite and known at build time, so
+    // every one of these prerenders — see app.routes.server.ts.
+    path: 'work/:slug',
+    loadComponent: () => import('./features/work/work-detail/work-detail').then((m) => m.WorkDetail),
+    title: 'Project — Ahmed Yassin',
   },
   {
     path: 'about',

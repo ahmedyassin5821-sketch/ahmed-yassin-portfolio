@@ -1,11 +1,65 @@
 <!--
-  #narrative spans the whole page: its scroll extent is what the single
-  ScrollTrigger scrub measures, and that scrub is the only channel between the
-  DOM and the WebGL scene.
+  The stage. `.is-staged` is added by the choreography only once it has actually
+  started — under reduced motion or without JS this element stays an ordinary
+  block and everything below reads as a normal vertical document.
 -->
-<div #narrative class="home">
-  <app-hero />
-  <app-strata-index />
-  <app-selected-work />
-  <app-work-transition />
+<div #stage class="home">
+  <div class="home__viewport">
+    <!--
+      The visual layer, behind the acts and decorative throughout. The poster is
+      in the server-rendered HTML so the composition exists at first paint; the
+      canvas fades over it once the scene reports it is rendering. Both are built
+      from the same AY_MARK_PATH, so they cannot drift.
+    -->
+    <div class="home__scene" aria-hidden="true">
+      <app-strata-poster
+        class="home__poster"
+        [class.is-retired]="sceneReady()"
+        [layers]="posterLayers()"
+      />
+
+      @if (canRunWebGL()) {
+        @defer (on idle) {
+          <app-strata-canvas class="home__canvas" (ready)="sceneReady.set(true)" />
+        }
+      }
+    </div>
+
+    <!--
+      The acts. Real content in every state — nothing here is exclusive to the
+      3D. Each carries its own slice of the timeline as custom properties, so its
+      stylesheet can derive visibility from --home-progress without a tween.
+    -->
+    <div class="home__acts">
+      @for (act of acts; track act.id) {
+        <div
+          class="home__act"
+          [class.is-current]="act.id === currentAct()"
+          [attr.data-act]="act.id"
+          [style.--act-start]="act.start"
+          [style.--act-end]="act.end"
+        >
+          @switch (act.id) {
+            @case ('mark') {
+              <app-act-mark />
+            }
+            @case ('count') {
+              <app-act-count />
+            }
+            @case ('resolve') {
+              <app-act-resolve />
+            }
+            @default {
+              <!-- separation and passage are scene-only beats: the camera work
+                   carries them, and there is no text that belongs there. The
+                   three gates are one component, driven by platform. -->
+              @if (act.platform; as platform) {
+                <app-act-gate [platform]="platform" [index]="$index - 4" />
+              }
+            }
+          }
+        </div>
+      }
+    </div>
+  </div>
 </div>

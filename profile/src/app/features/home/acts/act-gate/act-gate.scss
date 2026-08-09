@@ -1,0 +1,47 @@
+@use 'index' as ds;
+
+:host {
+  display: block;
+}
+
+.gate {
+  @include ds.container;
+}
+
+.gate__head {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-4);
+  margin-block-end: var(--space-8);
+  padding-block-end: var(--space-4);
+  border-block-end: var(--border-hairline) solid var(--color-border);
+}
+
+.gate__index {
+  @include ds.mono;
+
+  color: var(--color-text-muted);
+}
+
+// The platform name is the largest thing in the act — it is the gate the camera
+// passes through, and the DOM should read with the same emphasis.
+.gate__name {
+  @include ds.display-2;
+
+  color: var(--color-text-primary);
+}
+
+.gate__projects {
+  display: grid;
+  gap: var(--space-8);
+  grid-template-columns: 1fr;
+
+  @include ds.mq(sm) {
+    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  }
+}
+
+// Stops a wide screenshot forcing its track past its share and overflowing.
+.gate__project {
+  min-inline-size: 0;
+}

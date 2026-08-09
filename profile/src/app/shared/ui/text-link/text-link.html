@@ -1,0 +1,20 @@
+<ng-template #label><ng-content /></ng-template>
+
+@if (isExternal()) {
+  <a
+    class="link"
+    [href]="href()"
+    [attr.target]="newTab() ? '_blank' : null"
+    [attr.rel]="newTab() ? 'noopener noreferrer' : null"
+  >
+    <ng-container [ngTemplateOutlet]="label" />
+    @if (newTab()) {
+      <app-icon name="external-link" size="sm" />
+      <span class="sr-only">{{ newTabNotice() }}</span>
+    }
+  </a>
+} @else {
+  <a class="link" [routerLink]="route()">
+    <ng-container [ngTemplateOutlet]="label" />
+  </a>
+}

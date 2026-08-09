@@ -13,8 +13,11 @@ import { DOCUMENT } from '@angular/common';
 
 import { DirectionService } from '@core/i18n/direction.service';
 import { DeviceCapabilityService } from '@core/platform/device-capability.service';
+import { ViewportService } from '@core/platform/viewport.service';
+import { PROJECTS, PROJECTS_SHIPPED } from '@data/projects.data';
+import { buildProjectPlanes, buildTypePlanes } from '../../animation/corridor-layout';
 import { HomeProgress } from '../../animation/home-progress';
-import type { StrataScene } from '../strata-scene';
+import type { ApertureScene } from '../scene/aperture-scene';
 
 /**
  * Angular wrapper around the STRATA scene.
@@ -48,11 +51,12 @@ export class StrataCanvas {
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly doc = inject(DOCUMENT);
   private readonly capability = inject(DeviceCapabilityService);
+  private readonly viewport = inject(ViewportService);
   private readonly direction = inject(DirectionService);
   private readonly progress = inject(HomeProgress);
   private readonly destroyRef = inject(DestroyRef);
 
-  private scene: StrataScene | null = null;
+  private scene: ApertureScene | null = null;
 
   constructor() {
     // Never runs on the server, and runs after paint in the browser — so
@@ -75,16 +79,19 @@ export class StrataCanvas {
     // fetched and a GPU context is created.
     if (!this.capability.canRunWebGL()) return;
 
-    const { StrataScene } = await import('../strata-scene');
+    const { ApertureScene } = await import('../scene/aperture-scene');
     if (this.destroyed) return;
 
     const styles = getComputedStyle(this.doc.documentElement);
     const lowPower = this.capability.isLowPower();
 
-    this.scene = new StrataScene({
+    this.scene = new ApertureScene({
       canvas: this.canvasRef().nativeElement,
       // Fewer sheets on constrained devices — the concept survives at four.
       layers: lowPower ? 4 : 10,
+      // Chooses the choreography, not merely the level of detail: mobile
+      // settles at each gate where desktop glides continuously.
+      mobile: !this.viewport.isDesktop(),
       pixelRatioCap: this.capability.pixelRatioCap(),
       pointerParallax: this.capability.allowsPointerParallax(),
       directionSign: this.direction.isRtl() ? -1 : 1,
@@ -92,11 +99,37 @@ export class StrataCanvas {
       // drift from the design system or hardcode a brand colour.
       inkColor: styles.getPropertyValue('--color-brand-mark').trim() || '#0a0a09',
       surfaceColor: styles.getPropertyValue('--color-background').trim() || '#fdfcfb',
+      // The page's own typeface, so words drawn into the scene are set in the
+      // same face as the words around it rather than a WebGL-only fallback.
+      fontFamily: styles.getPropertyValue('--font-display').trim() || 'system-ui, sans-serif',
+      typePlanes: buildTypePlanes(`${PROJECTS_SHIPPED}+`),
+      // Only projects with real imagery carry a texture; the rest render as an
+      // empty frame. Nothing is invented to fill the corridor.
+      projectPlanes: buildProjectPlanes(
+        PROJECTS.map((project) => ({
+          slug: project.slug,
+          platform: project.platform,
+          // The 800px variant: these are never shown larger than ~half the
+          // viewport, so the 1600px file would be memory spent on nothing.
+          src: project.cover ? project.cover.src.replace('-1600.webp', '-800.webp') : null,
+        })),
+      ),
+      // A mid-range phone should never be asked to hold the whole set.
+      textureBudget: lowPower ? 3 : 7,
     });
 
     this.observeVisibility();
     this.observeResize();
     if (this.capability.allowsPointerParallax()) this.observePointer();
+
+    if (!this.scene.isBuilt) {
+      // The mark produced no geometry. Leaving the poster in place is the
+      // correct outcome: an empty canvas would be strictly worse than the
+      // static composition it was meant to replace.
+      this.scene.dispose();
+      this.scene = null;
+      return;
+    }
 
     this.scene.setProgress(this.progress.scroll());
 

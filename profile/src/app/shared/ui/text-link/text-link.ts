@@ -8,7 +8,20 @@ import {
 import { NgTemplateOutlet } from '@angular/common';
 import { RouterLink } from '@angular/router';
 
+import { localizedContent } from '@core/i18n/localized';
 import { Icon } from '../icon/icon';
+
+/**
+ * The new-tab warning, in both languages.
+ *
+ * Lives here rather than in `@data` because it is a property of this control,
+ * not project content — every caller would otherwise have to remember to pass
+ * it, and the one that forgot would ship an English string into Arabic.
+ */
+const NEW_TAB_NOTICE = {
+  en: '(opens in a new tab)',
+  ar: '(يفتح في تبويب جديد)',
+} as const;
 
 /**
  * Text link.
@@ -34,28 +47,7 @@ import { Icon } from '../icon/icon';
   selector: 'app-text-link',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [RouterLink, Icon, NgTemplateOutlet],
-  template: `
-    <ng-template #label><ng-content /></ng-template>
-
-    @if (isExternal()) {
-      <a
-        class="link"
-        [href]="href()"
-        [attr.target]="newTab() ? '_blank' : null"
-        [attr.rel]="newTab() ? 'noopener noreferrer' : null"
-      >
-        <ng-container [ngTemplateOutlet]="label" />
-        @if (newTab()) {
-          <app-icon name="external-link" size="sm" />
-          <span class="sr-only">(opens in a new tab)</span>
-        }
-      </a>
-    } @else {
-      <a class="link" [routerLink]="route()">
-        <ng-container [ngTemplateOutlet]="label" />
-      </a>
-    }
-  `,
+  templateUrl: './text-link.html',
   styleUrl: './text-link.scss',
   host: {
     '[class.is-subtle]': 'subtle()',
@@ -74,4 +66,6 @@ export class TextLink {
   readonly subtle = input(false, { transform: booleanAttribute });
 
   protected readonly isExternal = computed(() => this.href().length > 0);
+
+  protected readonly newTabNotice = localizedContent(NEW_TAB_NOTICE);
 }

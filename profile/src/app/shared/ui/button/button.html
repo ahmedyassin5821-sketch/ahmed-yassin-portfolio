@@ -1,0 +1,25 @@
+<button
+  [attr.type]="type()"
+  [disabled]="disabled() || loading()"
+  [attr.aria-busy]="loading() ? 'true' : null"
+  [attr.aria-label]="ariaLabel() || null"
+  [class]="'btn btn--' + variant() + ' btn--' + size()"
+  (click)="pressed.emit($event)"
+>
+  @if (loading()) {
+    <!-- Replaces the leading icon slot rather than being added beside it, so
+         the button's width does not jump on state change.
+         data-motion-essential keeps it turning (slowly) under
+         prefers-reduced-motion: it reports state, so freezing it would
+         remove information rather than discomfort. -->
+    <span class="btn__spinner" data-motion-essential aria-hidden="true"></span>
+  } @else if (iconStart()) {
+    <app-icon [name]="iconStart()!" [size]="iconSize()" />
+  }
+
+  <span class="btn__label"><ng-content /></span>
+
+  @if (iconEnd() && !loading()) {
+    <app-icon [name]="iconEnd()!" [size]="iconSize()" />
+  }
+</button>

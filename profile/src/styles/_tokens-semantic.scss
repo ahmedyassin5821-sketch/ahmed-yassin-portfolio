@@ -25,6 +25,12 @@
   --color-surface-sunken: var(--warm-200);
   --color-surface-elevated: var(--warm-50);
 
+  // The one dark surface in a light system. It exists for third-party logos
+  // supplied as white-on-transparent artwork — 2B's official mark is white and
+  // orange, and it would be half-invisible on paper. Recolouring someone else's
+  // logo is not an option, so the surface changes instead of the asset.
+  --color-surface-inverse: var(--warm-950);
+
   // ---------------------------------------------------------------------------
   // Text — ratios against --color-background
   // ---------------------------------------------------------------------------

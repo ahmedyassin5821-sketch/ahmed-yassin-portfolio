@@ -22,15 +22,14 @@ export interface HomeContent {
     readonly meta: readonly { readonly label: Localized; readonly value: Localized }[];
     readonly scrollHint: Localized;
   };
-  readonly strata: {
-    readonly index: Localized;
-    readonly title: Localized;
+  /** Act 3 — the scale of the work, before any single project is named. */
+  readonly count: {
+    readonly eyebrow: Localized;
+    readonly label: Localized;
     readonly lede: Localized;
   };
-  readonly work: {
-    readonly index: Localized;
-    readonly title: Localized;
-    readonly lede: Localized;
+  /** Acts 4–6 — shared chrome for the three platform gates. */
+  readonly gates: {
     readonly placeholderLabel: Localized;
   };
   readonly transition: {
@@ -80,39 +79,37 @@ export const HOME_CONTENT: HomeContent = {
       ar: 'مرّر',
     },
   },
-  strata: {
-    index: { en: '01', ar: '01' },
-    title: {
-      en: 'Composed of three platforms',
-      ar: 'مبنيّ على ثلاث منصّات',
-    },
-    lede: {
-      en: 'The mark separates into the layers it is made of. Each one is a platform I ship production work on.',
-      ar: 'ينفصل الشعار إلى الطبقات التي يتكوّن منها. كل طبقة منصّة أعمل عليها في بيئة إنتاج حقيقية.',
-    },
-  },
-  work: {
-    index: { en: '02', ar: '02' },
-    title: {
+  count: {
+    // Sits once, here, rather than repeating above each of the three gates:
+    // this act is where the selection begins.
+    eyebrow: {
       en: 'Selected work',
       ar: 'أعمال مختارة',
     },
-    lede: {
-      en: 'Production storefronts and enterprise applications, shipped with teams and independently.',
-      ar: 'متاجر إلكترونية وتطبيقات مؤسسية في بيئة الإنتاج، أنجزتها ضمن فرق وبشكل مستقل.',
+    // The numeral itself is substituted from PROJECTS_SHIPPED, never typed here.
+    label: {
+      en: 'Projects shipped',
+      ar: 'مشروعاً منجزاً',
     },
+    lede: {
+      en: 'Across three platforms, for enterprise teams and independent brands. A selection follows.',
+      ar: 'عبر ثلاث منصّات، لفرق مؤسسية وعلامات تجارية مستقلة. وفيما يلي مختارات منها.',
+    },
+  },
+  gates: {
     placeholderLabel: {
-      en: 'Image coming soon',
-      ar: 'الصورة قريباً',
+      en: 'Imagery coming soon',
+      ar: 'الصور قريباً',
     },
   },
   transition: {
-    // {count} is substituted from the project data at render time. Spelling the
-    // number out in the copy would let the page contradict its own list the
-    // moment a project is added.
+    // {shipped} is the career total from PROJECTS_SHIPPED, not the length of the
+    // showcase array. Spelling either number out in the copy would let the page
+    // contradict itself the moment a project is added — and using the array
+    // length here would have claimed seven projects total, which is false.
     title: {
-      en: '{count} projects across three platforms.',
-      ar: '{count} مشاريع عبر ثلاث منصّات.',
+      en: '{shipped}+ projects shipped across three platforms.',
+      ar: 'أكثر من {shipped} مشروع عبر ثلاث منصّات.',
     },
     cta: {
       en: 'See all work',

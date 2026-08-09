@@ -50,8 +50,16 @@ ahmed-yassin-portfolio/                 ← repo root (app promoted here, see AD
 │   ├── ARCHITECTURE.md                 ← this file
 │   ├── DESIGN-SYSTEM.md                ← token tables, component specs
 │   └── CONTENT-MODEL.md                ← what copy is needed, in both languages
+├── project-assets/                     ← raw project captures. NOT deployed —
+│   │                                     everything in public/ ships verbatim.
+│   ├── <slug>/                         ← originals exactly as supplied
+│   └── _unused/                        ← kept, not shown (see §12)
+├── scripts/
+│   ├── generate-logo-assets.mjs        ← the AY mark, all variants
+│   └── optimize-project-assets.mjs     ← redact + optimise → public/projects/
 ├── public/
 │   ├── fonts/                          ← self-hosted woff2, subset per locale
+│   ├── projects/<slug>/                ← GENERATED. Never edit by hand; §12
 │   ├── img/{projects,og,profile}/       ← AVIF + WebP, pre-sized
 │   ├── posters/                         ← static stills of the WebGL scenes
 │   ├── cv/ahmed-yassin-{en,ar}.pdf
@@ -100,15 +108,23 @@ ahmed-yassin-portfolio/                 ← repo root (app promoted here, see AD
 │       │   │   (theme-toggle/ deferred — light-only per BRAND-SYSTEM.md)
 │       │
 │       ├── features/                   ← lazy route boundaries
-│       │   ├── home/                   BUILT — Sprint 4
-│       │   │   ├── home.ts | .html | .scss
-│       │   │   ├── sections/  hero/ strata-index/ selected-work/ work-transition/
-│       │   │   ├── animation/ home-progress.ts   ← the ONLY DOM↔WebGL contract
-│       │   │   │              home-choreography.ts  ← every ScrollTrigger, one file
-│       │   │   └── webgl/     strata-scene.ts      ← framework-free Three.js
-│       │   │                  strata-canvas/       ← Angular wrapper, gating + lifecycle
-│       │   │                  strata-poster/       ← static SVG fallback
-│       │   ├── work/         work.routes.ts · work-list/ · work-detail/ · components/
+│       │   ├── home/                   REWORKED — Sprint 6 (see §13)
+│       │   │   ├── home.ts | .html | .scss   ← the sticky stage + spacer
+│       │   │   ├── acts/      act-mark/ act-count/ act-gate/ act-resolve/
+│       │   │   ├── animation/ act-timeline.ts   ← the acts, as data
+│       │   │   │              camera-path.ts    ← camera keyframes, pure
+│       │   │   │              corridor-layout.ts ← where the planes sit
+│       │   │   │              easing.ts · home-progress.ts
+│       │   │   │              home-choreography.ts  ← the ONE ScrollTrigger
+│       │   │   └── webgl/     scene/           ← framework-free Three.js
+│       │   │                  strata-canvas/   ← Angular wrapper, gating + lifecycle
+│       │   │                  strata-poster/   ← static SVG fallback
+│       │   ├── work/                   BUILT — Sprint 5
+│       │   │   ├── work.ts | .html | .scss        ← the six-project index
+│       │   │   ├── project-card/       ← one project on the index
+│       │   │   ├── project-logo/       ← client logo chip, incl. the dark surface
+│       │   │   ├── project-nav/        ← previous / next, wraps around
+│       │   │   └── work-detail/        ← /work/:slug, prerendered per slug
 │       │   ├── about/        about.routes.ts · sections/
 │       │   ├── services/     services.routes.ts
 │       │   ├── contact/      contact.routes.ts
@@ -116,7 +132,8 @@ ahmed-yassin-portfolio/                 ← repo root (app promoted here, see AD
 │       │
 │       ├── data/                       ← content-as-code, typed, bilingual
 │       │   ├── models/       project.model.ts · experience.model.ts · skill.model.ts · …
-│       │   ├── projects.data.ts   home.content.ts     ← BUILT
+│       │   ├── projects.data.ts   home.content.ts   work.content.ts   ← BUILT
+│       │   ├── project-media.generated.ts  ← paths + measured sizes; see §12
 │       │   ├── experience.data.ts skills.data.ts
 │       │   ├── education.data.ts  certifications.data.ts  profile.data.ts
 │       │   └── content.service.ts      ← signal selectors + filters
@@ -199,6 +216,14 @@ Two practical reasons beyond tidiness, both encountered in this project:
 2. **Editors format, lint, and autocomplete `.html` properly.** Angular's own language service is markedly better in a real template file than inside a string.
 
 When modifying an existing component, do not rewrite unrelated components purely to satisfy this rule — but if you are already working in a substantial inline template, move it to an external file.
+
+Applying exactly that: Sprint 5 moved `Button` and `TextLink` to `.html` files,
+because both were being edited anyway — `TextLink` to localise its new-tab
+warning, `Button` because the same change touched it. Other Sprint 2/3
+components (`Badge`, `Card`, `Icon`, `Logo`, `FormField`, the layout chrome, and
+the dev playground) still carry inline templates and are left alone until
+something else brings a change to them. Everything created from Sprint 4 onward
+— all of `features/home/` and `features/work/` — uses external files.
 
 ### Component rules
 
@@ -749,3 +774,264 @@ Removing this dataset would sever the ability to verify or re-derive a decision 
 - **Not read by the Angular CLI, TypeScript compiler, or SSR server.** `tsconfig.app.json` includes `src/**/*.ts` only; `angular.json` copies assets from `public/` only. Nothing under `.claude/` is on either path.
 - **Not a dependency.** No `import` in `src/` references anything under `.claude/skills`. Removing the six unused skills required no application code change, no dependency change, and no design-system change.
 - **Not secret.** The tracked files are markdown and CSV reference data with no credentials, tokens, or personal data.
+
+---
+
+## 12. Project data & assets (Sprint 5)
+
+The portfolio presents **exactly six projects**. They are defined once, in
+`src/app/data/projects.data.ts`, and every surface — the Home strata index, Home
+selected work, `/work`, and `/work/:slug` — reads from that one array. There is
+no second list anywhere.
+
+| # | Project | Platform | Dashboard | Public URL |
+| --- | --- | --- | --- | --- |
+| 1 | NAS HR | Angular | Yes | — internal |
+| 2 | Nature (الطبيعة) | Angular | Yes | `https://www.neas.ae/` |
+| 3 | 2B | Magento | No | `https://2b.com.eg/` |
+| 4 | Esterad | Magento | No (Porto theme) | `https://esterad.com.eg/` |
+| 5 | Designed by G | Shopify | No | `https://www.designedby-g.com/` |
+| 6 | Nader Coffee (بن نادر) | Shopify | No | `https://www.nader-coffee.com/` |
+
+Kaza, Egyptian Treasure, Vivace, and Mistka Home were removed from the dataset.
+
+### Two directories, one direction of flow
+
+```
+project-assets/          originals — NOT deployed, NOT referenced by the app
+  <slug>/                raw PNG/SVG/WebP captures exactly as supplied
+  _unused/               material kept but not shown (see below)
+        │
+        │  npm run assets:projects   (scripts/optimize-project-assets.mjs)
+        ▼
+public/projects/         generated — the ONLY images the site serves
+  <slug>/logo.webp|svg
+  <slug>/<name>-800.webp, <name>-1600.webp, + .avif for covers
+        │
+        ▼
+src/app/data/project-media.generated.ts   paths + measured dimensions
+```
+
+`angular.json` copies `public/**` verbatim into the build output, so anything
+left in `public/` ships. That is the whole reason the originals live outside it:
+the supplied material is ~38 MB of unoptimised PNG, and the generated set is
+**3.2 MB**. Nothing is ever hand-placed in `public/projects/` — the script
+deletes and rebuilds that directory on every run.
+
+Images are never imported into TypeScript. Only paths and dimensions cross into
+the bundle, via the generated manifest.
+
+### Why the manifest is generated
+
+`ProjectImage` carries `width`/`height` because the templates render them as
+attributes, which reserves the correct box before any bytes arrive. Those numbers
+come from the encoder's own output rather than being typed by hand, so they
+cannot drift from the files. `projects.data.ts` spreads a generated entry and
+adds the one thing a machine cannot write — bilingual `alt` text:
+
+```ts
+cover: { ...M.nature.shots.home, alt: { en: '…', ar: '…' } }
+```
+
+Referencing a shot by property name means a renamed or deleted capture fails the
+build instead of silently rendering a broken image.
+
+### Redaction
+
+Some captures could not be published as supplied. The script destroys the
+affected regions — downsampling 20× before blurring, so the original pixels are
+gone rather than merely smeared — and the full rectangle map with per-region
+reasons lives in `scripts/optimize-project-assets.mjs`.
+
+- **NAS HR (`pii`)** — every capture showed real employee names, work email
+  addresses, phone numbers, salary and penalty figures, and account photos from a
+  client's internal HR system. 15 regions across 5 captures.
+- **Nature admin (`junk`)** — development placeholder rows (`asaccsacasc`,
+  `TEST EXPORT`) that read as unfinished work, plus an account photo. 8 regions
+  across 3 captures.
+
+Captures excluded outright, for reasons redaction could not fix: a 2B checkout
+holding a customer's address and phone number; a Nature admin login with a
+populated username field; a Nature services list where every readable column was
+placeholder text; and a zero-byte 1×1 capture. All are preserved under
+`project-assets/`, none are referenced.
+
+### Third-party logos
+
+Client logos are shown as supplied and are never recoloured or re-drawn. 2B's
+official mark fills its "2" and underbar with white, which would be invisible on
+this light theme, so `project-logo` places that one asset on
+`--color-surface-inverse` — the surface changes, not the artwork. Which logos
+need it is decided inside `project-logo`, not by each consumer.
+
+Logos are always decorative (`aria-hidden`): every caller writes the project name
+beside them as real text.
+
+### `--ratio-screenshot`
+
+Project media does not use `--brand-ratio`. The brand's 7:8 portrait would crop a
+desktop screenshot to a sliver. The token is set just above the widest supplied
+capture, because `object-fit: cover` crops whichever axis overflows — a narrower
+frame crops the *sides* and decapitates the site logo in the corner.
+
+Gallery images on the detail page use no frame at all; they render at their own
+intrinsic ratio, so a 510px-wide cart drawer is not stretched to a 1024px column.
+
+### Routes
+
+`/work` and `/work/:slug` are both prerendered. `getPrerenderParams` reads the
+slugs from `PROJECTS`, so adding a project cannot leave a page rendering
+correctly while answering 404 — the failure mode that rule in §3 exists to
+prevent.
+
+### Private projects
+
+`url: null` is a real state, not missing data. NAS HR is an internal system, so
+the UI renders a labelled "Internal project" marker instead of an anchor. No
+disabled link, no dead href — the tests assert that the anchor does not exist.
+
+---
+
+## 13. THE APERTURE — the Home scene (Sprint 6)
+
+The Home page is one continuous camera journey through the AY monogram. Face-on
+the mark reads as the flat identity; as the reader scrolls, the sheets separate
+along the brand's own 24° axis and the camera passes *through* the letterform.
+Everything after that — the project count, the three platform gates — is inside
+the mark.
+
+The geometry is `AY_MARK_PATH`, the same outline the logo, favicon and SVG poster
+use. The corridor is Ahmed's own letterform, not a generic tunnel.
+
+### One trigger, one number
+
+```
+scroll ──▶ ScrollTrigger.onUpdate ──▶ HomeProgress.scroll (signal) ──▶ scene
+                                 └──▶ --home-progress (CSS var) ──▶ acts
+```
+
+There is **exactly one `ScrollTrigger`** in the application, and **zero GSAP
+tweens**. GSAP reports scroll position; it does not animate. Every visual result
+is derived from that one value — by the scene, which is a pure function of it,
+and by CSS, which reads it from a custom property.
+
+`HomeProgress.act` is now `computed()` from `ACT_TIMELINE`. It used to be written
+by three extra triggers that nothing read.
+
+### The timeline is a table
+
+`animation/act-timeline.ts` holds the eight acts and their boundaries;
+`animation/camera-path.ts` holds the camera keyframes; `animation/corridor-layout.ts`
+places the type and project planes. All three are pure, framework-free, and
+unit-tested in `choreography.spec.ts` — the choreography is verifiable before
+anything renders.
+
+Both the DOM and the scene read the same table, so the text and the camera cannot
+drift apart. Tuning the choreography means editing these files and nothing else.
+
+### Why `position: sticky`, not GSAP `pin`
+
+Identical to the reader; not identical to the application. GSAP's pin injects a
+spacer wrapper and switches to fixed positioning at runtime, which collides with
+three standing constraints here: `scrollPositionRestoration: 'enabled'`,
+incremental hydration (a `@defer` subtree can hydrate after a pin was measured),
+and the sticky header's requirement that no ancestor become a scroll container.
+
+The stage's height comes from `--home-screens`, written by the choreography, so
+the CSS height and the trigger's travel are two readings of one number. The
+trigger's travel is one screen *less* than the height: a sticky element releases
+when its container's bottom reaches the viewport bottom.
+
+### The fallback is the absence of a class
+
+`.is-staged` is added only once the choreography has actually started. Under
+`prefers-reduced-motion`, without JavaScript, or if GSAP fails to load, it is
+never added — the spacer collapses, the viewport un-sticks, and the page is an
+ordinary vertical document with every act readable in order. There is no second
+code path to rot, and no scroll void. Verified: 5.5 screens of real content
+instead of 12, canvas never built, all seven project names present.
+
+### Scene structure
+
+```
+webgl/scene/          framework-free — no Angular import anywhere below here
+├── aperture-scene.ts   renderer, camera, loop; owns nothing else
+├── monogram-layers.ts  the extruded AY sheets
+├── type-planes.ts      headline words as canvas textures
+├── project-planes.ts   screenshots as textured planes + texture queue
+└── svg-path.ts         the minimal path parser
+```
+
+Each subsystem builds and disposes its own resources and exposes
+`update(progress, cameraZ)`. Adding one must never require editing the loop.
+
+**Typography in the scene** is drawn to a 2D canvas using the page's *computed*
+font, not `TextGeometry` — no font loader, no typeface converted to Three's JSON
+format, no second copy of the type system to drift. Those words are held at 16%
+opacity: every one of them also exists as real DOM text, and the DOM copy is the
+one meant to be read.
+
+**Screenshots** reuse the existing `-800.webp` variants, are decoded with
+`createImageBitmap` off the main thread, and upload **one per frame**. A plane
+requests its texture only within 90 units and the resident count is capped —
+7 on desktop, 3 on mobile. Vivace, which has no imagery, renders as a wireframe
+frame: the 3D equivalent of `MediaPlaceholder`, never an invented screenshot.
+
+### Desktop and mobile are different choreographies
+
+Not a scaled-down copy. Desktop glides continuously through the corridor over 12
+screens with pointer parallax and 10 sheets. Mobile settles *at* each gate — the
+camera path has paired keys with identical `z`, producing a genuine hold — over 7
+screens, with 4 sheets, no parallax and a wider field of view. A continuous dolly
+reads as noise on a tall narrow viewport.
+
+The spec asserts the mobile dwell is real: an earlier version stepped 2 units
+across the "hold" and was travelling further during it than desktop does on its
+eased approach.
+
+### Counts are never the array length
+
+`PROJECTS_SHIPPED` (20) is the career total; `PROJECTS.length` (7) is the curated
+showcase. Every "how many" string substitutes one or both. Rendering the array
+length alone would have claimed seven projects total, which is false.
+
+### Visual decisions from the Sprint 6 review
+
+Reviewing the rendered page — not the tests — surfaced five defects that no unit
+test could have caught. Each fix is recorded here because each encodes a
+constraint that is easy to reintroduce.
+
+**The camera carries a lateral offset.** `CameraKey.x` exists so the mark sits
+away from the reading edge during act 0 and again at the close. Centred, the
+monogram printed straight through the `<h1>` — a collision, not a composition.
+It mirrors in RTL, so the mark moves to the opposite side when the text does.
+
+**Fog is the depth cue.** `scene.fog` fades everything into the page's own paper
+colour. It is the single largest contributor to the corridor reading as space
+rather than as shapes on a backdrop, and it adds depth without introducing a
+hue — depth cueing that stays strictly inside the monochrome system.
+
+**`NEAR_FADE_DISTANCE` is 16, not 6.** The front sheet is a solid extrusion, and
+at close range the camera sees its *side* faces: a flat grey slab filling the
+frame that read as a rendering bug. Dissolving well before arrival is what makes
+the passage feel like flight through an opening letterform.
+
+**Type planes are gated by act, not only by distance.** They are 16 units tall
+and the fog reaches 110, so `SHOPIFY` was legible behind the `ANGULAR` gate — the
+reader saw the wrong word two acts early. `TypePlaneSpec.from`/`.to` tie each word
+to its own act. They also sit at 13% opacity and are deliberately cropped by the
+viewport: at readable size they duplicated the DOM heading beside them, which
+looked like a mistake rather than a layer.
+
+**The reconvergence is a second mark, not a rewind.** `MonogramLayers` takes a
+`phase`: `open` spreads across act 1, `close` collapses across the final act. The
+closing instance sits near `CORRIDOR.exit`, so the camera arrives squared up on a
+mark re-forming ahead of it. Flying the camera backwards to the entry mark would
+have undone the journey rather than ended it. The geometry resolves — the canvas
+is never simply faded out.
+
+**Mobile resolves vertically.** On a portrait viewport the closing sentence takes
+the top of the frame and the mark converges beneath it (`align-content: start`
+below `lg`), and the mobile camera's final key sits further back. A phone has
+vertical room to spare and no horizontal room at all, so the lateral answer that
+works on desktop does not transfer.

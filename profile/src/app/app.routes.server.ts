@@ -27,6 +27,17 @@ export const serverRoutes: ServerRoute[] = [
   // Each MUST be listed: without an entry it falls through to the `**` rule below
   // and answers 404 while still rendering its content correctly.
   { path: 'work', renderMode: RenderMode.Prerender },
+  {
+    // Six known slugs, so the whole set becomes static HTML at build time. The
+    // params come from the dataset rather than a hand-maintained list, which is
+    // what stops a new project from silently rendering with a 404 status.
+    path: 'work/:slug',
+    renderMode: RenderMode.Prerender,
+    async getPrerenderParams() {
+      const { PROJECTS } = await import('./data/projects.data');
+      return PROJECTS.map((project) => ({ slug: project.slug }));
+    },
+  },
   { path: 'about', renderMode: RenderMode.Prerender },
   { path: 'cv', renderMode: RenderMode.Prerender },
   { path: 'contact', renderMode: RenderMode.Prerender },

@@ -1,0 +1,34 @@
+<section class="mark" aria-labelledby="mark-name">
+  <p class="mark__eyebrow">{{ c().eyebrow }}</p>
+
+  <!-- The LCP element. Plain text, no animation, outside every deferred block. -->
+  <h1 id="mark-name" class="mark__name">{{ c().name }}</h1>
+
+  <p class="mark__role">{{ c().role }}</p>
+  <p class="mark__lede">{{ c().lede }}</p>
+
+  <dl class="mark__meta">
+    @for (item of c().meta; track item.label) {
+      <div class="mark__meta-row">
+        <dt class="mark__meta-label">{{ item.label }}</dt>
+        <!--
+          dir="auto", not .ltr-isolate.
+
+          These values are mixed-script: "مطوّر واجهات أمامية في 2B" is Arabic
+          containing a Latin token, while "Angular · Magento · Shopify" is pure
+          Latin inside an Arabic page. Forcing LTR on the first breaks it — the
+          B detaches from the 2 and jumps to the far edge. dir="auto" resolves
+          direction from the first strong character, so each value gets the
+          layout its own content calls for.
+        -->
+        <dd class="mark__meta-value" dir="auto">{{ item.value }}</dd>
+      </div>
+    }
+  </dl>
+
+  <p class="mark__scroll" aria-hidden="true">{{ c().scrollHint }}</p>
+
+  <!-- The visual conveys nothing that is not written above; this describes it
+       for anyone who asks, without duplicating the page's information. -->
+  <p class="sr-only">{{ visual().description }}</p>
+</section>

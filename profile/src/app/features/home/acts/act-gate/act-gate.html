@@ -1,0 +1,25 @@
+<section class="gate" [attr.aria-labelledby]="'gate-' + platform()">
+  <header class="gate__head">
+    <p class="gate__index" aria-hidden="true">{{ indexLabel() }}</p>
+
+    <!--
+      The platform name is a proper noun and stays Latin in both languages;
+      .ltr-isolate stops the bidi algorithm reordering it inside Arabic copy.
+    -->
+    <h2 class="gate__name" [id]="'gate-' + platform()">
+      <span class="ltr-isolate">{{ label() }}</span>
+    </h2>
+  </header>
+
+  <ul class="gate__projects" role="list">
+    @for (project of projects(); track project.slug) {
+      <li class="gate__project">
+        <app-project-surface
+          [project]="project"
+          [index]="$index"
+          [placeholderLabel]="c().placeholderLabel"
+        />
+      </li>
+    }
+  </ul>
+</section>

@@ -21,7 +21,11 @@
   // Aspect is locked here as well as on the placeholder, so a real screenshot
   // and an empty frame occupy exactly the same space and swapping one for the
   // other cannot shift the layout.
-  aspect-ratio: var(--brand-ratio);
+  //
+  // Landscape, not the 7:8 brand ratio: the real captures are wide desktop
+  // screenshots at roughly 2.2:1, and a portrait frame crops them to unreadable
+  // slivers of their own headers.
+  aspect-ratio: var(--ratio-screenshot);
   background-color: var(--color-surface-sunken);
   border: var(--border-hairline) solid var(--color-border);
 }
@@ -30,7 +34,17 @@
   inline-size: 100%;
   block-size: 100%;
   object-fit: cover;
+  // Anchored to the top so the crop keeps each site's header and hero rather
+  // than centring on whatever happens to be mid-page.
+  object-position: top center;
   transition: scale var(--dur-slow) var(--ease-out);
+}
+
+// <picture> is an inline wrapper by default, which would leave a text-baseline
+// gap under the image inside the fixed-aspect frame.
+.surface__media picture {
+  display: block;
+  block-size: 100%;
 }
 
 :host(.is-linked):hover .surface__image {

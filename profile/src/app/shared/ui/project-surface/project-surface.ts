@@ -13,7 +13,18 @@ export interface ProjectSurfaceData {
   readonly role: string | null;
   readonly technology: readonly string[];
   readonly url: string | null;
-  readonly screenshot: { readonly src: string | null; readonly alt: string | null } | null;
+  /**
+   * `null` keeps the placeholder branch reachable for a project whose imagery
+   * has not been supplied yet. All six current projects have real captures.
+   */
+  readonly screenshot: {
+    readonly src: string;
+    readonly srcset: string | null;
+    readonly avif?: string | null;
+    readonly width: number;
+    readonly height: number;
+    readonly alt: string;
+  } | null;
 }
 
 /**
@@ -50,7 +61,12 @@ export class ProjectSurface {
   /** Index shown as an editorial numeral. */
   readonly index = input<number>(0);
 
-  protected readonly hasImage = computed(() => !!this.project().screenshot?.src);
-
   protected readonly indexLabel = computed(() => String(this.index() + 1).padStart(2, '0'));
+
+  /**
+   * Home lays these out three-up on wide screens and one-up on phones, inside a
+   * container that never exceeds ~1200px. Stating that lets the browser pick the
+   * 800px variant on a phone instead of fetching 1600px it cannot use.
+   */
+  protected readonly sizes = '(min-width: 64rem) 33vw, (min-width: 48rem) 50vw, 100vw';
 }

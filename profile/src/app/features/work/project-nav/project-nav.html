@@ -1,0 +1,26 @@
+<nav class="nav" [attr.aria-label]="regionLabel()">
+  <a class="nav__link is-previous" [routerLink]="['/work', previous().slug]">
+    <!-- arrow-left is in RTL_MIRRORED_ICONS, so it flips with the reading
+         direction without this template knowing which language is active. -->
+    <span class="nav__cue" aria-hidden="true">
+      <app-icon name="arrow-left" size="sm" />
+    </span>
+    <span class="nav__text">
+      <span class="nav__label">{{ previousLabel() }}</span>
+      <span class="nav__name" dir="auto">{{ previous().name }}</span>
+    </span>
+    <!-- The visible label is only "Previous"; this carries the project name. -->
+    <span class="sr-only">{{ previousA11y() }}</span>
+  </a>
+
+  <a class="nav__link is-next" [routerLink]="['/work', next().slug]">
+    <span class="nav__text">
+      <span class="nav__label">{{ nextLabel() }}</span>
+      <span class="nav__name" dir="auto">{{ next().name }}</span>
+    </span>
+    <span class="nav__cue" aria-hidden="true">
+      <app-icon name="arrow-right" size="sm" />
+    </span>
+    <span class="sr-only">{{ nextA11y() }}</span>
+  </a>
+</nav>

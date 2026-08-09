@@ -1,11 +1,236 @@
+@use 'index' as ds;
+
 :host {
   display: block;
 }
 
+// clip rather than hidden: `hidden` would make this a scroll container, which
+// breaks `position: sticky` for the header above it AND for the stage below.
 .home {
   display: block;
-  // The hero's visual layer is absolutely positioned and can extend past the
-  // gutter. `clip` rather than `hidden` so it does not create a scroll container
-  // and break the sticky header above it.
   overflow-x: clip;
+}
+
+// -----------------------------------------------------------------------------
+// Unstaged — the resting layout
+//
+// This is what renders under prefers-reduced-motion, without JavaScript, and
+// before the choreography starts. It is a plain vertical document: the scene is
+// a decorative band, and the acts follow one another in reading order.
+// -----------------------------------------------------------------------------
+.home__scene {
+  position: relative;
+  block-size: 60vh;
+  pointer-events: none;
+}
+
+.home__acts {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-24);
+  padding-block: var(--space-16) var(--space-24);
+}
+
+.home__poster,
+.home__canvas {
+  position: absolute;
+  inset: 0;
+}
+
+// Cross-fades out once the scene is live, so the SVG strata and the WebGL
+// strata never render on top of one another.
+.home__poster {
+  transition: opacity var(--dur-deliberate) var(--ease-out);
+}
+
+.home__poster.is-retired {
+  opacity: 0;
+}
+
+.home__canvas {
+  animation: home-canvas-in var(--dur-deliberate) var(--ease-out) both;
+}
+
+@keyframes home-canvas-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Staged — the scroll-driven scene
+//
+// Height comes from --home-screens, written by the choreography, so the scroll
+// distance and the ScrollTrigger's end are derived from one number rather than
+// duplicated between a stylesheet and a service.
+// -----------------------------------------------------------------------------
+.home.is-staged {
+  min-block-size: calc(var(--home-screens, 12) * 100dvh);
+}
+
+.home.is-staged .home__viewport {
+  position: sticky;
+  inset-block-start: 0;
+  block-size: 100dvh;
+  overflow: hidden;
+}
+
+.home.is-staged .home__scene {
+  position: absolute;
+  block-size: auto;
+  inset: 0;
+
+  // Subdued while the identity is being read, full once the journey starts.
+  //
+  // The scene is full-bleed and the monogram is centred, so at act 0 it renders
+  // directly behind the `<h1>`. At full strength it swamps the LCP heading — the
+  // one thing on the page that must be legible before anything else. Ramping in
+  // over the first act keeps the mark present as a ghost, then hands the frame
+  // over to the camera once the reader has committed to scrolling.
+  opacity: clamp(0.16, calc(0.16 + (var(--home-progress, 0) / 0.12) * 0.84), 1);
+}
+
+.home.is-staged .home__acts {
+  position: absolute;
+  display: block;
+  inset: 0;
+  padding-block: 0;
+}
+
+// Every act occupies the same box; the timeline decides which is legible.
+.home.is-staged .home__act {
+  position: absolute;
+  display: grid;
+  align-content: center;
+  inset: 0;
+  padding-block: var(--space-24) var(--space-16);
+  overflow-y: auto;
+
+  // How much of an act's span is spent fading, as a fraction of the whole
+  // scroll. Short: these are full-screen slabs of type at the same position, so
+  // a generous cross-fade reads as two headlines ghosting through each other
+  // rather than as a transition.
+  --act-fade: 0.008;
+
+  // Pure CSS envelope. No tween, no per-frame change detection, and it reads the
+  // same --home-progress the scene does, so text and camera cannot disagree.
+  //
+  // The rise happens in the window *before* the act starts, not after it. Fading
+  // in from `--act-start` would leave every act at opacity 0 at the instant it
+  // becomes current — including the first, which holds the LCP heading and must
+  // be fully painted at progress 0. Ramping over [start − fade, start] also makes
+  // one act's fall exactly the next one's rise, so they cross-fade rather than
+  // both dipping to nothing in between.
+  --enter: clamp(
+    0,
+    calc((var(--home-progress, 0) - (var(--act-start) - var(--act-fade))) / var(--act-fade)),
+    1
+  );
+  --exit: clamp(0, calc((var(--act-end) - var(--home-progress, 0)) / var(--act-fade)), 1);
+  --presence: min(var(--enter), var(--exit));
+
+  opacity: var(--presence);
+  // Enters from below and leaves upward, so consecutive acts travel in one
+  // direction instead of both sliding out of the same edge. Using --presence for
+  // both would have moved an outgoing act back down through the incoming one.
+  // The block axis does not mirror, so this is RTL-safe as written.
+  translate: 0
+    calc((1 - var(--enter)) * var(--space-8) - (1 - var(--exit)) * var(--space-8));
+  // Recedes on the way out as well as fading. Two slabs of type cross-fading at
+  // the same size and position read as one blurred image; giving the outgoing
+  // act depth separates them into foreground and background for the short
+  // window where both are on screen.
+  scale: calc(1 - (1 - var(--exit)) * 0.04);
+  // An act at zero opacity must not swallow clicks or trap the keyboard.
+  pointer-events: none;
+}
+
+// The final act never fades out: it ends at progress 1, and applying the exit
+// ramp there would blank the closing call to action exactly when the reader
+// reaches it.
+.home.is-staged .home__act[data-act='resolve'] {
+  --exit: 1;
+}
+
+// On a portrait viewport the closing sentence takes the top of the frame and the
+// mark reconverges beneath it. Centred, the two compete for the same space and
+// the mark prints straight through the text — the same collision the opening
+// camera offset exists to avoid, and it needs a different answer here because a
+// phone has vertical room to spare and no horizontal room at all.
+@include ds.mq-below(lg) {
+  .home.is-staged .home__act[data-act='resolve'] {
+    align-content: start;
+  }
+}
+
+// Only the act the reader is actually inside accepts input.
+//
+// Driven by the derived act signal rather than by the opacity envelope, because
+// `pointer-events` is not an interpolatable property — there is no way to derive
+// it from `--presence` in CSS. Without this, seven full-screen acts are stacked
+// on top of one another and the topmost invisible one swallows every click.
+//
+// `.is-current` changes seven times over the whole scroll, not once per frame.
+.home.is-staged .home__act {
+  pointer-events: none;
+}
+
+.home.is-staged .home__act.is-current {
+  pointer-events: auto;
+}
+
+// Scene-only beats carry no text at all — the camera work is the whole content.
+// Hidden in every state, not just the staged one: unstaged they would otherwise
+// render as two empty flex children and open a gap of dead space in the middle
+// of the reduced-motion document.
+.home__act[data-act='separation'],
+.home__act[data-act='passage'] {
+  display: none;
+}
+
+// -----------------------------------------------------------------------------
+// Reduced motion
+//
+// The choreography never adds .is-staged in this case, so these rules are a
+// belt-and-braces guarantee rather than the mechanism: if the class were ever
+// present, the stage still collapses to a readable document.
+// -----------------------------------------------------------------------------
+@include ds.mq-reduced-motion {
+  .home.is-staged {
+    min-block-size: 0;
+  }
+
+  .home.is-staged .home__viewport {
+    position: static;
+    block-size: auto;
+    overflow: visible;
+  }
+
+  .home.is-staged .home__acts {
+    position: static;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-24);
+    padding-block: var(--space-16) var(--space-24);
+  }
+
+  .home.is-staged .home__act {
+    position: static;
+    display: block;
+    overflow: visible;
+    opacity: 1;
+    translate: none;
+    scale: none;
+    padding-block: 0;
+    pointer-events: auto;
+  }
+
+  .home__act[data-act='separation'],
+  .home__act[data-act='passage'] {
+    display: none;
+  }
 }

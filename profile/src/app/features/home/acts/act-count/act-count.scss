@@ -1,0 +1,46 @@
+@use 'index' as ds;
+
+:host {
+  display: block;
+}
+
+.count {
+  @include ds.container;
+
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  gap: var(--space-3);
+}
+
+.count__eyebrow {
+  @include ds.label;
+
+  color: var(--color-text-muted);
+}
+
+// Set in a mono face at display scale: this is a measurement, not a headline,
+// and the tabular figures keep it from wobbling if the number ever changes.
+.count__figure {
+  @include ds.display-1;
+  @include ds.tabular;
+
+  color: var(--color-text-primary);
+  line-height: 0.85;
+}
+
+.count__label {
+  @include ds.heading-2;
+
+  color: var(--color-text-secondary);
+  font-weight: var(--weight-light);
+}
+
+.count__lede {
+  @include ds.body;
+
+  max-inline-size: 42ch;
+  margin-block-start: var(--space-2);
+  color: var(--color-text-muted);
+  text-wrap: pretty;
+}
