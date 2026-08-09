@@ -1,6 +1,6 @@
 <section class="gate" [attr.aria-labelledby]="'gate-' + platform()">
   <header class="gate__head">
-    <p class="gate__index" aria-hidden="true">{{ indexLabel() }}</p>
+    <p class="gate__eyebrow">{{ c().eyebrow }}</p>
 
     <!--
       The platform name is a proper noun and stays Latin in both languages;
@@ -9,15 +9,25 @@
     <h2 class="gate__name" [id]="'gate-' + platform()">
       <span class="ltr-isolate">{{ label() }}</span>
     </h2>
+
+    <p class="gate__count" aria-hidden="true">{{ countLabel() }}</p>
   </header>
 
-  <ul class="gate__projects" role="list">
+  <!--
+    Not a grid. The first project of each platform leads at a larger size and the
+    rest support it, with the media side alternating — so a gate reads as one
+    art-directed composition rather than as equal tiles.
+  -->
+  <ul class="gate__plates" role="list">
     @for (project of projects(); track project.slug) {
-      <li class="gate__project">
-        <app-project-surface
+      <li class="gate__plate" [class.is-lead]="$first">
+        <app-project-figure
           [project]="project"
-          [index]="$index"
+          [index]="offset() + $index"
+          [variant]="$first ? 'lead' : 'support'"
+          [align]="$first ? 'end' : 'start'"
           [placeholderLabel]="c().placeholderLabel"
+          [viewLabel]="c().viewLabel"
         />
       </li>
     }

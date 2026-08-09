@@ -1,0 +1,26 @@
+<section class="gallery" [attr.aria-label]="regionLabel()">
+  <h2 class="gallery__title">{{ title() }}</h2>
+
+  <!--
+    Alternating inset rather than a uniform stack: every plate the same width
+    down a long page read as a contact sheet, not a sequence.
+  -->
+  <ul class="gallery__shots" role="list">
+    @for (shot of shots(); track shot.src; let i = $index) {
+      <li [class.is-inset]="i % 2 === 1" appReveal [revealIndex]="i">
+        <figure>
+          <img
+            [src]="shot.src"
+            [attr.srcset]="shot.srcset"
+            [attr.sizes]="sizes()"
+            [alt]="shot.alt"
+            [width]="shot.width"
+            [height]="shot.height"
+            loading="lazy"
+            decoding="async"
+          />
+        </figure>
+      </li>
+    }
+  </ul>
+</section>

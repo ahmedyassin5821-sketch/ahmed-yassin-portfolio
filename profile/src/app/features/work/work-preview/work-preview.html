@@ -1,0 +1,26 @@
+<div class="preview">
+  <!--
+    Every project is rendered and cross-faded by class rather than swapped in and
+    out of the DOM. Swapping would re-request the image on every change and flash
+    an empty frame between projects; here the browser has already decoded them.
+  -->
+  @for (project of projects(); track project.slug) {
+    <figure class="preview__plate" [class.is-active]="project.slug === activeSlug()">
+      @if (project.image; as image) {
+        <img
+          class="preview__image"
+          [src]="image.src"
+          [attr.srcset]="image.srcset"
+          [attr.sizes]="sizes"
+          [alt]="''"
+          [width]="image.width"
+          [height]="image.height"
+          [attr.loading]="$first ? 'eager' : 'lazy'"
+          decoding="async"
+        />
+      } @else {
+        <app-media-placeholder [caption]="project.name" [label]="placeholderLabel()" />
+      }
+    </figure>
+  }
+</div>

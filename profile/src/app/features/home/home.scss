@@ -183,6 +183,30 @@
   pointer-events: auto;
 }
 
+// Gates carry the most content of any act, so they take the padding back.
+.home.is-staged .home__act[data-act='angular'],
+.home.is-staged .home__act[data-act='magento'],
+.home.is-staged .home__act[data-act='shopify'] {
+  padding-block: var(--space-16) var(--space-8);
+
+  // The DOM half of the hand-off.
+  //
+  // Immediately before a gate, the scene brings that platform's lead screenshot
+  // out of the periphery, squares it to the camera and grows it. This settles
+  // the incoming plate out of depth on the same beat, so the plane appears to
+  // become the DOM element rather than being replaced by it.
+  //
+  // Scoped to gate acts on purpose: act 0 holds the LCP heading and must never
+  // be transformed. --enter (not --presence) drives it, so the settle happens on
+  // arrival and does not run backwards as the act leaves.
+  perspective: 1400px;
+  transform-style: preserve-3d;
+  // Composed with the base exit-recede rather than replacing it: a bare
+  // `scale` here would override the outgoing act's depth separation and the two
+  // gates would cross-fade at identical size again.
+  scale: calc((1 + (1 - var(--enter)) * 0.06) * (1 - (1 - var(--exit)) * 0.04));
+}
+
 // Scene-only beats carry no text at all — the camera work is the whole content.
 // Hidden in every state, not just the staged one: unstaged they would otherwise
 // render as two empty flex children and open a gap of dead space in the middle

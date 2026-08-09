@@ -17,6 +17,8 @@
   }
 }
 
+// Unboxed. Two bordered rectangles at the foot of the page read as buttons in a
+// CMS; a rule and a name read as the next thing to look at.
 .nav__link {
   @include ds.focus-visible;
 
@@ -24,15 +26,17 @@
   min-inline-size: 0;
   align-items: center;
   gap: var(--space-3);
-  padding: var(--space-4);
-  border: var(--border-hairline) solid var(--color-border);
+  padding-block: var(--space-4);
   color: var(--color-text-primary);
   text-decoration: none;
-  transition: border-color var(--dur-quick) var(--ease-out);
 }
 
-.nav__link:hover {
-  border-color: var(--color-border-interactive);
+.nav__link .nav__name {
+  transition: opacity var(--dur-quick) var(--ease-out);
+}
+
+.nav__link:hover .nav__name {
+  opacity: 0.6;
 }
 
 // justify-content follows the inline axis, so "next" sits at the reading end in
@@ -55,12 +59,12 @@
   color: var(--color-text-muted);
 }
 
-// A long project name must not widen the grid track — it truncates instead.
+// The next project is worth reading, so it is set at heading scale rather than
+// as a caption. Still truncates so a long name cannot widen the grid track.
 .nav__name {
-  @include ds.body;
+  @include ds.heading-3;
 
   overflow: hidden;
-  font-size: var(--fs-body-sm);
   text-overflow: ellipsis;
   white-space: nowrap;
 }

@@ -236,7 +236,7 @@ export class ApertureScene {
     this.monogram.update(p, key.z);
     this.exitMark.update(p, key.z);
     this.type.update(p, key.z);
-    this.projects.update(key.z);
+    this.projects.update(p, key.z);
   }
 
   dispose(): void {

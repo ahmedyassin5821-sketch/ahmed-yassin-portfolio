@@ -1035,3 +1035,112 @@ the top of the frame and the mark converges beneath it (`align-content: start`
 below `lg`), and the mobile camera's final key sits further back. A phone has
 vertical room to spare and no horizontal room at all, so the lateral answer that
 works on desktop does not transfer.
+
+### Selected Work as an editorial system (Sprint 7)
+
+The gates were a two-across grid of bordered cards. Six identical boxes read as a
+CMS listing: the eye finds no entry point, and nothing signals that these are
+*selected* pieces rather than a complete table.
+
+`ProjectFigure` replaces the card. Each project is a plate with an oversized
+index numeral, a name at display scale, its category on its own line, and the
+stack beneath — so the hierarchy is **number → name → category → stack** and a
+reader places the work in one glance without reading a paragraph.
+
+`variant` (`lead` | `support`) is what makes a gate a composition rather than a
+row: the first project of each platform leads at a larger size in a wider column
+and the rest support it, with `align` flipping which side the media sits on. The
+grid is `3fr / 2fr`, never `1fr / 1fr` — an even split is a grid, an uneven one
+is a composition.
+
+Two constraints the layout has to respect:
+
+- **An act is exactly one viewport.** A plate cannot be sized by aspect ratio
+  alone; the three-project Shopify gate overflowed and clipped. `max-block-size`
+  in `dvh` caps each plate and `object-fit` absorbs the extra crop.
+- **Numbering runs 01–07 across the whole showcase**, not per gate, so the
+  numerals read as one curated sequence. `offset` derives it from `PROJECTS`.
+
+The stack line (`Shopify · Dashboard`) is assembled in the component from
+`platform`, `theme` and `dashboard` rather than stored as copy, so a project that
+gains a dashboard needs no content edit.
+
+**Project planes moved to the periphery.** Once every project had a real
+editorial plate in the DOM, a textured plane sitting behind it rendered the same
+screenshot twice — which reads as a bug, not as depth. They now sit at ±12 units
+with peak opacity 0.26: scenery the camera passes at the frame edges, not a
+second presentation. Planes also clear entirely across the final act, so the
+reconvergence is the mark and nothing else.
+
+---
+
+## 14. Spatial continuity & the editorial archive (Sprint 8)
+
+### The hero → work hand-off
+
+The corridor and the gates used to be two systems occupying the same instant
+without acknowledging each other: the scene showed peripheral scenery while the
+DOM faded an unrelated composition over it.
+
+`ProjectPlaneSpec` now carries `isLead` and `gateAt`. Over the
+`HANDOFF_WINDOW` before a gate, that one plane leaves the periphery — `offsetX →
+0`, `rotation.y → 0`, scaling up — and the gate's DOM act settles out of depth on
+the same beat (`perspective` + a scale driven by `--enter`, scoped to gate acts
+only so act 0's LCP heading is never transformed).
+
+Two details that were wrong on the first attempt:
+
+- **The near-fade had to be released during presentation.** It exists to stop a
+  plane clipping through the camera, so it dims by proximity — exactly backwards
+  for a hand-off, where the plane must be most present when it is closest.
+- **The gate's scale composes with the base exit-recede** rather than replacing
+  it. A bare `scale` on the gate rule overrode the outgoing act's depth
+  separation, and consecutive gates cross-faded at identical size again.
+
+Nothing is pixel-matched between the plane and the plate; matching a projected
+rect across viewports and RTL is fragile. The two share a direction, a size and
+an instant, and that is what reads as one world.
+
+### `/work` — a typographic index
+
+Home presents *plates*; the archive presents a *list*. Seven oversized numbered
+rows (`display-2` names, mono numeral column, category as a label, stack as one
+`·`-joined line) beside a sticky pane holding the active project's screenshot.
+Hairline rules between rows, and **no boxes, pills, chips or badges** anywhere.
+
+- The pane is an **enhancement, never the content**: it defaults to the first
+  project, so it shows real work on the server and without JavaScript. Below
+  `md` it disappears and each row carries its own image instead.
+- All plates are rendered and cross-faded by class rather than swapped in and
+  out of the DOM — swapping re-requests the image and flashes an empty frame.
+- Non-active names dim to 0.6, not 0.38; at 0.38 six of seven names read as
+  disabled and the page looked washed out.
+
+**Link status has three states, not two.** `live` · `private` · `pending`.
+NAS HR has no public address because it is an internal system; Vivace has none
+because its assets have not been supplied. Labelling Vivace "Internal project"
+was false, and the spec now asserts the three counts separately.
+
+### `/work/:slug` — type-first
+
+Identity lands on paper before any imagery: index numeral, name at `display-1`,
+category, stack, link status. The cover then **breaks the measure full-bleed** —
+the one moment on the page where the work is larger than the words about it.
+Facts follow as a hairline-ruled row, then the gallery with every second plate
+inset so a long page reads as a sequence rather than a contact sheet.
+
+Everything unboxed: no logo chip, no dashed private box (a left rule instead), no
+bordered plates, no bordered prev/next.
+
+### Component budget forced a better structure
+
+`work-detail.scss` went 1.55 kB over the 4 kB per-component budget. Rather than
+weaken the budget, the two self-contained units moved out — `project-gallery` and
+`project-facts`, each owning its own styles, matching what `project-nav` already
+did. The budget did its job: it caught a component accumulating unrelated
+responsibilities.
+
+### Removed
+
+`shared/ui/project-surface/` — dead, zero usages, a generation older than
+`ProjectFigure`. And `features/work/project-card/`, replaced by `work-row`.

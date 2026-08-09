@@ -86,7 +86,7 @@ describe('Work detail', () => {
     expect(cover?.getAttribute('loading')).toBe('eager');
     expect(cover?.getAttribute('fetchpriority')).toBe('high');
 
-    const shots = Array.from(el.querySelectorAll<HTMLImageElement>('.detail__shots img'));
+    const shots = Array.from(el.querySelectorAll<HTMLImageElement>('.gallery__shots img'));
     expect(shots.length).toBe(projectBySlug('nature')!.screenshots.length);
     expect(shots.every((i) => i.getAttribute('loading') === 'lazy')).toBe(true);
   });

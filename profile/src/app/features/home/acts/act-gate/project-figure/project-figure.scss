@@ -1,0 +1,151 @@
+@use 'index' as ds;
+
+:host {
+  display: block;
+  min-inline-size: 0;
+}
+
+.figure {
+  display: grid;
+  gap: var(--space-4);
+}
+
+// -----------------------------------------------------------------------------
+// Media
+//
+// No border and no box. A plate sits on the paper and is separated from it by a
+// hairline underneath and a shadow, not by being fenced in — the fenced version
+// is what made six projects read as six identical cards.
+// -----------------------------------------------------------------------------
+.figure__media {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: var(--ratio-screenshot);
+  // An act occupies exactly one viewport, so a plate cannot be sized by its
+  // aspect alone: the three-project Shopify gate overflowed and clipped. The cap
+  // crops a little more instead, which object-fit already handles gracefully.
+  max-block-size: 34dvh;
+  background-color: var(--color-surface-sunken);
+  // Grounded on the page rather than floating: a hairline seam plus the
+  // system's own elevation shadow. Raw rgb() is banned under src/app — every
+  // shade has to come from a token, which is what keeps the greys consistent.
+  box-shadow: var(--elevation-3-shadow);
+}
+
+.figure__image {
+  inline-size: 100%;
+  block-size: 100%;
+  // Anchored to the top so a crop keeps each site's header and hero, which is
+  // the part that identifies the work.
+  object-fit: cover;
+  object-position: top center;
+  transition: scale var(--dur-deliberate) var(--ease-out);
+}
+
+.figure:hover .figure__image {
+  scale: 1.03;
+}
+
+@include ds.mq-reduced-motion {
+  .figure__image,
+  .figure:hover .figure__image {
+    scale: 1;
+    transition: none;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Meta
+// -----------------------------------------------------------------------------
+.figure__meta {
+  display: grid;
+  align-items: baseline;
+  gap: 0 var(--space-3);
+  // The numeral occupies its own narrow column so every name in a gate starts on
+  // the same optical axis regardless of how wide its number is.
+  grid-template-columns: auto minmax(0, 1fr);
+}
+
+.figure__index {
+  @include ds.mono;
+
+  grid-row: 1 / span 3;
+  color: var(--color-text-muted);
+  font-size: var(--fs-body-sm);
+  line-height: 1.2;
+}
+
+.figure__name {
+  @include ds.heading-2;
+
+  color: var(--color-text-primary);
+  line-height: 1.05;
+}
+
+.figure__link {
+  @include ds.focus-visible;
+
+  color: inherit;
+  text-decoration: none;
+}
+
+.figure__link:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+// The category is the line that lets someone place the work instantly, so it is
+// set as prominently as the technology and above it in the hierarchy.
+.figure__category {
+  @include ds.label;
+
+  margin-block-start: var(--space-2);
+  color: var(--color-text-primary);
+}
+
+.figure__stack {
+  @include ds.mono;
+
+  margin-block-start: var(--space-1);
+  color: var(--color-text-muted);
+  font-size: var(--fs-caption);
+}
+
+// -----------------------------------------------------------------------------
+// Variants
+//
+// The lead plate is larger and its type steps up with it. Support plates hold
+// the same structure at a smaller scale, which is what makes a gate read as one
+// composition rather than as equal tiles.
+// -----------------------------------------------------------------------------
+:host(.figure--lead) .figure__name {
+  @include ds.display-2;
+
+  line-height: 0.95;
+}
+
+:host(.figure--lead) .figure__index {
+  font-size: var(--fs-body);
+}
+
+:host(.figure--lead) .figure__media {
+  max-block-size: 44dvh;
+}
+
+:host(.figure--support) .figure__media {
+  max-block-size: 19dvh;
+}
+
+// Media before caption, or after it. Alternating this across a gate is what
+// stops three plates from marching down the page in the same rhythm.
+:host(.figure--end) .figure {
+  grid-template-areas: 'meta' 'media';
+}
+
+:host(.figure--end) .figure__media {
+  grid-area: media;
+}
+
+:host(.figure--end) .figure__meta {
+  grid-area: meta;
+}

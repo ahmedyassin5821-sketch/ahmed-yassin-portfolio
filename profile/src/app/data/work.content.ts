@@ -54,6 +54,18 @@ export const WORK_CONTENT = {
       en: 'An internal system with no public address.',
       ar: 'نظام داخلي بلا عنوان عام.',
     },
+    /**
+     * The counterpart to `private` on the index. Both are stated as plain text
+     * rather than badges — whether a project has a public address is a fact
+     * about the work, and a pill made it read as a disabled control.
+     */
+    live: { en: 'Live ↗', ar: '↗ مباشر' },
+    /**
+     * Distinct from `private`. NAS HR has no public address because it is an
+     * internal system; Vivace has none because its assets have not been supplied
+     * yet. Calling the second "internal" would be false.
+     */
+    pending: { en: 'Coming soon', ar: 'قريباً' },
     backToWork: { en: 'All work', ar: 'كل الأعمال' },
     previous: { en: 'Previous', ar: 'السابق' },
     next: { en: 'Next', ar: 'التالي' },

@@ -8,40 +8,90 @@
   @include ds.container;
 }
 
+// -----------------------------------------------------------------------------
+// Head
+//
+// The platform is the largest thing in the act — it is the gate the camera
+// passes through, and the DOM should read with the same weight. The rule beneath
+// it is skewed to the monogram's own leg angle, so the page's line work and the
+// 3D share one geometry.
+// -----------------------------------------------------------------------------
 .gate__head {
-  display: flex;
-  align-items: baseline;
-  gap: var(--space-4);
+  display: grid;
+  align-items: end;
+  gap: 0 var(--space-4);
+  grid-template-columns: minmax(0, 1fr) auto;
   margin-block-end: var(--space-8);
-  padding-block-end: var(--space-4);
-  border-block-end: var(--border-hairline) solid var(--color-border);
+  padding-block-end: var(--space-3);
+  border-block-end: var(--border-hairline) solid var(--color-border-strong);
 }
 
-.gate__index {
-  @include ds.mono;
+.gate__eyebrow {
+  @include ds.label;
 
+  grid-column: 1 / -1;
+  margin-block-end: var(--space-2);
   color: var(--color-text-muted);
 }
 
-// The platform name is the largest thing in the act — it is the gate the camera
-// passes through, and the DOM should read with the same emphasis.
 .gate__name {
   @include ds.display-2;
 
   color: var(--color-text-primary);
+  line-height: 0.9;
 }
 
-.gate__projects {
+.gate__count {
+  @include ds.mono;
+
+  color: var(--color-text-muted);
+  font-size: var(--fs-caption);
+  // Sits on the same baseline as the platform name without being dragged up by
+  // its much larger line box.
+  padding-block-end: var(--space-1);
+}
+
+// -----------------------------------------------------------------------------
+// Plates
+//
+// Asymmetric by construction. The lead project takes the wider column and the
+// supports stack beside it, so the eye enters at one place instead of scanning
+// equal tiles. Below `md` the composition becomes a single column, still led by
+// the same project.
+// -----------------------------------------------------------------------------
+.gate__plates {
   display: grid;
   gap: var(--space-8);
   grid-template-columns: 1fr;
 
-  @include ds.mq(sm) {
-    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  @include ds.mq(md) {
+    align-items: start;
+    gap: var(--space-10);
+    // 3fr / 2fr rather than 1fr / 1fr: an even split is a grid, an uneven one is
+    // a composition.
+    grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
   }
 }
 
-// Stops a wide screenshot forcing its track past its share and overflowing.
-.gate__project {
+.gate__plate {
   min-inline-size: 0;
+}
+
+// The lead spans the full height of the left column while the supports stack on
+// the right — the shape that makes a gate read as one spread.
+@include ds.mq(md) {
+  .gate__plate.is-lead {
+    grid-column: 1;
+    grid-row: 1 / span 3;
+  }
+
+  .gate__plate:not(.is-lead) {
+    grid-column: 2;
+  }
+
+  // Supports are inset from the lead so the two columns do not read as a pair of
+  // equal blocks butted together.
+  .gate__plate:not(.is-lead) + .gate__plate:not(.is-lead) {
+    padding-block-start: var(--space-2);
+  }
 }

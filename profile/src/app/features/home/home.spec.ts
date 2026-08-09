@@ -118,7 +118,7 @@ describe('Home', () => {
 
   it('renders a media frame for every project, real or pending', async () => {
     const { el } = await render();
-    const images = el.querySelectorAll('.surface__image');
+    const images = el.querySelectorAll('.figure__image');
     const placeholders = el.querySelectorAll('app-media-placeholder');
 
     expect(images.length).toBe(PROJECTS.filter((p) => p.cover !== null).length);
@@ -128,7 +128,7 @@ describe('Home', () => {
 
   it('never renders a project link without a confirmed URL', async () => {
     const { el } = await render();
-    const anchors = Array.from(el.querySelectorAll('.surface__link'));
+    const anchors = Array.from(el.querySelectorAll('.figure__link'));
 
     expect(anchors.length).toBe(PROJECTS.filter((p) => p.url !== null).length);
     for (const anchor of anchors) {

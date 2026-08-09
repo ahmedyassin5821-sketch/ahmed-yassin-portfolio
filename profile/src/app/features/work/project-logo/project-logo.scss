@@ -7,8 +7,9 @@
   inline-size: 4rem;
   block-size: 2rem;
   padding: var(--space-1);
-  border: var(--border-hairline) solid var(--color-border);
-  background-color: var(--color-surface);
+  // No frame. The chip only needs a ground where the artwork itself would be
+  // invisible; everywhere else the logo sits directly on the paper.
+  background-color: transparent;
 }
 
 // Both dimensions must be definite. With `inline-size: auto` the image's

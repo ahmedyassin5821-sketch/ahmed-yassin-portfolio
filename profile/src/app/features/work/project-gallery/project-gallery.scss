@@ -1,0 +1,43 @@
+@use 'index' as ds;
+
+:host {
+  display: block;
+  margin-block-start: var(--space-16);
+}
+
+.gallery__title {
+  @include ds.label;
+
+  margin-block-end: var(--space-8);
+  padding-block-end: var(--space-3);
+  border-block-end: var(--border-hairline) solid var(--color-border);
+  color: var(--color-text-muted);
+}
+
+.gallery__shots {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+}
+
+.gallery__shots figure {
+  background-color: var(--color-surface-sunken);
+  box-shadow: var(--elevation-3-shadow);
+}
+
+.gallery__shots img {
+  display: block;
+  // Narrow captures — a cart drawer, a modal — keep their real resolution
+  // rather than being stretched to the column.
+  max-inline-size: 100%;
+  inline-size: 100%;
+  block-size: auto;
+  margin-inline: auto;
+}
+
+@include ds.mq(md) {
+  .gallery__shots > li.is-inset {
+    // Logical, so the inset follows the reading direction in both languages.
+    margin-inline-start: var(--space-24);
+  }
+}

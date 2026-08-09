@@ -1,0 +1,14 @@
+<dl class="facts">
+  @for (fact of facts(); track fact.label) {
+    <div class="facts__row">
+      <dt>{{ fact.label }}</dt>
+      <dd dir="auto">
+        @if (fact.isolate) {
+          <span class="ltr-isolate">{{ fact.value }}</span>
+        } @else {
+          {{ fact.value }}
+        }
+      </dd>
+    </div>
+  }
+</dl>

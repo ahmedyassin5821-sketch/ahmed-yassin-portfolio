@@ -33,7 +33,7 @@ describe('Work index', () => {
 
   it('renders exactly the approved showcase, and nothing else', async () => {
     const { el } = await render();
-    const cards = el.querySelectorAll('app-project-card');
+    const cards = el.querySelectorAll('app-work-row');
 
     // Pinned to the approved slugs rather than a count, so adding a project is
     // a deliberate edit here and not something a test silently absorbs.
@@ -81,12 +81,18 @@ describe('Work index', () => {
 
     // Vivace today. No stock photography, no borrowed screenshot, no empty box.
     expect(pending.length).toBeGreaterThan(0);
-    expect(el.querySelectorAll('app-media-placeholder').length).toBe(pending.length);
+
+    // Once in its own row (the only image path below md) and once in the sticky
+    // pane (the only image path above it). Both must be honest frames.
+    expect(el.querySelectorAll('.row__media app-media-placeholder').length).toBe(pending.length);
+    expect(el.querySelectorAll('.preview__plate app-media-placeholder').length).toBe(
+      pending.length,
+    );
   });
 
   it('links every card to its detail route', async () => {
     const { el } = await render();
-    const links = Array.from(el.querySelectorAll<HTMLAnchorElement>('.card__link'));
+    const links = Array.from(el.querySelectorAll<HTMLAnchorElement>('.row__link'));
 
     expect(links.length).toBe(PROJECTS.length);
     for (const project of PROJECTS) {
@@ -94,29 +100,49 @@ describe('Work index', () => {
     }
   });
 
-  it('marks work with no public URL instead of linking nowhere', async () => {
+  it('distinguishes live, internal and pending rather than collapsing them', async () => {
     const { el } = await render();
-    const markers = el.querySelectorAll('.card__private');
+    const text = Array.from(el.querySelectorAll('.row__status')).map((m) =>
+      m.textContent?.trim(),
+    );
 
-    expect(markers.length).toBe(PROJECTS.filter((p) => p.url === null).length);
-    expect(markers[0].textContent).toContain(WORK_CONTENT.actions.private.en);
+    // Every row states its status as text; a pill made "private" read as a
+    // disabled control.
+    expect(text.length).toBe(PROJECTS.length);
+
+    const count = (label: string) => text.filter((t) => t?.includes(label)).length;
+
+    // NAS HR has no address because it is an internal system. Vivace has none
+    // because its assets have not been supplied. Labelling Vivace "internal"
+    // would be false, so the two states are separate.
+    expect(count(WORK_CONTENT.actions.private.en)).toBe(
+      PROJECTS.filter((p) => p.url === null && p.cover !== null).length,
+    );
+    expect(count(WORK_CONTENT.actions.pending.en)).toBe(
+      PROJECTS.filter((p) => p.url === null && p.cover === null).length,
+    );
+    expect(count('Live')).toBe(PROJECTS.filter((p) => p.url !== null).length);
   });
 
-  it('loads the first row eagerly and lazily thereafter', async () => {
+  it('lazy-loads every row image, and loads the preview lead eagerly', async () => {
     const { el } = await render();
-    const images = Array.from(el.querySelectorAll<HTMLImageElement>('.card__image'));
+    const rowImages = Array.from(el.querySelectorAll<HTMLImageElement>('.row__image'));
+    const previewImages = Array.from(
+      el.querySelectorAll<HTMLImageElement>('.preview__image'),
+    );
 
-    // Only projects that actually have a cover produce an <img>.
-    expect(images.length).toBe(PROJECTS.filter((p) => p.cover !== null).length);
-    // The only images that can be above the fold at any supported width.
-    expect(images.slice(0, 2).every((i) => i.getAttribute('loading') === 'eager')).toBe(true);
-    expect(images.slice(2).every((i) => i.getAttribute('loading') === 'lazy')).toBe(true);
+    // Row images only render below md; they are never the LCP candidate.
+    expect(rowImages.every((i) => i.getAttribute('loading') === 'lazy')).toBe(true);
+
+    // The pane shows the first project before any interaction, so it loads eagerly.
+    expect(previewImages[0]?.getAttribute('loading')).toBe('eager');
+    expect(previewImages.slice(1).every((i) => i.getAttribute('loading') === 'lazy')).toBe(true);
   });
 
-  it('gives every image alt text and an intrinsic size', async () => {
+  it('gives every row image alt text and an intrinsic size', async () => {
     const { el } = await render();
 
-    for (const img of Array.from(el.querySelectorAll<HTMLImageElement>('.card__image'))) {
+    for (const img of Array.from(el.querySelectorAll<HTMLImageElement>('.row__image'))) {
       expect(img.getAttribute('alt')?.length).toBeGreaterThan(0);
       expect(Number(img.getAttribute('width'))).toBeGreaterThan(0);
       expect(Number(img.getAttribute('height'))).toBeGreaterThan(0);
@@ -163,17 +189,19 @@ describe('Work index', () => {
     expect(text).toContain('بن نادر');
   });
 
-  it('keeps Latin technology names bidi-isolated in Arabic', async () => {
+  it('keeps the Latin stack line bidi-isolated in Arabic', async () => {
     const { fixture, el } = await render();
 
     direction.set('ar');
     await fixture.whenStable();
 
+    // The stack is one joined line now ("Magento · Porto"), not a badge per
+    // technology, so it is asserted as a whole string rather than per node.
     const isolated = Array.from(el.querySelectorAll('.ltr-isolate')).map((n) =>
       n.textContent?.trim(),
     );
-    expect(isolated).toContain('Angular');
-    expect(isolated).toContain('Magento 2');
-    expect(isolated).toContain('Shopify');
+    expect(isolated.some((t) => t?.startsWith('Angular'))).toBe(true);
+    expect(isolated.some((t) => t?.startsWith('Magento'))).toBe(true);
+    expect(isolated.some((t) => t?.startsWith('Shopify'))).toBe(true);
   });
 });

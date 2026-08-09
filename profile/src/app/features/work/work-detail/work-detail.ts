@@ -3,13 +3,13 @@ import { RouterLink } from '@angular/router';
 
 import { DirectionService } from '@core/i18n/direction.service';
 import { localizedContent, resolveLocalized } from '@core/i18n/localized';
-import { PLATFORM_LABELS, projectBySlug, projectNeighbours } from '@data/projects.data';
+import { PLATFORM_LABELS, PROJECTS, projectBySlug, projectNeighbours } from '@data/projects.data';
 import { WORK_CONTENT } from '@data/work.content';
-import { RevealDirective } from '@shared/directives/reveal.directive';
 import { Icon } from '@shared/ui/icon/icon';
 import { MediaPlaceholder } from '@shared/ui/media-placeholder/media-placeholder';
 import { TextLink } from '@shared/ui/text-link/text-link';
-import { ProjectLogo } from '../project-logo/project-logo';
+import { ProjectFacts, ProjectFact } from '../project-facts/project-facts';
+import { ProjectGallery } from '../project-gallery/project-gallery';
 import { ProjectNav } from '../project-nav/project-nav';
 
 /**
@@ -31,11 +31,11 @@ import { ProjectNav } from '../project-nav/project-nav';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     RouterLink,
-    RevealDirective,
     Icon,
     MediaPlaceholder,
     TextLink,
-    ProjectLogo,
+    ProjectFacts,
+    ProjectGallery,
     ProjectNav,
   ],
   templateUrl: './work-detail.html',
@@ -57,6 +57,17 @@ export class WorkDetail {
    * rather than dereferencing a missing project and throwing during SSR.
    */
   protected readonly project = computed(() => projectBySlug(this.slug()));
+
+  /**
+   * Position in the whole showcase, shown as an editorial numeral.
+   *
+   * Runs 01–07 across the selection, the same sequence the index and the Home
+   * gates use, so a project keeps its number wherever it appears.
+   */
+  protected readonly indexLabel = computed(() => {
+    const position = PROJECTS.findIndex((p) => p.slug === this.slug());
+    return position < 0 ? '' : String(position + 1).padStart(2, '0');
+  });
 
   protected readonly content = computed(() => {
     const project = this.project();
@@ -83,6 +94,15 @@ export class WorkDetail {
           }
         : null,
       projectType: resolveLocalized(project.projectType, locale),
+      // "Magento · Porto · Dashboard" — one scannable line, assembled here so a
+      // project that gains a theme or a dashboard needs no copy change.
+      stack: [
+        resolveLocalized(PLATFORM_LABELS[project.platform], locale),
+        project.theme,
+        project.dashboard ? resolveLocalized(WORK_CONTENT.labels.dashboard, locale) : null,
+      ]
+        .filter(Boolean)
+        .join(' · '),
       // null until imagery is supplied; the template renders the empty frame.
       cover: project.cover
         ? {
@@ -119,6 +139,36 @@ export class WorkDetail {
         name: resolveLocalized(found.next.name, locale),
       },
     };
+  });
+
+  /**
+   * The facts, assembled once here.
+   *
+   * Technologies join into one line rather than a list, matching how the index
+   * and the Home gates present a stack — the reader scans one string instead of
+   * a column of single words.
+   */
+  protected readonly facts = computed<ProjectFact[]>(() => {
+    const p = this.content();
+    if (!p) return [];
+
+    const labels = this.c().labels;
+    const rows: ProjectFact[] = [
+      { label: labels.platform, value: p.platformLabel, isolate: true },
+      { label: labels.projectType, value: p.projectType },
+      { label: labels.role, value: p.role },
+      {
+        label: labels.technologies,
+        value: [...p.technology, p.dashboard ? labels.dashboard : null]
+          .filter(Boolean)
+          .join(' · '),
+        isolate: true,
+      },
+    ];
+
+    return p.theme
+      ? [...rows.slice(0, 3), { label: labels.theme, value: p.theme, isolate: true }, rows[3]]
+      : rows;
   });
 
   /**

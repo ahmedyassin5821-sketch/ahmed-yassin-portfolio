@@ -4,34 +4,36 @@ import { DirectionService } from '@core/i18n/direction.service';
 import { localizedContent, resolveLocalized } from '@core/i18n/localized';
 import { ProjectPlatform } from '@data/models/project.model';
 import { HOME_CONTENT } from '@data/home.content';
-import { PLATFORM_LABELS, projectsByPlatform } from '@data/projects.data';
-import { ProjectSurface, ProjectSurfaceData } from '@shared/ui/project-surface/project-surface';
+import { PLATFORM_LABELS, PROJECTS, projectsByPlatform } from '@data/projects.data';
+import { ProjectFigure, ProjectFigureData } from './project-figure/project-figure';
 
 /**
  * A platform gate — acts 4, 5 and 6.
  *
  * One component, rendered three times with a different `platform`, rather than
  * three near-identical sections. The gates are the same structure by definition:
- * a platform name the camera passes through, then the work built on it. Writing
- * them separately would be three places to fix every future change.
+ * a platform the camera passes through, then the work built on it.
  *
- * In the scene this is a typographic plane followed by that platform's project
- * planes; here it is the same information as text. Neither is a copy of the
- * other — they are two presentations of one dataset, and this one is the
- * accessible, indexable, always-present presentation.
+ * ## Composition, not a grid
+ *
+ * The first project of each platform leads at a larger size and the rest support
+ * it, with the media side alternating. Six equal boxes two-across read as a CMS
+ * listing — the eye finds no entry point and nothing signals that these are
+ * *selected* pieces. An asymmetric composition gives each gate a subject.
+ *
+ * In the scene this same platform is a typographic plane the camera flies
+ * through, followed by that platform's project planes. Neither is a copy of the
+ * other; this one is the accessible, indexable, always-present presentation.
  */
 @Component({
   selector: 'app-act-gate',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ProjectSurface],
+  imports: [ProjectFigure],
   templateUrl: './act-gate.html',
   styleUrl: './act-gate.scss',
 })
 export class ActGate {
   readonly platform = input.required<ProjectPlatform>();
-
-  /** Editorial numeral — 01, 02, 03 — supplied by the stage. */
-  readonly index = input<number>(0);
 
   private readonly direction = inject(DirectionService);
 
@@ -41,33 +43,56 @@ export class ActGate {
     resolveLocalized(PLATFORM_LABELS[this.platform()], this.direction.locale()),
   );
 
-  protected readonly indexLabel = computed(() => String(this.index() + 1).padStart(2, '0'));
+  /**
+   * Where this platform's first project sits in the whole showcase.
+   *
+   * Numbering runs 01–07 across the entire selection rather than restarting at
+   * each gate, so the numerals read as one curated sequence.
+   */
+  protected readonly offset = computed(() =>
+    PROJECTS.findIndex((p) => p.platform === this.platform()),
+  );
+
+  protected readonly countLabel = computed(() => {
+    const total = projectsByPlatform(this.platform()).length;
+    return this.c().countLabel.replace('{count}', String(total));
+  });
 
   /**
-   * Localised once here, so `ProjectSurface` stays presentational and knows
+   * Localised once here, so `ProjectFigure` stays presentational and knows
    * nothing about languages.
    */
-  protected readonly projects = computed<ProjectSurfaceData[]>(() => {
+  protected readonly projects = computed<ProjectFigureData[]>(() => {
     const locale = this.direction.locale();
 
-    return projectsByPlatform(this.platform()).map((project) => ({
-      slug: project.slug,
-      name: resolveLocalized(project.name, locale),
-      platform: project.platform,
-      summary: resolveLocalized(project.projectType, locale),
-      role: resolveLocalized(project.role, locale),
-      technology: project.technology,
-      url: project.url,
-      screenshot: project.cover
-        ? {
-            src: project.cover.src,
-            srcset: project.cover.srcset,
-            avif: project.cover.avif ?? null,
-            width: project.cover.width,
-            height: project.cover.height,
-            alt: resolveLocalized(project.cover.alt, locale),
-          }
-        : null,
-    }));
+    return projectsByPlatform(this.platform()).map((project) => {
+      // "Shopify · Dashboard" — what it was built with, plus the one capability
+      // worth calling out. Assembled here rather than stored, so a project that
+      // gains a dashboard needs no copy change.
+      const stack = [
+        resolveLocalized(PLATFORM_LABELS[project.platform], locale),
+        project.theme,
+        project.dashboard ? this.c().dashboard : null,
+      ]
+        .filter(Boolean)
+        .join(' · ');
+
+      return {
+        slug: project.slug,
+        name: resolveLocalized(project.name, locale),
+        category: resolveLocalized(project.projectType, locale),
+        stack,
+        url: project.url,
+        image: project.cover
+          ? {
+              src: project.cover.src,
+              srcset: project.cover.srcset,
+              width: project.cover.width,
+              height: project.cover.height,
+              alt: resolveLocalized(project.cover.alt, locale),
+            }
+          : null,
+      };
+    });
   });
 }

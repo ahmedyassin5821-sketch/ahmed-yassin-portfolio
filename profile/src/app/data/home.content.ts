@@ -30,6 +30,12 @@ export interface HomeContent {
   };
   /** Acts 4–6 — shared chrome for the three platform gates. */
   readonly gates: {
+    readonly eyebrow: Localized;
+    /** "{count} selected" — the number is substituted from the data. */
+    readonly countLabel: Localized;
+    /** Appended to a project's stack line when it included a dashboard. */
+    readonly dashboard: Localized;
+    readonly viewLabel: Localized;
     readonly placeholderLabel: Localized;
   };
   readonly transition: {
@@ -97,6 +103,22 @@ export const HOME_CONTENT: HomeContent = {
     },
   },
   gates: {
+    eyebrow: {
+      en: 'Selected work',
+      ar: 'أعمال مختارة',
+    },
+    countLabel: {
+      en: '{count} selected',
+      ar: '{count} مختارة',
+    },
+    dashboard: {
+      en: 'Dashboard',
+      ar: 'لوحة تحكّم',
+    },
+    viewLabel: {
+      en: '(opens the live site in a new tab)',
+      ar: '(يفتح الموقع في تبويب جديد)',
+    },
     placeholderLabel: {
       en: 'Imagery coming soon',
       ar: 'الصور قريباً',

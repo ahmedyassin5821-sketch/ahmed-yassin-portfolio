@@ -1,26 +1,31 @@
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 
 import { DirectionService } from '@core/i18n/direction.service';
 import { localizedContent, resolveLocalized } from '@core/i18n/localized';
 import { PLATFORM_LABELS, PROJECTS, PROJECTS_SHIPPED } from '@data/projects.data';
 import { WORK_CONTENT } from '@data/work.content';
-import { RevealDirective } from '@shared/directives/reveal.directive';
-import { ProjectCard, ProjectCardData } from './project-card/project-card';
+import { WorkPreview, WorkPreviewData } from './work-preview/work-preview';
+import { WorkRow, WorkRowData } from './work-row/work-row';
 
 /**
- * The work index.
+ * The work index — an editorial archive, not a grid.
  *
- * A grid of six projects, each understandable at a glance: logo, platform, role,
- * technologies, and a real screenshot. No case studies, no walls of text — the
- * detail page is one click away for anyone who wants more.
+ * Seven oversized numbered rows beside a sticky pane that shows whichever
+ * project the reader is on. The previous treatment gave each project an
+ * identical bordered card two-across, which made a curated selection look like a
+ * database listing.
  *
- * Localisation happens once, here, so `ProjectCard` stays presentational and
- * knows nothing about languages.
+ * Deliberately *not* the Home showcase. Home presents plates inside a fixed
+ * viewport act; this is a scrolling archive, so it reads as a list of names with
+ * the work held beside it.
+ *
+ * Localisation happens once here, so both child components stay presentational
+ * and know nothing about languages.
  */
 @Component({
   selector: 'app-work',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ProjectCard, RevealDirective],
+  imports: [WorkRow, WorkPreview],
   templateUrl: './work.html',
   styleUrl: './work.scss',
 })
@@ -30,10 +35,11 @@ export class Work {
   protected readonly c = localizedContent(WORK_CONTENT);
 
   /**
-   * Both numbers derived from data, so the copy cannot drift.
+   * Both numbers derived from data.
    *
    * `{shipped}` is the career total and `{selected}` is what is presented here.
-   * Rendering only the array length would have read as "seven projects, total".
+   * Rendering the array length alone would read as "seven projects, total",
+   * which is false — this is a curated selection.
    */
   protected readonly countLabel = computed(() =>
     this.c()
@@ -41,51 +47,66 @@ export class Work {
       .replace('{selected}', String(PROJECTS.length)),
   );
 
-  protected readonly projects = computed<ProjectCardData[]>(() => {
+  /**
+   * Which project the preview pane is showing.
+   *
+   * Defaults to the first, so the pane shows real work before any interaction
+   * and on the server — it is an enhancement, never a blank slot waiting for JS.
+   */
+  protected readonly activeSlug = signal(PROJECTS[0].slug);
+
+  private readonly resolved = computed(() => {
     const locale = this.direction.locale();
 
-    return PROJECTS.map((project) => ({
-      slug: project.slug,
-      name: resolveLocalized(project.name, locale),
-      platform: project.platform,
-      platformLabel: resolveLocalized(PLATFORM_LABELS[project.platform], locale),
-      role: resolveLocalized(project.role, locale),
-      summary: resolveLocalized(project.summary, locale),
-      projectType: resolveLocalized(project.projectType, locale),
-      technology: project.technology,
-      dashboard: project.dashboard,
-      isPrivate: project.url === null,
-      logo: project.logo
-        ? {
-            src: project.logo.src,
-            width: project.logo.width,
-            height: project.logo.height,
-            alt: resolveLocalized(project.logo.alt, locale),
-          }
-        : null,
-      // null while a project's imagery has not been supplied — the card renders
-      // the placeholder frame rather than an empty box or a borrowed image.
-      cover: project.cover
-        ? {
-            src: project.cover.src,
-            srcset: project.cover.srcset,
-            avif: project.cover.avif ?? null,
-            width: project.cover.width,
-            height: project.cover.height,
-            alt: resolveLocalized(project.cover.alt, locale),
-          }
-        : null,
-    }));
+    return PROJECTS.map((project) => {
+      // "Magento · Porto" — assembled here rather than stored, so a project that
+      // gains a dashboard or a theme needs no copy change.
+      const stack = [
+        resolveLocalized(PLATFORM_LABELS[project.platform], locale),
+        project.theme,
+        project.dashboard ? resolveLocalized(WORK_CONTENT.labels.dashboard, locale) : null,
+      ]
+        .filter(Boolean)
+        .join(' · ');
+
+      return {
+        slug: project.slug,
+        name: resolveLocalized(project.name, locale),
+        category: resolveLocalized(project.projectType, locale),
+        stack,
+        // Three states, not two: see WorkRowData.linkStatus. A project with no
+        // address and no imagery is pending, not internal.
+        linkStatus: project.url
+          ? ('live' as const)
+          : project.cover
+            ? ('private' as const)
+            : ('pending' as const),
+        image: project.cover
+          ? {
+              src: project.cover.src,
+              srcset: project.cover.srcset,
+              width: project.cover.width,
+              height: project.cover.height,
+              alt: resolveLocalized(project.cover.alt, locale),
+            }
+          : null,
+      };
+    });
   });
 
-  /** Per-card view label, so each link announces which project it opens. */
-  protected readonly viewLabel = computed(() => this.c().a11y.viewProject);
+  protected readonly rows = computed<WorkRowData[]>(() => this.resolved());
 
-  /**
-   * The first two cards are the only ones that can be above the fold at any
-   * supported width, so they load eagerly and everything else defers.
-   */
-  protected isPriority(index: number): boolean {
-    return index < 2;
+  /** Passed to every row, so the label set is defined once. */
+  protected readonly statusLabels = computed(() => {
+    const a = this.c().actions;
+    return { live: a.live, private: a.private, pending: a.pending };
+  });
+
+  protected readonly previews = computed<WorkPreviewData[]>(() =>
+    this.resolved().map(({ slug, name, category, image }) => ({ slug, name, category, image })),
+  );
+
+  protected setActive(slug: string): void {
+    this.activeSlug.set(slug);
   }
 }

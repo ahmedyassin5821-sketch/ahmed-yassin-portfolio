@@ -1,0 +1,41 @@
+@use 'index' as ds;
+
+:host {
+  display: block;
+  margin-block: var(--space-12);
+  padding-block-start: var(--space-6);
+  // A single rule above, not a box around.
+  border-block-start: var(--border-hairline) solid var(--color-border);
+}
+
+.facts {
+  display: grid;
+  gap: var(--space-6);
+  grid-template-columns: 1fr;
+
+  // Two columns, not four at the widest tier: there are only ever a handful of
+  // facts, and a four-across row strands them as a thin band of labels.
+  @include ds.mq(sm) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.facts__row {
+  display: flex;
+  min-inline-size: 0;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.facts__row dt {
+  @include ds.label;
+
+  color: var(--color-text-muted);
+}
+
+.facts__row dd {
+  @include ds.body;
+
+  font-size: var(--fs-body-sm);
+  color: var(--color-text-primary);
+}

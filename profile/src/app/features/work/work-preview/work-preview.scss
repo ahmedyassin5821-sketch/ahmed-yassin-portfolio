@@ -1,0 +1,49 @@
+@use 'index' as ds;
+
+:host {
+  display: none;
+
+  // The pane only exists where there is a column to spare. Below `md` each row
+  // carries its own image instead.
+  @include ds.mq(md) {
+    display: block;
+  }
+}
+
+.preview {
+  position: sticky;
+  // Clears the sticky header, and sits low enough to read as centred against
+  // the list rather than pinned to the top of it.
+  inset-block-start: 24vh;
+  aspect-ratio: var(--ratio-screenshot);
+  overflow: hidden;
+  background-color: var(--color-surface-sunken);
+  box-shadow: var(--elevation-3-shadow);
+}
+
+// All plates occupy the same box; only the active one is visible.
+.preview__plate {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity var(--dur-slow) var(--ease-out);
+}
+
+.preview__plate.is-active {
+  opacity: 1;
+}
+
+.preview__image {
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+  object-position: top center;
+}
+
+// A cross-fade is the motion; without it the swap is instant, which is correct
+// rather than degraded.
+@include ds.mq-reduced-motion {
+  .preview__plate {
+    transition: none;
+  }
+}

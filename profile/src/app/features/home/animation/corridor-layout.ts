@@ -36,6 +36,15 @@ export interface ProjectPlaneSpec {
   readonly z: number;
   readonly offsetX: number;
   readonly offsetY: number;
+  /**
+   * The first project of a gate. This one plane performs the hand-off: as the
+   * camera closes on the gate it leaves the periphery, squares up to the camera
+   * and grows, so the DOM plate that lands next appears to be the same object.
+   * The others stay peripheral scenery throughout.
+   */
+  readonly isLead: boolean;
+  /** Scroll position at which the gate's DOM takes over. */
+  readonly gateAt: number;
 }
 
 /** Minimal shape the layout needs. Keeps `three` and Angular out of this file. */
@@ -53,7 +62,7 @@ export interface CorridorProject {
  */
 export function buildTypePlanes(countLabel: string): readonly TypePlaneSpec[] {
   const planes: TypePlaneSpec[] = [
-    { text: countLabel, z: CORRIDOR.count, offsetX: 0, scale: 1.35, from: 0.3, to: 0.54 },
+    { text: countLabel, z: CORRIDOR.count, offsetX: 0, scale: 1.35, from: 0.22, to: 0.54 },
   ];
 
   GATE_ACTS.forEach((act, index) => {
@@ -91,10 +100,15 @@ export function buildProjectPlanes(
       planes.push({
         slug: project.slug,
         src: project.src,
+        isLead: index === 0,
+        gateAt: act.start,
         z: gateZ + CORRIDOR.planeOffset + index * CORRIDOR.planeStep,
-        // Wide enough to flank the DOM cards rather than sit beneath them.
-        offsetX: index % 2 === 0 ? -6 : 6,
-        offsetY: index % 2 === 0 ? 1.2 : -1.2,
+        // Far enough out to be cropped by the frame edges. Once the DOM gained
+        // a real editorial plate for every project, a plane sitting behind it
+        // rendered the same screenshot twice — which reads as a bug, not depth.
+        // Out here they are peripheral scenery the camera passes.
+        offsetX: index % 2 === 0 ? -12 : 12,
+        offsetY: index % 2 === 0 ? 2.4 : -2.4,
       });
     });
   }

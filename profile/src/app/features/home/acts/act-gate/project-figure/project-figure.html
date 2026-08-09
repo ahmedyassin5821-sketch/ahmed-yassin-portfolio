@@ -1,0 +1,42 @@
+<figure class="figure">
+  <div class="figure__media">
+    @if (project().image; as image) {
+      <img
+        class="figure__image"
+        [src]="image.src"
+        [attr.srcset]="image.srcset"
+        [attr.sizes]="sizes()"
+        [alt]="image.alt"
+        [width]="image.width"
+        [height]="image.height"
+        loading="lazy"
+        decoding="async"
+      />
+    } @else {
+      <!-- Assets not supplied yet. An honest frame, never a borrowed image. -->
+      <app-media-placeholder [caption]="project().name" [label]="placeholderLabel()" />
+    }
+  </div>
+
+  <figcaption class="figure__meta">
+    <!-- The numeral is editorial furniture: it paces the sequence and gives the
+         eye an entry point. The name beside it carries the accessible label. -->
+    <p class="figure__index" aria-hidden="true">{{ indexLabel() }}</p>
+
+    <h3 class="figure__name" dir="auto">
+      @if (project().url) {
+        <a class="figure__link" [href]="project().url!" target="_blank" rel="noopener noreferrer">
+          {{ project().name }}
+          <span class="sr-only">{{ viewLabel() }}</span>
+        </a>
+      } @else {
+        {{ project().name }}
+      }
+    </h3>
+
+    <!-- What it is, then what it was built with. Two lines, read in one glance,
+         so nobody has to parse a paragraph to place the work. -->
+    <p class="figure__category">{{ project().category }}</p>
+    <p class="figure__stack"><span class="ltr-isolate">{{ project().stack }}</span></p>
+  </figcaption>
+</figure>

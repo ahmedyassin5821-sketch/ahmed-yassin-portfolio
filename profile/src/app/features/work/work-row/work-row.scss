@@ -1,0 +1,150 @@
+@use 'index' as ds;
+
+:host {
+  display: block;
+}
+
+// The only rule in the system is the hairline *between* rows. Nothing is boxed.
+.row {
+  position: relative;
+  display: grid;
+  align-items: baseline;
+  gap: var(--space-2) var(--space-5);
+  grid-template-areas:
+    'index body'
+    'index status'
+    'media media';
+  grid-template-columns: auto minmax(0, 1fr);
+  padding-block: var(--space-8);
+  border-block-start: var(--border-hairline) solid var(--color-border);
+
+  @include ds.mq(md) {
+    align-items: center;
+    grid-template-areas: 'index body status';
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    padding-block: var(--space-10);
+  }
+}
+
+.row__index {
+  @include ds.mono;
+
+  grid-area: index;
+  color: var(--color-text-muted);
+  font-size: var(--fs-caption);
+  // Aligned to the cap height of the name beside it rather than its line box.
+  align-self: start;
+  padding-block-start: var(--space-2);
+}
+
+.row__body {
+  grid-area: body;
+  min-inline-size: 0;
+}
+
+// The row is carried by the name. This is the whole reason the index reads as a
+// portfolio rather than a table of contents.
+.row__name {
+  @include ds.display-2;
+
+  color: var(--color-text-primary);
+  line-height: 0.95;
+  transition: opacity var(--dur-base) var(--ease-out);
+}
+
+.row__link {
+  color: inherit;
+  text-decoration: none;
+}
+
+// Stretched over the row without nesting its content inside the anchor.
+.row__link::after {
+  position: absolute;
+  z-index: var(--z-raised);
+  inset: 0;
+  content: '';
+}
+
+.row__link:focus-visible {
+  // The visible ring is drawn on the row; an outline on a zero-height stretched
+  // link is not a visible focus indicator.
+  outline: none;
+}
+
+:host(:has(.row__link:focus-visible)) .row {
+  @include ds.focus-ring;
+}
+
+.row__category {
+  @include ds.label;
+
+  margin-block-start: var(--space-3);
+  color: var(--color-text-primary);
+}
+
+.row__stack {
+  @include ds.mono;
+
+  margin-block-start: var(--space-1);
+  color: var(--color-text-muted);
+  font-size: var(--fs-caption);
+}
+
+.row__status {
+  @include ds.mono;
+
+  grid-area: status;
+  color: var(--color-text-muted);
+  font-size: var(--fs-caption);
+  text-align: end;
+}
+
+// -----------------------------------------------------------------------------
+// Media
+//
+// Only below `md`. Above it the sticky pane carries the image, and rendering it
+// twice would download the same file for a box nobody sees.
+// -----------------------------------------------------------------------------
+.row__media {
+  grid-area: media;
+  margin-block-start: var(--space-5);
+  aspect-ratio: var(--ratio-screenshot);
+  overflow: hidden;
+  background-color: var(--color-surface-sunken);
+  box-shadow: var(--elevation-3-shadow);
+
+  @include ds.mq(md) {
+    display: none;
+  }
+}
+
+.row__image {
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+  object-position: top center;
+}
+
+// -----------------------------------------------------------------------------
+// Active state
+//
+// The row the pane is currently showing. Dimming the others is what connects the
+// list to the pane — without it the two read as unrelated columns.
+// -----------------------------------------------------------------------------
+@include ds.mq(md) {
+  // Dimmed enough to point at the active row, not so far that six of seven
+  // names look disabled. At 0.38 the page read as washed out.
+  :host(:not(.is-active)) .row__name {
+    opacity: 0.6;
+  }
+
+  :host(.is-active) .row__name {
+    opacity: 1;
+  }
+}
+
+@include ds.mq-reduced-motion {
+  .row__name {
+    transition: none;
+  }
+}

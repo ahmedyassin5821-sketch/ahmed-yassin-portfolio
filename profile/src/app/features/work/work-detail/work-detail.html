@@ -6,36 +6,31 @@
       {{ c().actions.backToWork }}
     </a>
 
+    <!--
+      Identity before imagery. The name lands on paper at display scale and the
+      cover breaks full-bleed beneath it — the same order the Home acts read in,
+      and the reason this does not look like a case-study template.
+    -->
     <header class="detail__head">
-      @if (p.logo; as logo) {
-        <app-project-logo [logo]="logo" [slug]="slug()" large />
-      }
+      <p class="detail__index" aria-hidden="true">{{ indexLabel() }}</p>
 
-      <p class="detail__platform">{{ p.platformLabel }}</p>
-
-      <!-- dir="auto" so a Latin wordmark inside an Arabic page keeps its own
-           direction without dragging the surrounding layout with it. -->
       <h1 id="detail-title" class="detail__title" dir="auto">{{ p.name }}</h1>
 
-      <p class="detail__summary">{{ p.summary }}</p>
+      <p class="detail__category">{{ p.projectType }}</p>
+      <p class="detail__stack"><span class="ltr-isolate">{{ p.stack }}</span></p>
 
       <div class="detail__actions">
         @if (p.url) {
           <!--
             TextLink, not Button: Button renders a real <button> on purpose and
-            refuses an href, because a button that navigates breaks middle-click
-            and misreports itself to a screen reader. TextLink already carries
-            rel="noopener noreferrer", the external glyph, and the localised
-            new-tab warning.
+            refuses an href. TextLink already carries rel="noopener noreferrer",
+            the external glyph, and the localised new-tab warning.
           -->
           <app-text-link class="detail__visit" [href]="p.url">
             {{ c().actions.visit }}
           </app-text-link>
         } @else {
-          <!--
-            No anchor at all. A disabled-looking link that goes nowhere is worse
-            than a plain statement that the work is internal.
-          -->
+          <!-- Stated, not boxed. A dashed frame read as a disabled control. -->
           <p class="detail__private">
             <span class="detail__private-label">{{ c().actions.private }}</span>
             <span class="detail__private-note">{{ c().actions.privateNote }}</span>
@@ -44,49 +39,9 @@
       </div>
     </header>
 
-    <!-- Facts as a definition list: it is a list of pairs, so it is marked up as
-         one rather than as styled paragraphs. -->
-    <dl class="detail__facts">
-      <div class="detail__fact">
-        <dt>{{ c().labels.platform }}</dt>
-        <dd><span class="ltr-isolate">{{ p.platformLabel }}</span></dd>
-      </div>
-
-      <div class="detail__fact">
-        <dt>{{ c().labels.projectType }}</dt>
-        <dd dir="auto">{{ p.projectType }}</dd>
-      </div>
-
-      <div class="detail__fact">
-        <dt>{{ c().labels.role }}</dt>
-        <dd dir="auto">{{ p.role }}</dd>
-      </div>
-
-      @if (p.theme) {
-        <div class="detail__fact">
-          <dt>{{ c().labels.theme }}</dt>
-          <dd><span class="ltr-isolate">{{ p.theme }}</span></dd>
-        </div>
-      }
-
-      <div class="detail__fact">
-        <dt>{{ c().labels.technologies }}</dt>
-        <dd>
-          <ul class="detail__tech" role="list">
-            @for (tech of p.technology; track tech) {
-              <li class="ltr-isolate">{{ tech }}</li>
-            }
-            @if (p.dashboard) {
-              <li>{{ c().labels.dashboard }}</li>
-            }
-          </ul>
-        </dd>
-      </div>
-    </dl>
-
     <!--
-      The cover is the lead image: eager and high priority, because it is the
-      LCP candidate on this page. Everything in the gallery below lazy-loads.
+      Full-bleed: the cover breaks the measure the type sits in. This is the one
+      moment on the page where the work is larger than the words about it.
     -->
     <figure class="detail__cover">
       @if (p.cover; as cover) {
@@ -107,34 +62,21 @@
           />
         </picture>
       } @else {
-        <!-- Assets pending. An honest frame, never a borrowed screenshot. -->
         <app-media-placeholder [caption]="p.name" [label]="c().labels.awaitingAssets" />
       }
     </figure>
 
-    @if (p.screenshots.length) {
-      <section class="detail__gallery" [attr.aria-label]="fill(c().a11y.gallery, p.name)">
-        <h2 class="detail__gallery-title">{{ c().labels.screenshots }}</h2>
+    <p class="detail__summary">{{ p.summary }}</p>
 
-        <ul class="detail__shots" role="list">
-          @for (shot of p.screenshots; track shot.src; let i = $index) {
-            <li appReveal [revealIndex]="i">
-              <figure>
-                <img
-                  [src]="shot.src"
-                  [attr.srcset]="shot.srcset"
-                  [attr.sizes]="sizes"
-                  [alt]="shot.alt"
-                  [width]="shot.width"
-                  [height]="shot.height"
-                  loading="lazy"
-                  decoding="async"
-                />
-              </figure>
-            </li>
-          }
-        </ul>
-      </section>
+    <app-project-facts [facts]="facts()" />
+
+    @if (p.screenshots.length) {
+      <app-project-gallery
+        [shots]="p.screenshots"
+        [title]="c().labels.screenshots"
+        [regionLabel]="fill(c().a11y.gallery, p.name)"
+        [sizes]="sizes"
+      />
     }
 
     @if (neighbours(); as nav) {
