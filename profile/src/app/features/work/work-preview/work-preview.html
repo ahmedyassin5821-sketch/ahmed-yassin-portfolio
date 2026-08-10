@@ -21,6 +21,24 @@
         />
       </figure>
     }
+
+    <!--
+      The client's mark, over their own screenshot, while the reader is on that row.
+      On a scrim rather than bare: a logo dropped straight onto a screenshot lands on
+      whatever happens to be in the corner of that capture — a dark navigation bar in
+      one, a white banner in the next — and half of these marks would disappear. The
+      wash is the same paper the page is on, so it reads as the portfolio labelling
+      the image rather than as a badge stuck to it.
+    -->
+    @if (active(); as project) {
+      <div class="preview__mark" [class.is-shown]="engaged()">
+        <app-project-logo
+          class="preview__logo"
+          [logo]="project.logo"
+          [slug]="project.slug"
+        />
+      </div>
+    }
   </div>
 
   <!--

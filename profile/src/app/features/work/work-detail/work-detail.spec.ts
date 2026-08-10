@@ -131,6 +131,148 @@ describe('Work detail', () => {
     ]);
   });
 
+  it('follows the information hierarchy: business, role, build, brief, evidence', async () => {
+    const { el } = await render('nader-coffee');
+    const marker = (node: Element) =>
+      ['detail__identity', 'detail__role', 'facts--build', 'detail__brief', 'detail__cover'].find(
+        (c) => node.classList.contains(c),
+      ) ?? node.tagName.toLowerCase();
+
+    const blocks = Array.from(
+      el.querySelectorAll(
+        '.detail__identity, .detail__role, app-project-facts.facts--build, .detail__brief, .detail__cover, app-project-gallery',
+      ),
+    ).map(marker);
+
+    // The business context comes before the technology list, his role comes
+    // between them, and the imagery comes last — a reader places the work, learns
+    // who did what, is told how it was made, and only then is shown the proof.
+    expect(blocks).toEqual([
+      'detail__identity',
+      'detail__role',
+      'facts--build',
+      'detail__brief',
+      'detail__cover',
+      'app-project-gallery',
+    ]);
+  });
+
+  it('splits the page: the account of the project beside the evidence', async () => {
+    const { el } = await render('vivace');
+    const aside = el.querySelector('.detail__aside')!;
+    const media = el.querySelector('.detail__media')!;
+
+    // The account comes FIRST in the DOM — a reader, and a screen reader, meets the
+    // project's name before its screenshots — and CSS places it in the second
+    // column, which is the right in English and the left in Arabic.
+    const order = Array.from(el.querySelectorAll('.detail__aside, .detail__media'));
+    expect(order[0]).toBe(aside);
+
+    for (const selector of [
+      'h1',
+      '.detail__identity',
+      '.detail__role',
+      'app-project-facts.facts--build',
+      '.detail__brief',
+      '.detail__object',
+    ]) {
+      expect(aside.querySelector(selector)).not.toBeNull();
+      expect(media.querySelector(selector)).toBeNull();
+    }
+
+    for (const selector of ['.detail__cover', 'app-project-gallery']) {
+      expect(media.querySelector(selector)).not.toBeNull();
+      expect(aside.querySelector(selector)).toBeNull();
+    }
+
+    // The sticky box is inside the grid item, never the item itself: the item has
+    // to stay full-height for sticky to have anywhere to travel.
+    expect(aside.querySelector('.detail__pinned')).not.toBeNull();
+  });
+
+  it('separates his role, the project team and his contribution', async () => {
+    for (const project of PROJECTS) {
+      const { el } = await render(project.slug);
+      const role = el.querySelector('.detail__role');
+      const labels = Array.from(role?.querySelectorAll('dt') ?? []).map((d) =>
+        d.textContent?.trim(),
+      );
+      const values = Array.from(role?.querySelectorAll('dd') ?? []).map((d) =>
+        d.textContent?.trim(),
+      );
+
+      expect(values[0]).toBe(project.role.en);
+      expect(values).toContain(project.contribution.en);
+
+      if (project.team) {
+        // Labelled as the *project's* team, never as his own.
+        expect(labels).toContain(WORK_CONTENT.labels.team.en);
+        expect(values).toContain(project.team.en);
+      } else {
+        // No row at all where the composition is not known — not "unknown", and
+        // certainly not an estimate.
+        expect(labels).not.toContain(WORK_CONTENT.labels.team.en);
+      }
+    }
+  });
+
+  it('never implies he built a whole platform or owns a product', async () => {
+    for (const project of PROJECTS) {
+      const { el } = await render(project.slug);
+      const text = (el.textContent ?? '').toLowerCase();
+
+      for (const claim of [
+        'built the entire',
+        'developed the complete',
+        'the whole platform',
+        'my company',
+        'founded',
+        'i own',
+      ]) {
+        expect(text).not.toContain(claim);
+      }
+    }
+
+    // Magento work says front-end, and says the backend was someone else's.
+    for (const slug of ['2b', 'esterad']) {
+      const { el } = await render(slug);
+      const text = el.textContent ?? '';
+      expect(text).toContain('Front-End Developer');
+      expect(text).toContain('backend team');
+    }
+  });
+
+  it('wears the project’s atmosphere from first paint, with no hover needed', async () => {
+    for (const project of PROJECTS) {
+      const { el } = await render(project.slug);
+      const article = el.querySelector<HTMLElement>('.detail')!;
+
+      expect(article.classList).toContain('atmosphere');
+      expect(article.classList).toContain('is-themed');
+      expect(article.style.getPropertyValue('--atmos-surface')).toBe(
+        project.atmosphere.surface,
+      );
+      expect(article.style.getPropertyValue('--atmos-accent')).toBe(project.atmosphere.accent);
+    }
+  });
+
+  it('keeps the 3D object out of the server render and off most projects', async () => {
+    // Deferred on viewport, so it is never in the prerendered HTML — the content
+    // that matters is, and the object is decoration that arrives later or not at all.
+    for (const project of PROJECTS) {
+      const { el } = await render(project.slug);
+      expect(el.querySelectorAll('app-project-sculpture').length).toBe(0);
+      expect(el.querySelectorAll('.detail__object').length).toBe(project.sculpture ? 1 : 0);
+    }
+
+    // Two of seven. The rest have no shape that can be built from primitives
+    // without looking fake, and an abstract stand-in says nothing about a business.
+    expect(PROJECTS.filter((p) => p.sculpture !== null).map((p) => p.slug)).toEqual([
+      'nader-coffee',
+      'vivace',
+    ]);
+  });
+
   it('never states the size of the showcase as a career total', async () => {
     const { el } = await render('vivace');
     const text = el.textContent ?? '';

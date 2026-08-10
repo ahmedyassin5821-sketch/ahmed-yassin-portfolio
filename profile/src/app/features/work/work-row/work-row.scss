@@ -26,12 +26,19 @@
   }
 }
 
-.row__index {
+// One include of `ds.mono`, not three. See the note above `.row__field`: each
+// include emits the whole property set, and this stylesheet is on a 4 kB budget.
+.row__index,
+.row__stack,
+.row__status {
   @include ds.mono;
 
-  grid-area: index;
   color: var(--color-text-muted);
   font-size: var(--fs-caption);
+}
+
+.row__index {
+  grid-area: index;
   // Aligned to the cap height of the name beside it rather than its line box.
   align-self: start;
   padding-block-start: var(--space-2);
@@ -107,9 +114,23 @@
   @include ds.focus-ring;
 }
 
-.row__field {
+// Grouped by mixin rather than by element. Each `@include` emits that mixin's
+// whole property set, so four separate includes of `ds.label` / `ds.body` put four
+// copies of it in the file — which is what pushed this stylesheet past its 4 kB
+// budget when the role line was added.
+.row__field,
+.row__role-label {
   @include ds.label;
+}
 
+.row__context,
+.row__role-value {
+  @include ds.body;
+
+  font-size: var(--fs-body-sm);
+}
+
+.row__field {
   margin-block-start: var(--space-3);
   color: var(--color-text-primary);
 }
@@ -117,27 +138,36 @@
 // Where it trades and what kind of product it is. Secondary to the field, ahead
 // of the stack — the reader is placing a business, not a repository.
 .row__context {
-  @include ds.body;
-
   margin-block-start: var(--space-1);
   color: var(--color-text-secondary);
-  font-size: var(--fs-body-sm);
 }
 
 .row__stack {
-  @include ds.mono;
-
   margin-block-start: var(--space-2);
+}
+
+// His part in it. A labelled pair rather than a third mono line, so it does not
+// read as more stack — and the value takes the accent, which is the one place a
+// project's brand colour reaches the index rows.
+.row__role {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-2);
+  margin-block-start: var(--space-3);
+}
+
+.row__role-label {
   color: var(--color-text-muted);
   font-size: var(--fs-caption);
 }
 
-.row__status {
-  @include ds.mono;
+.row__role-value {
+  color: var(--color-text-secondary);
+}
 
+.row__status {
   grid-area: status;
-  color: var(--color-text-muted);
-  font-size: var(--fs-caption);
   text-align: end;
 }
 
@@ -176,7 +206,10 @@
 @include ds.mq(md) {
   // Dimmed enough to point at the active row, not so far that six of seven
   // names look disabled. At 0.38 the page read as washed out.
-  :host(:not(.is-active)) .row__name {
+  //
+  // Gated on `.is-engaged`: at rest nobody is on a row, so there is nothing to
+  // point at and every name stays at full strength.
+  :host(.is-engaged:not(.is-active)) .row__name {
     opacity: 0.6;
   }
 
@@ -189,7 +222,7 @@
   // exactly the same `.is-active` host class as the name and the numeral, so
   // pointer and keyboard cannot diverge and the logo cannot get out of step with
   // the preview pane.
-  :host(:not(.is-active)) .row__logo {
+  :host(.is-engaged:not(.is-active)) .row__logo {
     opacity: 0.5;
     filter: grayscale(1);
   }

@@ -6,7 +6,9 @@ export const routes: Routes = [
   {
     path: '',
     loadComponent: () => import('./features/home/home').then((m) => m.Home),
-    title: 'Ahmed Yassin — Front-End & eCommerce Engineer',
+    // Kept in step with PROFESSIONAL_TITLE.en by hand: a route `title` is a plain
+    // string the router reads before any injector exists.
+    title: 'Ahmed Yassin — Front-End Web Developer',
   },
   {
     path: 'work',

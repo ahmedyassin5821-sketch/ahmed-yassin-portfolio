@@ -5,11 +5,13 @@ import { DirectionService } from '@core/i18n/direction.service';
 import { localizedContent, resolveLocalized } from '@core/i18n/localized';
 import { PLATFORM_LABELS, PROJECTS, projectBySlug, projectNeighbours } from '@data/projects.data';
 import { WORK_CONTENT } from '@data/work.content';
+import { AtmosphereDirective } from '@shared/directives/atmosphere.directive';
 import { Icon } from '@shared/ui/icon/icon';
 import { TextLink } from '@shared/ui/text-link/text-link';
 import { ProjectFacts, ProjectFact } from '../project-facts/project-facts';
 import { ProjectGallery } from '../project-gallery/project-gallery';
 import { ProjectNav } from '../project-nav/project-nav';
+import { ProjectSculpture } from '../project-sculpture/project-sculpture';
 
 /**
  * One project.
@@ -28,7 +30,18 @@ import { ProjectNav } from '../project-nav/project-nav';
 @Component({
   selector: 'app-work-detail',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, Icon, TextLink, ProjectFacts, ProjectGallery, ProjectNav],
+  imports: [
+    RouterLink,
+    Icon,
+    TextLink,
+    AtmosphereDirective,
+    ProjectFacts,
+    ProjectGallery,
+    ProjectNav,
+    // Used only inside a @defer block, which is what keeps it — and `three` —
+    // out of this route's chunk.
+    ProjectSculpture,
+  ],
   templateUrl: './work-detail.html',
   styleUrl: './work-detail.scss',
 })
@@ -70,6 +83,11 @@ export class WorkDetail {
       name: resolveLocalized(project.name, locale),
       platformLabel: resolveLocalized(PLATFORM_LABELS[project.platform], locale),
       role: resolveLocalized(project.role, locale),
+      // `null` where the project's team is genuinely not known. The row is then
+      // omitted rather than filled with an estimate.
+      team: project.team ? resolveLocalized(project.team, locale) : null,
+      contribution: resolveLocalized(project.contribution, locale),
+      sculpture: project.sculpture,
       // The business, ahead of anything technical.
       market: resolveLocalized(project.market, locale),
       field: resolveLocalized(project.field, locale),
@@ -143,12 +161,34 @@ export class WorkDetail {
   });
 
   /**
+   * Ahmed's part in it — role, the project's team, his contribution.
+   *
+   * Its own block, above the build facts, because the reader's questions arrive in
+   * that order: what is this, who did what, how was it made. Folding the role into
+   * the technology list files a responsibility under tooling.
+   *
+   * The team row is present only where the real composition is known. It is
+   * labelled "Project team", not "Team" — beside one person's name the shorter word
+   * reads as *his* team, which is a claim nobody made.
+   */
+  protected readonly roleFacts = computed<ProjectFact[]>(() => {
+    const p = this.content();
+    if (!p) return [];
+
+    const labels = this.c().labels;
+    return [
+      { label: labels.role, value: p.role },
+      ...(p.team ? [{ label: labels.team, value: p.team }] : []),
+      { label: labels.contribution, value: p.contribution, wide: true },
+    ];
+  });
+
+  /**
    * How it was built, assembled once here.
    *
    * Market, field and domain deliberately do *not* appear: they identify the
    * business and belong in the header, above the fold, before any technology is
-   * named. What is left here answers the later question — how the thing was
-   * made, and what part of it was Ahmed's.
+   * named. Nor does the role, which now has its own block above this one.
    *
    * Technologies join into one line rather than a list, matching how the index
    * and the Home gates present a stack — the reader scans one string instead of
@@ -159,9 +199,9 @@ export class WorkDetail {
     if (!p) return [];
 
     const labels = this.c().labels;
-    const rows: ProjectFact[] = [
+    return [
       { label: labels.platform, value: p.platformLabel, isolate: true },
-      { label: labels.role, value: p.role },
+      ...(p.theme ? [{ label: labels.theme, value: p.theme, isolate: true }] : []),
       {
         label: labels.technologies,
         value: [...p.technologies, p.dashboard ? labels.dashboard : null]
@@ -170,11 +210,16 @@ export class WorkDetail {
         isolate: true,
       },
     ];
-
-    return p.theme
-      ? [...rows.slice(0, 2), { label: labels.theme, value: p.theme, isolate: true }, rows[2]]
-      : rows;
   });
+
+  /**
+   * The project's atmosphere, active from first paint.
+   *
+   * Never `null` here: arriving on `/work/designed-by-g` *is* entering that brand,
+   * so there is nothing to wait for. On `/work` the same directive takes `null`
+   * until the reader hovers or focuses a row.
+   */
+  protected readonly atmosphere = computed(() => this.project()?.atmosphere ?? null);
 
   /**
    * The cover spans the content column; gallery shots do too. One `sizes` value

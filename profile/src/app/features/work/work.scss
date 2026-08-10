@@ -4,10 +4,13 @@
   display: block;
 }
 
+// `ds.container` gives this the page measure; the atmosphere class (global) gives
+// it the ground. Padding is generous at the block-end so the tinted surface reads
+// as the page's own rather than as a band that stops under the last row.
 .work {
   @include ds.container;
 
-  padding-block: var(--space-16) var(--space-24);
+  padding-block: var(--space-16) var(--space-32);
 }
 
 // -----------------------------------------------------------------------------
@@ -79,8 +82,44 @@
   min-inline-size: 0;
 }
 
-// A closing rule under the last row, so the list is bounded at both ends.
-.work__index > li:last-child {
+// -----------------------------------------------------------------------------
+// Categories
+//
+// The heading is what states the hierarchy — Shopify, then Angular, then Magento.
+// The numerals keep running 01–07 across the whole selection, so a project has one
+// number wherever it appears; the grouping is the more important structure, and
+// the heading is set larger than the numerals to say so.
+// -----------------------------------------------------------------------------
+.work__category + .work__category {
+  margin-block-start: var(--space-20);
+}
+
+.work__category-head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-block-end: var(--space-6);
+}
+
+.work__category-name {
+  @include ds.heading-1;
+
+  color: var(--color-text-primary);
+  line-height: 1;
+}
+
+.work__category-summary {
+  @include ds.body;
+
+  max-inline-size: 48ch;
+  color: var(--color-text-secondary);
+  font-size: var(--fs-body-sm);
+  text-wrap: pretty;
+}
+
+// A closing rule under each category's last row, so every group is bounded at
+// both ends rather than running into the next heading.
+.work__list > li:last-child {
   border-block-end: var(--border-hairline) solid var(--color-border);
 }
 

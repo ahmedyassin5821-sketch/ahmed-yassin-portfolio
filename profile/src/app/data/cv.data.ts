@@ -50,13 +50,15 @@ export interface CvSkillGroup {
   readonly items: readonly string[];
 }
 
-/** The one-line professional title, used as the site's own role line. */
-export const PROFESSIONAL_TITLE: Localized = {
-  en: 'Front-End & eCommerce Engineer',
-  // Ahmed's own wording. Not a translation of the English line — this is how the
-  // role is named in Arabic, and it is not to be re-translated to match.
-  ar: 'مبرمج مواقع ومتاجر إلكترونية',
-};
+/**
+ * The one-line professional title, used as the site's own role line.
+ *
+ * Defined in `identity.ts` and re-exported here, so `/about`, `/cv` and `/contact`
+ * can keep reading it beside the rest of the CV while the app shell's footer imports
+ * the small module instead — importing it from here put the whole CV in the initial
+ * bundle. One definition, see `identity.ts`.
+ */
+export { PROFESSIONAL_TITLE } from './identity';
 
 export const CV_PROFILE: Localized = {
   en: 'Front-End Developer specializing in Angular and Magento, with hands-on experience delivering scalable eCommerce and enterprise-level web applications. Currently contributing to high-traffic production platforms, focusing on modular architecture, API integration, performance optimization, and user-centered UI development. With a background in engineering and digital business, I combine technical execution with analytical thinking and business awareness.',

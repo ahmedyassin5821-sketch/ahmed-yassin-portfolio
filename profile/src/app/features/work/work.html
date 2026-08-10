@@ -1,4 +1,10 @@
-<section class="work" aria-labelledby="work-title">
+<!--
+  The atmosphere sits on the section, not on the body: it is this page's ground,
+  and a brand tint escaping into the header and footer would make the chrome look
+  like part of the client's site. `null` until the reader is on a project, so the
+  page opens on neutral paper and the colour is something they enter.
+-->
+<section class="work atmosphere" [appAtmosphere]="atmosphere()" aria-labelledby="work-title">
   <header class="work__head">
     <p class="work__eyebrow">{{ c().index.eyebrow }}</p>
     <h1 id="work-title" class="work__title">{{ c().index.title }}</h1>
@@ -10,27 +16,60 @@
   </header>
 
   <div class="work__body">
-    <ol class="work__index" role="list">
-      @for (project of rows(); track project.slug) {
-        <li>
-          <app-work-row
-            [project]="project"
-            [index]="$index"
-            [active]="project.slug === activeSlug()"
-            (focused)="setActive($event)"
-            [statusLabels]="statusLabels()"
-            [viewLabel]="c().a11y.viewProject.replace('{name}', project.name)"
-          />
-        </li>
-      }
-    </ol>
+    <!--
+      Leaving the index returns the page to neutral paper — the brand colour is
+      something the reader is *inside*, so it goes when they go. Moving between two
+      rows does not count as leaving: `pointerleave` does not fire inside the
+      container, and `focusout` is filtered on its `relatedTarget`.
+    -->
+    <div
+      class="work__index"
+      (pointerleave)="release()"
+      (focusout)="releaseFocus($event)"
+    >
+      <!--
+        Grouped by platform, in the priority order PROJECTS is written in: Shopify,
+        then Angular, then Magento. The heading carries the hierarchy; the numerals
+        keep running across the whole selection, so a project has one number
+        wherever it appears.
+      -->
+      @for (category of categories(); track category.platform) {
+        <section class="work__category" [attr.aria-labelledby]="'category-' + category.platform">
+          <header class="work__category-head">
+            <h2 [id]="'category-' + category.platform" class="work__category-name">
+              <span class="ltr-isolate">{{ category.label }}</span>
+            </h2>
+            <p class="work__category-summary">{{ category.summary }}</p>
+          </header>
 
-    <!-- Decorative: every project's name, field, market and stack is real text
-         in the rows beside it. Holds the first project until the reader moves. -->
+          <ol class="work__list" role="list">
+            @for (project of category.rows; track project.slug) {
+              <li>
+                <app-work-row
+                  [project]="project"
+                  [index]="project.index"
+                  [active]="project.slug === active()"
+                  [engaged]="engaged()"
+                  (focused)="setActive($event)"
+                  [statusLabels]="statusLabels()"
+                  [roleLabel]="c().labels.role"
+                  [viewLabel]="c().a11y.viewProject.replace('{name}', project.name)"
+                />
+              </li>
+            }
+          </ol>
+        </section>
+      }
+    </div>
+
+    <!-- Decorative: every project's name, field, market, stack and role is real
+         text in the rows beside it. Holds the first project until the reader
+         moves, so it is never an empty frame. -->
     <app-work-preview
       class="work__preview"
       [projects]="previews()"
-      [activeSlug]="activeSlug()"
+      [activeSlug]="previewSlug()"
+      [engaged]="engaged()"
     />
   </div>
 </section>

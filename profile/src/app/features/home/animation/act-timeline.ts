@@ -62,9 +62,13 @@ export const ACT_TIMELINE: readonly Act[] = [
   { id: 'separation', start: 0.08, end: 0.16 },
   { id: 'passage', start: 0.16, end: 0.24 },
   { id: 'count', start: 0.24, end: 0.32 },
-  { id: 'angular', start: 0.32, end: 0.53, platform: 'angular' },
-  { id: 'magento', start: 0.53, end: 0.73, platform: 'magento' },
-  { id: 'shopify', start: 0.73, end: 0.92, platform: 'shopify' },
+  // Shopify, Angular, Magento — the priority order the showcase is stated in.
+  // The reader walks the corridor in the same sequence `PROJECTS` is written in,
+  // and the depths the camera flies to are derived from this order rather than
+  // written per platform, so the two can never disagree (see `camera-path.ts`).
+  { id: 'shopify', start: 0.32, end: 0.53, platform: 'shopify' },
+  { id: 'angular', start: 0.53, end: 0.73, platform: 'angular' },
+  { id: 'magento', start: 0.73, end: 0.92, platform: 'magento' },
   { id: 'resolve', start: 0.92, end: 1.0 },
 ];
 

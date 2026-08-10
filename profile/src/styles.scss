@@ -9,6 +9,8 @@
 //   4. motion-global    reveal states + the reduced-motion override, which must
 //                       follow reset so its !important rules win
 //   5. utilities        opt-in global classes
+//   6. atmosphere       rebinds the semantic tokens per project, so it must come
+//                       after the tokens it shadows
 //
 // Everything else is component-scoped. Components import 'index' for mixins and
 // must never @use a token or utility file directly — see _index.scss for why.
@@ -26,3 +28,4 @@
 @use 'reset';
 @use 'motion-global';
 @use 'utilities';
+@use 'atmosphere';

@@ -35,18 +35,40 @@ describe('Work index', () => {
     const { el } = await render();
     const cards = el.querySelectorAll('app-work-row');
 
-    // Pinned to the approved slugs rather than a count, so adding a project is
-    // a deliberate edit here and not something a test silently absorbs.
+    // Pinned to the approved slugs *in the approved order*, so both the set and
+    // the priority are a deliberate edit here rather than something a test
+    // silently absorbs: Shopify first, then Angular, then Magento.
     expect(PROJECTS.map((p) => p.slug)).toEqual([
+      'designed-by-g',
+      'nader-coffee',
+      'vivace',
       'nas-hr',
       'nature',
       '2b',
       'esterad',
-      'designed-by-g',
-      'nader-coffee',
-      'vivace',
     ]);
     expect(cards.length).toBe(PROJECTS.length);
+  });
+
+  it('groups the index by platform, Shopify first', async () => {
+    const { el } = await render();
+    const headings = Array.from(el.querySelectorAll('.work__category-name')).map((h) =>
+      h.textContent?.trim(),
+    );
+
+    expect(headings).toEqual(['Shopify', 'Angular', 'Magento']);
+  });
+
+  it('numbers projects across the whole selection, not within each category', async () => {
+    const { el } = await render();
+    const numbers = Array.from(el.querySelectorAll('.row__index')).map((n) =>
+      n.textContent?.trim(),
+    );
+
+    // The category heading carries the hierarchy; the numeral is a project's own,
+    // and it must be the same one on Home and on the detail page. Restarting at
+    // 01 inside each group would give three projects the number 01.
+    expect(numbers).toEqual(['01', '02', '03', '04', '05', '06', '07']);
   });
 
   it('keeps the dropped projects gone', async () => {
@@ -111,6 +133,99 @@ describe('Work index', () => {
     expect(rows[4].classList).toContain('is-active');
     expect(rows[4].querySelector('.row__logo')).not.toBeNull();
     expect(rows.filter((r) => r.classList.contains('is-active')).length).toBe(1);
+  });
+
+  it('states his role on every row, not only on the detail page', async () => {
+    const { el } = await render();
+    const roles = Array.from(el.querySelectorAll('.row__role-value')).map((r) =>
+      r.textContent?.trim(),
+    );
+
+    expect(roles).toEqual(PROJECTS.map((p) => p.role.en));
+    // Labelled, so it cannot be mistaken for another line of stack.
+    expect(el.querySelector('.row__role-label')?.textContent?.trim()).toBe(
+      WORK_CONTENT.labels.role.en,
+    );
+  });
+
+  it('opens on neutral paper, takes the brand on hover, and gives it back on leaving', async () => {
+    const { fixture, el } = await render();
+    const index = el.querySelector('.work__index')!;
+    const section = el.querySelector('.work')!;
+    const surface = () => (section as HTMLElement).style.getPropertyValue('--atmos-surface');
+
+    // The colour is something the reader enters. Pre-tinting the page would spend
+    // the effect before anyone had done anything.
+    expect(section.classList).toContain('atmosphere');
+    expect(section.classList).not.toContain('is-themed');
+    expect(surface()).toBe('');
+
+    const nader = PROJECTS.findIndex((p) => p.slug === 'nader-coffee');
+    el.querySelectorAll('app-work-row')[nader].querySelector('.row')!.dispatchEvent(
+      new PointerEvent('pointerenter'),
+    );
+    await fixture.whenStable();
+
+    expect(section.classList).toContain('is-themed');
+    expect(surface()).toBe(PROJECTS[nader].atmosphere.surface);
+
+    // Leaving the whole index, not one row for the next.
+    index.dispatchEvent(new PointerEvent('pointerleave'));
+    await fixture.whenStable();
+
+    expect(section.classList).not.toContain('is-themed');
+    expect(surface()).toBe('');
+    // The pane keeps what the reader last looked at — only the atmosphere left.
+    expect(el.querySelectorAll('.preview__plate')[nader].classList).toContain('is-active');
+  });
+
+  it('takes the brand from keyboard focus exactly as from hover', async () => {
+    const { fixture, el } = await render();
+    const section = el.querySelector('.work')!;
+    const rows = Array.from(el.querySelectorAll('app-work-row'));
+    const vivace = PROJECTS.findIndex((p) => p.slug === 'vivace');
+
+    rows[vivace]
+      .querySelector<HTMLAnchorElement>('.row__link')!
+      .dispatchEvent(new FocusEvent('focusin', { bubbles: true }));
+    await fixture.whenStable();
+
+    expect(section.classList).toContain('is-themed');
+    expect((section as HTMLElement).style.getPropertyValue('--atmos-surface')).toBe(
+      PROJECTS[vivace].atmosphere.surface,
+    );
+  });
+
+  it('lays the client’s mark over their capture, only while the reader is on a row', async () => {
+    const { fixture, el } = await render();
+    const mark = () => el.querySelector('.preview__mark');
+
+    // The pane always shows work; the mark is a response to the reader, so at rest
+    // it is present but not shown.
+    expect(mark()).not.toBeNull();
+    expect(mark()!.classList).not.toContain('is-shown');
+
+    const index = PROJECTS.findIndex((p) => p.slug === '2b');
+    el.querySelectorAll('app-work-row')[index].querySelector('.row')!.dispatchEvent(
+      new PointerEvent('pointerenter'),
+    );
+    await fixture.whenStable();
+
+    expect(mark()!.classList).toContain('is-shown');
+    expect(mark()!.querySelector('img')?.getAttribute('src')).toBe(PROJECTS[index].logo.src);
+
+    el.querySelector('.work__index')!.dispatchEvent(new PointerEvent('pointerleave'));
+    await fixture.whenStable();
+    expect(mark()!.classList).not.toContain('is-shown');
+  });
+
+  it('never renders a 3D object on the index', async () => {
+    const { el } = await render();
+
+    // The objects belong to a project's own page. Seven canvases in a scrolling
+    // list would be seven WebGL contexts and no editorial gain.
+    expect(el.querySelectorAll('canvas').length).toBe(0);
+    expect(el.querySelectorAll('app-project-sculpture').length).toBe(0);
   });
 
   it('states what each business is, not only what it was built with', async () => {

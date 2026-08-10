@@ -1,6 +1,10 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
+import { localizedContent } from '@core/i18n/localized';
+// From `identity`, not `cv.data`: this component is in the app shell, and pulling
+// the whole CV in here costs 2.4 kB gzipped in the initial bundle for one string.
+import { PROFESSIONAL_TITLE } from '@data/identity';
 import { Logo } from '@shared/ui/logo/logo';
 import { TextLink } from '@shared/ui/text-link/text-link';
 import { NAV_LINKS } from '../nav-links';
@@ -26,7 +30,7 @@ import { CONTACT_EMAIL, CONTACT_LOCATION, SOCIAL_LINKS } from './contact-links';
       <div class="footer__inner">
         <div class="footer__brand">
           <app-logo variant="mark" [size]="64" label="Ahmed Yassin" />
-          <p class="footer__role">Front-End &amp; eCommerce Engineer</p>
+          <p class="footer__role">{{ role() }}</p>
           <p class="footer__location">{{ location }}</p>
         </div>
 
@@ -69,6 +73,15 @@ import { CONTACT_EMAIL, CONTACT_LOCATION, SOCIAL_LINKS } from './contact-links';
   styleUrl: './footer.scss',
 })
 export class Footer {
+  /**
+   * The one professional title, read from the CV data.
+   *
+   * It was a hardcoded literal here, and that is exactly how it went stale: the
+   * title changed in `cv.data.ts` and the footer on every page kept the old one.
+   * A value with a single source has to be read from it, including by the chrome.
+   */
+  protected readonly role = localizedContent(PROFESSIONAL_TITLE);
+
   protected readonly navLinks = NAV_LINKS;
   protected readonly email = CONTACT_EMAIL;
   protected readonly location = CONTACT_LOCATION;

@@ -15,7 +15,7 @@ import { DsBlock } from '../ui/ds-block';
            the page is switched to Arabic — the font tokens are language-scoped. -->
       <div class="stack" lang="en">
         <p class="t-display-1">Ahmed Yassin</p>
-        <p class="t-display-2">Front-End &amp; eCommerce Engineer</p>
+        <p class="t-display-2">Front-End Web Developer</p>
         <h2 class="t-h1">Angular · Magento · Shopify</h2>
         <h3 class="t-h2">Selected work</h3>
         <h4 class="t-h3">2B Website Revamp</h4>

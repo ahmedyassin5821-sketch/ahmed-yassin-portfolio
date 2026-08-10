@@ -4,6 +4,62 @@ import { Localized } from '@core/i18n/localized';
 export type ProjectPlatform = 'angular' | 'magento' | 'shopify';
 
 /**
+ * A brand's atmosphere — the controlled colour a project brings with it.
+ *
+ * ## Why these are literal colours and not design tokens
+ *
+ * The token layer describes *AY's* system. These describe seven other companies,
+ * and a client's brand is data about that client, not a decision about this
+ * design system — putting 42 client colours into `_tokens-primitive.scss` would
+ * make the token sheet a place brands are added.
+ *
+ * They are consumed by binding them onto an element as custom properties, where
+ * they *rebind the semantic tokens locally*. Every component already reads
+ * `var(--color-text-primary)` and friends, so the whole page adapts without a
+ * single component learning that themes exist.
+ *
+ * ## How the values were arrived at
+ *
+ * Each brand's own logo artwork in `public/projects/<slug>/logo.*` was sampled
+ * for the colours actually in the mark — not a screenshot, and nothing invented.
+ * The ramp is then derived from that hue as a *tinted paper*: the portfolio stays
+ * the portfolio and the brand arrives as an atmosphere inside it, rather than the
+ * page turning into the client's website.
+ *
+ * Every value in every ramp was checked for WCAG contrast against its own
+ * `surface`. The worst case in the set is 4.58:1; primary and secondary text are
+ * AAA everywhere. See `docs/ARCHITECTURE.md` §21.
+ */
+export interface ProjectAtmosphere {
+  /** The page ground. A tinted paper, never a saturated field. */
+  readonly surface: string;
+  /** Plate and image grounds — one step deeper than the paper. */
+  readonly surfaceStrong: string;
+  readonly border: string;
+  readonly text: string;
+  readonly textSecondary: string;
+  readonly textMuted: string;
+  /**
+   * The brand's own colour, darkened only as far as legibility on `surface`
+   * demands. Used for marks and accents, never for a large field.
+   */
+  readonly accent: string;
+  /** Full-chroma brand colour, for the subtle lighting behind imagery only. */
+  readonly glow: string;
+}
+
+/**
+ * A small 3D object for a project's detail page.
+ *
+ * Deliberately a short closed union rather than a model path: each of these is
+ * built from primitives in the existing Three.js scene, so there is no asset to
+ * download and no second 3D library. A project only carries one where an object
+ * can be made that actually reads as the business — most cannot, and those carry
+ * `null` rather than an abstract shape standing in for one.
+ */
+export type SculptureKind = 'perfume-bottle' | 'coffee-bean';
+
+/**
  * A real image, with the geometry the encoder measured.
  *
  * `width`/`height` are the intrinsic dimensions of the largest variant. They are
@@ -66,8 +122,27 @@ export interface Project {
    */
   readonly brief: Localized;
 
-  /** Ahmed's role on the project, as supported by the CV. */
+  // ---------------------------------------------------------------------------
+  // Ahmed's part in it
+  //
+  // Kept rigorously separate from the business fields above. Describing what a
+  // client's product does must never read as a claim to have built the whole of
+  // it — on two of these projects the backend was another team's work, and one of
+  // them is owned by an employer.
+  // ---------------------------------------------------------------------------
+
+  /** What Ahmed was on this project — "Front-End Developer". Never a job title. */
   readonly role: Localized;
+
+  /**
+   * The **project's** team, where the real composition is known — not Ahmed's
+   * team, and not a headcount to be estimated. `null` everywhere it is not known,
+   * and the UI omits the row entirely rather than guessing.
+   */
+  readonly team: Localized | null;
+
+  /** What Ahmed actually did, in one sentence. Scoped to his own work. */
+  readonly contribution: Localized;
 
   /**
    * Technologies actually used — from the brief, the CV, or visible in the
@@ -75,7 +150,19 @@ export interface Project {
    */
   readonly technologies: readonly string[];
 
-  /** A named third-party or in-house theme, where one was used. */
+  /** The controlled colour this project brings with it. */
+  readonly atmosphere: ProjectAtmosphere;
+
+  /** A 3D object for the detail page, where one can honestly be made. */
+  readonly sculpture: SculptureKind | null;
+
+  /**
+   * A named third-party or in-house **storefront** theme — "Porto", "Wide".
+   *
+   * Not to be confused with `atmosphere`: this is a product name that appears in
+   * the build facts, and it is the reason the brand-colour field is not called
+   * `theme`.
+   */
   readonly theme: string | null;
 
   /** Whether the work included a dashboard or admin system. */

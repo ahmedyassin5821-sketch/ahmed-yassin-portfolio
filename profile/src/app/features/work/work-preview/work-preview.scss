@@ -55,6 +55,48 @@
   object-position: top center;
 }
 
+// -----------------------------------------------------------------------------
+// The mark over the capture
+//
+// Top of the image, at the reading edge, on a wash of the page's own paper so the
+// artwork is legible whatever happens to be underneath it — these screenshots have
+// dark navigation bars, white banners and photographs in that corner.
+// -----------------------------------------------------------------------------
+.preview__mark {
+  position: absolute;
+  z-index: var(--z-raised);
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  display: flex;
+  align-items: center;
+  padding: var(--space-3) var(--space-5) var(--space-3) var(--space-3);
+  background-color: color-mix(in srgb, var(--color-background) 92%, transparent);
+  // Only while the reader is on a row: the pane always shows work, but the mark is
+  // a response to them, not a permanent watermark.
+  opacity: 0;
+  translate: 0 -0.5rem;
+  transition:
+    opacity var(--dur-slow) var(--ease-out),
+    translate var(--dur-slow) var(--ease-out);
+}
+
+.preview__mark.is-shown {
+  opacity: 1;
+  translate: 0 0;
+}
+
+.preview__logo {
+  --logo-inline-size: 5.5rem;
+  --logo-block-size: 2.25rem;
+  --logo-padding: 0;
+}
+
+@include ds.mq-reduced-motion {
+  .preview__mark {
+    transition: none;
+  }
+}
+
 // The caption is the second half of the connection between list and pane: it
 // names what is on screen, so the pane is legible even mid-scroll when the
 // matching row has passed out of view.

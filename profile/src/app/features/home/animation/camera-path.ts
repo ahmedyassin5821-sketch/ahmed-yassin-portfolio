@@ -1,3 +1,5 @@
+import { ProjectPlatform } from '@data/models/project.model';
+import { GATE_ACTS } from './act-timeline';
 import { clamp, easeInOutCubic, lerp, normalise } from './easing';
 
 /**
@@ -22,9 +24,9 @@ import { clamp, easeInOutCubic, lerp, normalise } from './easing';
  * ```
  *     0   the monogram plane — sheets extend back from here
  *   −38   "20+"
- *   −62   ANGULAR gate
- *  −100   MAGENTO gate
- *  −138   SHOPIFY gate
+ *   −62   first gate    ┐
+ *  −100   second gate   ├ whichever platforms GATE_ACTS lists, in that order
+ *  −138   third gate    ┘
  *  −180   exit
  * ```
  *
@@ -56,11 +58,29 @@ export interface CameraState {
   readonly fov: number;
 }
 
-/** Fixed depths for everything the camera passes. Shared with the scene. */
+/**
+ * How deep each gate sits, in travel order. The camera path below is written
+ * against these three numbers, so they are the ones to tune — never the mapping.
+ */
+const GATE_DEPTHS = [-62, -100, -138] as const;
+
+/**
+ * Fixed depths for everything the camera passes. Shared with the scene.
+ *
+ * `gates` is keyed by platform for the callers' convenience but **assigned by
+ * travel order**: the first gate in `ACT_TIMELINE` gets the nearest depth. When
+ * the showcase was reordered to lead with Shopify, a hardcoded
+ * `{ angular: -62, magento: -100, shopify: -138 }` would have sent the camera
+ * flying to the far end of the corridor first and then back — the acts and the
+ * geometry disagreeing, which is exactly the failure this whole module is
+ * arranged to prevent. Derived, they cannot.
+ */
 export const CORRIDOR = {
   mark: 0,
   count: -38,
-  gates: { angular: -62, magento: -100, shopify: -138 },
+  gates: Object.fromEntries(
+    GATE_ACTS.map((act, index) => [act.platform, GATE_DEPTHS[index]]),
+  ) as Record<ProjectPlatform, number>,
   exit: -180,
 } as const;
 

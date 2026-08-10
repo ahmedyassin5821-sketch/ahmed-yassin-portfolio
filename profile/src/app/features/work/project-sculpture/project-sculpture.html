@@ -1,0 +1,16 @@
+<!--
+  No canvas at all where WebGL will not run — which includes `prefers-reduced-motion`.
+
+  The guard used to be in `initialise()` only, which stopped the scene being built
+  but still left the element in the page. That went unnoticed while the object sat
+  mid-page and was never deferred into existence; moving it into the pinned column
+  put it in the first viewport, `@defer (on viewport)` fired immediately, and an
+  empty canvas appeared under reduced motion. Caught by the assertion that there are
+  zero canvases in that state.
+
+  Decorative throughout: the object states nothing the page does not say in text, so
+  there is no fallback content to put here in its place.
+-->
+@if (canRender()) {
+  <canvas #canvas class="sculpture__canvas"></canvas>
+}

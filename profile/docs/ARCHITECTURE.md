@@ -1500,3 +1500,262 @@ Two harness bugs, for the next person — both produced confident false results:
 And one measurement that was asking the wrong question: `object-fit: contain`
 letterboxes the artwork inside the element box, so the box's aspect ratio says
 nothing about whether the picture is distorted. Compute the painted size.
+
+---
+
+## 21. Positioning, roles and brand atmosphere (Sprint 9)
+
+### Shopify leads, and the order is stated once
+
+`PROJECTS` is `[...shopify, ...angular, ...magento]`, and everything derives from
+it: the `/work` category sections, the numerals 01–07, previous/next, and the order
+of the Home corridor's gates.
+
+The corridor was the interesting part. `CORRIDOR.gates` used to be written
+`{ angular: -62, magento: -100, shopify: -138 }` — depths keyed by platform. With
+Shopify moved to the front, that would have sent the camera to the *far* end of the
+corridor first and then back toward the viewer. The depths are now a list in travel
+order and the platform mapping is derived from `GATE_ACTS`:
+
+```
+GATE_DEPTHS = [-62, -100, -138]   ->   the first gate is the nearest, whichever it is
+```
+
+`choreography.spec.ts` asserts both halves: that the gates appear in the same order
+as `PROJECTS`, and that each gate is deeper than the last.
+
+### Role, team, contribution — three fields, because they are three claims
+
+| Project | Role | Project team | What the contribution says |
+| --- | --- | --- | --- |
+| Designed by G | Shopify Developer · Visual Design | — | independent build, plus the store's visual assets |
+| Nader Coffee | Shopify Developer · Visual Design | — | same |
+| Vivace | Shopify Developer | — | independent build. **No design claim** — the visual work was stated for the other two only |
+| NAS HR | Front-End Developer | 3 Front-End · 4 Backend | one of the front-end developers on the project team |
+| Nature | Front-End Developer | — | front-end of the public site and the admin screens |
+| 2B | Front-End Developer | — | front-end and theme work, **in collaboration with a backend team** |
+| Esterad | Front-End Developer | — | sole front-end developer *on the project*, with a backend team |
+
+Three rules hold across the set, and `work-detail.spec.ts` enforces them:
+
+- **`team` is `null` wherever the real composition is not known**, and the row is
+  omitted rather than filled with an estimate. Only NAS HR has one.
+- It is labelled **"Project team"**, not "Team". Beside one person's name the
+  shorter word reads as *his* team.
+- No page contains "built the entire", "developed the complete", "the whole
+  platform", "founded" or "I own". Esterad's CV line — "sole Front-End Magento
+  developer" — is carried as *sole front-end developer on the project*, which is
+  what it means, and the backend team is named in the same sentence.
+
+Ownership of NAS HR is **not stated at all**. Sprint 8.5 was told not to name the
+publisher; Sprint 9 says not to claim ownership. Saying nothing satisfies both, and
+role plus team already make it impossible to read as his product.
+
+`PROFESSIONAL_TITLE` is now `Front-End Web Developer` / **مبرمج مواقع ومتاجر
+إلكترونية**. The Arabic is untouched. "Visual Design" appears only in individual
+project roles and never in the title. Three hardcoded copies of the old English line
+were found — the footer, `index.html`, and a dev specimen — and the footer now reads
+the constant instead of repeating it, which is how it went stale in the first place.
+
+### The atmosphere system
+
+Each project carries eight colours. They are **data about a client**, not design
+tokens, so they live in `projects.data.ts` rather than in the token sheet — adding a
+project should not mean editing `_tokens-primitive.scss`.
+
+**Where the colours come from.** Each brand's own logo artwork in
+`public/projects/<slug>/logo.*` was sampled for the colours actually in the mark —
+not a screenshot, and nothing invented:
+
+| Project | From the mark | Ground |
+| --- | --- | --- |
+| Designed by G | `#771415` down to `#2d0809` | warm red paper |
+| Nader Coffee | `#2e2018`, `#5f4c30` | roast brown |
+| Vivace | `#103b3e` | deep teal |
+| NAS HR | `#11282b` with cool greys | cool graphite — the mark is monochrome, so the ground is too |
+| Nature | `#7dc261` | leaf green |
+| 2B | `#f37021`, exact from the SVG source | graphite, as the logo's own ground is, with the orange as the accent |
+| Esterad | `#34b643` with `#222021` type | graphite with a green accent |
+
+Each hue then becomes a *tinted paper* ramp. `atmosphere.spec.ts` asserts every
+value in every ramp: primary and secondary text at AAA, muted text and the accent at
+AA or better, and primary text AAA on the plate tone as well. The worst case in the
+set is 4.58:1. Two brands were below 4.5 before the ramp was darkened, which is why
+that test exists rather than a note in a document.
+
+**How it reaches the page, without any component knowing.** `AtmosphereDirective`
+binds the eight values as `--atmos-*` and adds one class.
+`styles/_atmosphere.scss` rebinds the *semantic tokens* from them on that element:
+
+```
+--color-background: var(--atmos-surface);
+--color-text-primary: var(--atmos-text);   ... and so on
+```
+
+Custom properties inherit through Angular's emulated encapsulation, and stylelint
+already forbids a component from using anything but a token — so the whole page
+adapts because what is under it changed. No component has a theme branch.
+
+Not rebound, deliberately: `--color-focus` (a focus ring that changes colour stops
+reading as focus), `--color-surface-inverse` (2B's white logo needs its dark plate on
+any surface), and the status colours.
+
+**Why `@property`.** Unregistered custom properties are not animatable, so the
+surface would snap. Registered with a `<color>` syntax they interpolate, and because
+`var()` substitution is live, every derived token interpolates with them — one 900ms
+transition drives the entire page. Their `initial-value` is the neutral token each
+one shadows, which is what makes neutral the *default* rather than a second code
+path: `/work` passes `null`, the properties fall back, and the transition runs in
+that direction too.
+
+### /work: one interaction, two questions
+
+`active` is which project the reader is on; `engaged` is whether they are still in
+the list. Not two sources of truth about the same thing — the atmosphere and the
+dimming need "still there", because the colour is something you are *inside* and it
+has to leave when you do, while the preview pane needs only "which" and should keep
+showing what was last pointed at rather than snapping back to the first project.
+
+`focusout` is filtered on `relatedTarget`: it fires on every hop between rows, so
+without that check tabbing down the list would flash to neutral and back on every
+keystroke.
+
+The dimming of inactive rows is gated on `engaged`. Without it the page opened with
+all seven names at 0.6 and nothing to explain why — six disabled-looking projects and
+no active one.
+
+### The 3D objects: two of seven, and that is the answer
+
+A perfume flacon for Vivace (a `LatheGeometry` profile, plus a collar and a stopper)
+and a coffee bean for Nader Coffee (a sphere with the crease displaced into one
+face). Both are things those businesses sell, both are built from primitives, and
+nothing was added to `package.json`.
+
+The other five have none. A jacket, an HR platform, an electronics catalogue and a
+mangrove nursery have no shape that can be made from primitives without looking like
+a toy, and an abstract blob standing in for a business says nothing about it. The
+brief allowed for exactly this.
+
+The bean took two attempts, and both were decided by looking at a render:
+
+1. A crease 0.42 deep in a 0.72 half-depth reached past the centre and the bean read
+   as **split open** — more pistachio than coffee.
+2. `Math.sign(bz || 1)` put a **visible spike** on the silhouette at the seam.
+
+It now displaces only the front hemisphere, scaled by how far forward a vertex
+already is, so there is no discontinuity at all, at a depth of 0.2.
+
+Performance and reduced motion: reached only through `@defer (on viewport)`, so
+`three` is absent from the initial bundle *and* from the detail route's chunk —
+verified by grepping the built `main-*.js` for `WebGLRenderer`. It is gated on
+`canRunWebGL()`, which is false under `prefers-reduced-motion`, so in that case there
+is no canvas, no context and no animation rather than a frozen object. It is
+`aria-hidden`, `pointer-events: none`, and absent from the server render — the content
+that matters is all there.
+
+### Verification (Sprint 9)
+
+| Gate | Result |
+| --- | --- |
+| Typecheck, stylelint | clean |
+| Tests | 183 / 20 files |
+| Build | zero warnings, 12 prerendered, initial 95.31 kB gz (+0.63 kB) |
+| `three` in the initial bundle | absent — 0 occurrences in `main-*.js` |
+| SSR | role, team, contribution, business facts, brief and the theme all in the prerendered HTML; the object is not |
+| Browser pass | **263 / 263**: gate order, hover *and* focus theming all seven projects to seven distinguishable grounds, neutral restored on leaving, sticky pane still fully visible at rows 5 and 7, roles on every row, objects arriving only where they exist, reduced motion with zero canvases, 0px overflow at 320–1920 in EN and AR, 0 console errors |
+
+Two more harness bugs, and one real fix that came from looking rather than
+measuring:
+
+1. **`html { scroll-behavior: smooth }`** is set in the reset, so `scrollIntoView`
+   *animates*. Reading a rect in the same turn returns a mid-flight position and the
+   synthetic pointer lands on the next row — or off the page. Seven "the atmosphere
+   does not follow the reader" failures, every one of them the harness. Settle the
+   scroll, then measure, then move.
+2. `getComputedStyle().translate` keeps a percentage, and an `infinite` animation at
+   `currentTime === duration` renders its `from` keyframe — both from §20, both hit
+   again here.
+3. **`dir="auto"` on a fact value** auto-detected "Magento" and "Wide" as LTR and
+   aligned them to the left of their column in Arabic while their labels stayed
+   right — a label and its value at opposite edges of one cell. Removed;
+   `.ltr-isolate` already isolates the Latin run without moving the block. Found by
+   reading the Arabic page, not by a measurement.
+
+---
+
+## 22. The split detail page, and the mark over the capture (Sprint 9, follow-up)
+
+### The account beside the evidence
+
+`/work/:slug` is two columns above `lg`. The captures scroll in the wider column;
+the account of the project — the 3D object, the name, the business facts, the role,
+the build and the brief — holds beside them. A reader looking at the fifth
+screenshot no longer has to remember what the project was, or scroll back up to
+check which part of it was his.
+
+Two details are load-bearing:
+
+**The account is first in the DOM and second in the grid.** A reader, and a screen
+reader, should meet the project's name before its screenshots; the eye should be
+able to travel down the column of images. Placing the account in column 2 also
+means it mirrors for free — right in English, left in Arabic, the same side of the
+reading direction in both — with no directional override anywhere.
+
+**The sticky box is inside the grid item, not the item.** `position: sticky` can
+only travel inside its containing block, so `.detail__aside` stretches to the row
+(the grid must NOT use `align-items: start`) and `.detail__pinned` inside it does
+the sticking. This is the same mistake that cost the `/work` preview pane all its
+travel in Sprint 8.5, in the same shape.
+
+### The account has to fit a viewport, so it was measured until it did
+
+A pinned column taller than the viewport cannot be read: sticky pins it, and the
+part below the fold never scrolls into view. So the content was measured, not
+guessed:
+
+| | needed at first | after trimming |
+| --- | --- | --- |
+| Vivace (object + brief) | 1065px | 834px |
+| 2B (no object, long build facts) | 956px | 813px |
+| NAS HR (team row) | 891px | 727px |
+
+The budget at a 900px-tall window is 836px. What changed: the object band 208 → 128,
+the title from `display-1` to `heading-1`, the identity triad from stacked rows to
+inline label-and-value, the brief to `--fs-body-sm`, and every join between blocks
+tightened. **At 1080 — the common desktop height — all seven projects fit with room
+to spare.** One project, Nader Coffee, runs 49px over at 900px, which is why
+`max-block-size` plus `overflow-y: auto` stays: nothing is ever clipped or
+unreachable, and no scrollbar is reserved when it is not needed.
+
+### The mark over the capture
+
+Hovering or focusing a row on `/work` lays that client's own logo over the top of
+the preview screenshot, at the reading edge, and it leaves when the reader does —
+the same `engaged` signal that drives the page's atmosphere, so the two arrive
+together.
+
+It sits on a wash of the page's own paper rather than bare on the image. These
+captures have a dark navigation bar in that corner, a white banner in the next and
+a photograph in a third; half the marks would have disappeared. The wash reads as
+the portfolio labelling the image, not as a badge stuck to it.
+
+### One regression, caused by the move
+
+The object used to sit mid-page, so `@defer (on viewport)` never fired until the
+reader scrolled. In the pinned column it is in the first viewport, fires
+immediately — and `ProjectSculpture` was guarding only the *scene*, not the canvas.
+Under `prefers-reduced-motion` an empty `<canvas>` appeared. The template now guards
+the element itself on `canRunWebGL()`, so the component renders nothing at all in
+that state. Caught by the existing "zero canvases under reduced motion" assertion,
+which is the entire argument for asserting the absence of things.
+
+### Verification
+
+| Gate | Result |
+| --- | --- |
+| Typecheck, stylelint | clean |
+| Tests | 185 / 20 files |
+| Build | zero warnings, 12 prerendered, initial 95.52 kB gz |
+| Split layout | **77 / 77** browser checks: column sides in LTR *and* RTL, DOM order, which blocks are in which column, sticky with real travel, the account still on screen mid-gallery, every project fitting at 1080, stacked below `lg` at 390/768, 0px overflow |
+| The mark | absent at rest, present on hover *and* on keyboard focus, the correct project's artwork, at the top of the frame, on a scrim, mirrored to the reading edge in Arabic, gone on leaving |
+| Sprint 9 suite | **263 / 263**, re-run after both changes |

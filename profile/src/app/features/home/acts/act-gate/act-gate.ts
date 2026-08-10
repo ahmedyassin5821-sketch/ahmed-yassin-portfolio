@@ -4,7 +4,12 @@ import { DirectionService } from '@core/i18n/direction.service';
 import { localizedContent, resolveLocalized } from '@core/i18n/localized';
 import { ProjectPlatform } from '@data/models/project.model';
 import { HOME_CONTENT } from '@data/home.content';
-import { PLATFORM_LABELS, PROJECTS, projectsByPlatform } from '@data/projects.data';
+import {
+  PLATFORM_GROUPS,
+  PLATFORM_LABELS,
+  PROJECTS,
+  projectsByPlatform,
+} from '@data/projects.data';
 import { ProjectFigure, ProjectFigureData } from './project-figure/project-figure';
 
 /**
@@ -52,6 +57,18 @@ export class ActGate {
   protected readonly offset = computed(() =>
     PROJECTS.findIndex((p) => p.platform === this.platform()),
   );
+
+  /**
+   * What this platform does for a business.
+   *
+   * Read from `PLATFORM_GROUPS` rather than authored here, so the gate, `/about`
+   * and the `/work` category sections cannot say three different things about the
+   * same platform.
+   */
+  protected readonly summary = computed(() => {
+    const group = PLATFORM_GROUPS.find((g) => g.platform === this.platform());
+    return group ? resolveLocalized(group.summary, this.direction.locale()) : '';
+  });
 
   protected readonly countLabel = computed(() => {
     const total = projectsByPlatform(this.platform()).length;

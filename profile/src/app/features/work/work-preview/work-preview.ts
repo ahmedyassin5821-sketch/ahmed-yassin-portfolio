@@ -1,9 +1,13 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 
+import { ProjectLogo, ProjectLogoImage } from '@shared/ui/project-logo/project-logo';
+
 export interface WorkPreviewData {
   readonly slug: string;
   readonly name: string;
   readonly field: string;
+  /** The client's own mark, laid over their screenshot while the reader is on it. */
+  readonly logo: ProjectLogoImage;
   readonly image: {
     readonly src: string;
     readonly srcset: string | null;
@@ -45,6 +49,7 @@ export interface WorkPreviewData {
 @Component({
   selector: 'app-work-preview',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [ProjectLogo],
   templateUrl: './work-preview.html',
   styleUrl: './work-preview.scss',
   host: {
@@ -57,6 +62,15 @@ export class WorkPreview {
 
   /** Slug of the project currently being shown. */
   readonly activeSlug = input.required<string>();
+
+  /**
+   * Whether the reader is actually on a row.
+   *
+   * The mark is laid over the capture only while they are, so it reads as "this is
+   * the one you are pointing at" rather than as a watermark the pane always wears.
+   * Same signal that drives the page's atmosphere, so the two arrive together.
+   */
+  readonly engaged = input<boolean>(false);
 
   /** Falls back to the first project, which is also what the pane shows. */
   protected readonly active = computed(

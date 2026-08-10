@@ -1,89 +1,139 @@
 @if (content(); as p) {
-  <article class="detail" aria-labelledby="detail-title">
+  <!--
+    The atmosphere is active from first paint. Arriving here *is* entering the
+    brand's world, so there is nothing to wait for and no hover to require — but it
+    stays an atmosphere inside the AY system: tinted paper, one accent and a low
+    wash of light, never a repaint of the page as the client's own site.
+  -->
+  <article
+    class="detail atmosphere"
+    [appAtmosphere]="atmosphere()"
+    aria-labelledby="detail-title"
+  >
     <!-- Back first in the DOM, so it is the first thing reached by keyboard. -->
     <a class="detail__back" routerLink="/work">
       <app-icon name="arrow-left" size="sm" />
       {{ c().actions.backToWork }}
     </a>
 
-    <!--
-      The business, then the build, then the imagery.
-      A reader should be able to say what this project *is* — what industry, what
-      market, what kind of product — before a single technology is named. The
-      stack and the screenshots follow that, not the other way round.
-    -->
-    <header class="detail__head">
-      <p class="detail__index" aria-hidden="true">{{ indexLabel() }}</p>
+    <div class="detail__split">
+      <!--
+        The account of the project: held still while the evidence scrolls past it.
 
-      <h1 id="detail-title" class="detail__title" dir="auto">{{ p.name }}</h1>
-
-      <!-- Field, market, domain: the three facts that place the business. -->
-      <app-project-facts class="detail__identity" variant="identity" [facts]="identity()" />
-
-      <p class="detail__stack"><span class="ltr-isolate">{{ p.stack }}</span></p>
-
-      <div class="detail__actions">
-        @if (p.url) {
+        FIRST in the DOM and second in the grid. A reader — and a screen reader —
+        should meet the project's name before its screenshots, but the column of
+        images is what the eye should be able to travel down. Placing this in the
+        second grid column also means it mirrors for free: it sits on the right in
+        English and on the left in Arabic, which is the same side of the reading
+        direction in both.
+      -->
+      <aside class="detail__aside">
+        <div class="detail__pinned">
           <!--
-            TextLink, not Button: Button renders a real <button> on purpose and
-            refuses an href. TextLink already carries rel="noopener noreferrer",
-            the external glyph, and the localised new-tab warning.
+            A small object from the business itself — a flacon, a coffee bean — for
+            the two projects where one can be built from primitives without looking
+            fake. Deferred on viewport, so `three` is fetched only if the reader
+            reaches it, and never on /work. Absent entirely under reduced motion
+            (see ProjectSculpture).
           -->
-          <app-text-link class="detail__visit" [href]="p.url">
-            {{ c().actions.visit }}
-          </app-text-link>
-        } @else {
-          <!-- Stated, not boxed. A dashed frame read as a disabled control. -->
-          <p class="detail__private">
-            <span class="detail__private-label">{{ c().actions.private }}</span>
-            <span class="detail__private-note">{{ c().actions.privateNote }}</span>
-          </p>
-        }
-      </div>
+          @if (p.sculpture; as sculpture) {
+            <div class="detail__object">
+              @defer (on viewport) {
+                <app-project-sculpture [kind]="sculpture" [atmosphere]="atmosphere()!" />
+              } @placeholder {
+                <span></span>
+              }
+            </div>
+          }
+
+          <!--
+            The order is the order the reader's questions arrive in:
+
+              what is this  ->  what business, which market, what kind of product
+                            ->  who did what
+                            ->  how was it made
+                            ->  what does it do
+
+            The business context comes before the technology list, and the
+            screenshots are beside all of it rather than after it.
+          -->
+          <header class="detail__head">
+            <p class="detail__index" aria-hidden="true">{{ indexLabel() }}</p>
+            <h1 id="detail-title" class="detail__title" dir="auto">{{ p.name }}</h1>
+          </header>
+
+          <!-- Field, market, domain: the three facts that place the business. -->
+          <app-project-facts class="detail__identity" variant="identity" [facts]="identity()" />
+
+          <!--
+            His part in it, separated from what the project is. The team row appears
+            only where the project's real composition is known, and it is labelled
+            "Project team" so it can never be read as his own.
+          -->
+          <app-project-facts class="detail__role" variant="role" [facts]="roleFacts()" />
+
+          <!-- How it was built. After the role, because it answers a later question. -->
+          <app-project-facts variant="build" [facts]="facts()" />
+
+          <!-- What the business actually is, in two or three sentences. -->
+          <p class="detail__brief">{{ p.brief }}</p>
+
+          <div class="detail__actions">
+            @if (p.url) {
+              <!--
+                TextLink, not Button: Button renders a real <button> on purpose and
+                refuses an href. TextLink already carries rel="noopener noreferrer",
+                the external glyph, and the localised new-tab warning.
+              -->
+              <app-text-link class="detail__visit" [href]="p.url">
+                {{ c().actions.visit }}
+              </app-text-link>
+            } @else {
+              <!-- Stated, not boxed. A dashed frame read as a disabled control. -->
+              <p class="detail__private">
+                <span class="detail__private-label">{{ c().actions.private }}</span>
+                <span class="detail__private-note">{{ c().actions.privateNote }}</span>
+              </p>
+            }
+          </div>
+        </div>
+      </aside>
 
       <!--
-        What the business actually is. Inside the header so it shares the title's
-        column: as a sibling it took `ds.container` and its own 46ch measure,
-        which `margin-inline: auto` then centred in the viewport — leaving the
-        paragraph floating 180px to the right of the name it describes.
+        The evidence. Every capture in one column the reader scrolls, with the
+        account of the project holding beside it — so a screenshot never has to be
+        matched to a paragraph that has left the screen.
       -->
-      <p class="detail__brief">{{ p.brief }}</p>
-    </header>
+      <div class="detail__media">
+        <figure class="detail__cover">
+          <picture>
+            @if (p.cover.avif) {
+              <source type="image/avif" [srcset]="p.cover.avif" [attr.sizes]="sizes" />
+            }
+            <img
+              [src]="p.cover.src"
+              [attr.srcset]="p.cover.srcset"
+              [attr.sizes]="sizes"
+              [alt]="p.cover.alt"
+              [width]="p.cover.width"
+              [height]="p.cover.height"
+              loading="eager"
+              fetchpriority="high"
+              decoding="async"
+            />
+          </picture>
+        </figure>
 
-    <!--
-      Full-bleed: the cover breaks the measure the type sits in. This is the one
-      moment on the page where the work is larger than the words about it.
-    -->
-    <figure class="detail__cover">
-      <picture>
-        @if (p.cover.avif) {
-          <source type="image/avif" [srcset]="p.cover.avif" [attr.sizes]="sizes" />
+        @if (p.screenshots.length) {
+          <app-project-gallery
+            [shots]="p.screenshots"
+            [title]="c().labels.screenshots"
+            [regionLabel]="fill(c().a11y.gallery, p.name)"
+            [sizes]="sizes"
+          />
         }
-        <img
-          [src]="p.cover.src"
-          [attr.srcset]="p.cover.srcset"
-          [attr.sizes]="sizes"
-          [alt]="p.cover.alt"
-          [width]="p.cover.width"
-          [height]="p.cover.height"
-          loading="eager"
-          fetchpriority="high"
-          decoding="async"
-        />
-      </picture>
-    </figure>
-
-    <!-- How it was built. Second, because it answers a later question. -->
-    <app-project-facts variant="build" [facts]="facts()" />
-
-    @if (p.screenshots.length) {
-      <app-project-gallery
-        [shots]="p.screenshots"
-        [title]="c().labels.screenshots"
-        [regionLabel]="fill(c().a11y.gallery, p.name)"
-        [sizes]="sizes"
-      />
-    }
+      </div>
+    </div>
 
     @if (neighbours(); as nav) {
       <app-project-nav

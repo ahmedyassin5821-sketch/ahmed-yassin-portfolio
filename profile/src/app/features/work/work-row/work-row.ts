@@ -15,6 +15,14 @@ export interface WorkRowData {
   /** "Magento · Porto" — what it was built with. */
   readonly stack: string;
   /**
+   * What Ahmed was on this project — "Front-End Developer".
+   *
+   * On the index, not only on the detail page: what the project is and what his
+   * part in it was are two different facts, and the second one should not require
+   * a click.
+   */
+  readonly role: string;
+  /**
    * Whether there is a public address.
    *
    * `internal` is a fact about the work, not missing data: NAS HR has no public
@@ -67,17 +75,29 @@ export interface WorkRowData {
   styleUrl: './work-row.scss',
   host: {
     '[class.is-active]': 'active()',
+    '[class.is-engaged]': 'engaged()',
   },
 })
 export class WorkRow {
   readonly project = input.required<WorkRowData>();
   readonly index = input<number>(0);
 
-  /** Marked when this row is the one the preview pane is showing. */
+  /** Marked when this row is the one the reader is on. */
   readonly active = input<boolean>(false);
+
+  /**
+   * Whether the reader is on *any* row.
+   *
+   * Dimming the inactive rows is what connects the list to the pane, but it is
+   * only meaningful once there is something to point at. Without this the page
+   * would open with all seven names at 0.6 and nothing explaining why — six
+   * disabled-looking projects and no active one.
+   */
+  readonly engaged = input<boolean>(false);
 
   /** Keyed by `linkStatus`, so the row never decides what the states mean. */
   readonly statusLabels = input<Record<string, string>>({});
+  readonly roleLabel = input<string>('');
   readonly viewLabel = input<string>('');
 
   /** Raised on pointer or keyboard focus so the pane can follow the reader. */

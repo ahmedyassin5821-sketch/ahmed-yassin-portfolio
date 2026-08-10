@@ -13,8 +13,8 @@ export const WORK_CONTENT = {
     eyebrow: { en: 'Selected work', ar: 'أعمال مختارة' },
     title: { en: 'Work', ar: 'الأعمال' },
     lede: {
-      en: 'Front-end and eCommerce engineering across Angular, Magento, and Shopify — for enterprise teams and independent brands.',
-      ar: 'هندسة واجهات أمامية وتجارة إلكترونية عبر Angular وMagento وShopify — لفرق مؤسسية وعلامات تجارية مستقلة.',
+      en: 'Websites and online stores built to sell, to present a product range, and to give a business a professional presence. Grouped by the platform each one runs on.',
+      ar: 'مواقع ومتاجر إلكترونية مبنية للبيع وعرض تشكيلة المنتجات ومنح النشاط حضوراً مهنياً. مجمّعة حسب المنصة التي يعمل عليها كل مشروع.',
     },
     /**
      * Two numbers, both substituted from data and neither typed as a word.
@@ -36,7 +36,20 @@ export const WORK_CONTENT = {
     domain: { en: 'Domain', ar: 'نوع المنتج' },
 
     platform: { en: 'Platform', ar: 'المنصة' },
+
+    // Ahmed's part in the project, kept in three separate fields so the page can
+    // never blur what he did into what the product is.
     role: { en: 'Role', ar: 'الدور' },
+    /**
+     * Deliberately "Project team", not "Team".
+     *
+     * On NAS HR the row states 3 front-end and 4 backend developers. Labelled
+     * "Team" beside his own name that reads as *his* team — which would be a claim
+     * about seniority nobody made.
+     */
+    team: { en: 'Project team', ar: 'فريق المشروع' },
+    contribution: { en: 'Contribution', ar: 'المساهمة' },
+
     technologies: { en: 'Technologies', ar: 'التقنيات' },
     theme: { en: 'Theme', ar: 'القالب' },
     dashboard: { en: 'Includes dashboard', ar: 'يشمل لوحة تحكّم' },

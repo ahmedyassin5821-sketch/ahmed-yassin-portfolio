@@ -6,19 +6,43 @@
 
 // How it was built. Sits below the cover, ruled above only.
 :host(.facts--build) {
-  margin-block: var(--space-12);
-  padding-block-start: var(--space-6);
+  padding-block-start: var(--space-5);
   // A single rule above, not a box around.
   border-block-start: var(--border-hairline) solid var(--color-border);
 }
 
-// What the business is. Opens the page, ruled above and below so the triad reads
-// as one banded statement rather than three loose lines.
+// What the business is. Ruled above and below so the triad reads as one banded
+// statement rather than three loose lines.
 :host(.facts--identity) {
   inline-size: 100%;
-  margin-block-start: var(--space-6);
-  padding-block: var(--space-4);
+  padding-block: var(--space-3);
   border-block: var(--border-hairline) solid var(--color-border);
+}
+
+// Label beside value, not above it.
+//
+// These three now sit in a column a third of the page wide, sharing a viewport
+// with everything else about the project. Stacked they cost 43px a row; inline they
+// cost 24, and the label is short enough that a fixed measure keeps the values in a
+// clean edge without a grid.
+:host(.facts--identity) .facts__row {
+  flex-direction: row;
+  gap: var(--space-3);
+  align-items: baseline;
+}
+
+:host(.facts--identity) .facts__row dt {
+  flex: none;
+  inline-size: 4.5rem;
+}
+
+// His part in it. Between the business above and the build below, because that is
+// the order the question is asked in: what is this, who did what, how was it made.
+:host(.facts--role) {
+  display: block;
+  margin-block: var(--space-6) var(--space-5);
+  padding-block-start: var(--space-5);
+  border-block-start: var(--border-hairline) solid var(--color-border);
 }
 
 .facts {
@@ -34,15 +58,15 @@
   }
 }
 
-// The triad is three facts, so it gets three columns rather than a 2 + 1 orphan.
+// One per line at every width now: the triad lives in the narrow account column,
+// and three across in a third of the page stranded every value on its own line
+// anyway.
 :host(.facts--identity) .facts {
-  @include ds.mq(sm) {
-    grid-template-columns: 1fr;
-  }
+  gap: var(--space-2);
+  grid-template-columns: minmax(0, 1fr);
 
-  @include ds.mq(md) {
-    gap: var(--space-8);
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+  @include ds.mq(sm) {
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
@@ -53,8 +77,28 @@
   gap: var(--space-1);
 }
 
-:host(.facts--build) .facts__row {
+// A sentence, not a phrase. Half a column would wrap the contribution to four
+// ragged lines beside a two-word role.
+.facts__row--wide {
+  grid-column: 1 / -1;
+}
+
+.facts__row--wide dd {
+  max-inline-size: 62ch;
+  text-wrap: pretty;
+}
+
+:host(.facts--build) .facts__row,
+:host(.facts--role) .facts__row {
   gap: var(--space-2);
+}
+
+// The one place a project's brand colour reaches the facts: his role, in the
+// brand's accent. Under the neutral palette this resolves to the ordinary
+// primary-text colour, so it is a no-op until an atmosphere is active.
+:host(.facts--role) .facts__row:first-child dd {
+  color: var(--color-accent);
+  font-size: var(--fs-body);
 }
 
 .facts__row dt {

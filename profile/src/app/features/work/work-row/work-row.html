@@ -39,6 +39,16 @@
     <p class="row__field">{{ project().field }}</p>
     <p class="row__context">{{ project().context }}</p>
     <p class="row__stack"><span class="ltr-isolate">{{ project().stack }}</span></p>
+
+    <!--
+      What the project is, then what his part in it was. Labelled, because "Shopify
+      Developer · Visual Design" sitting bare under a stack line would read as more
+      technology rather than as a statement of responsibility.
+    -->
+    <p class="row__role">
+      <span class="row__role-label">{{ roleLabel() }}</span>
+      <span class="row__role-value">{{ project().role }}</span>
+    </p>
   </div>
 
   <!--

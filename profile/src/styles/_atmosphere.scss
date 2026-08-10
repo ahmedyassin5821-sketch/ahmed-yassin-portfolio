@@ -1,0 +1,148 @@
+// =============================================================================
+// PROJECT ATMOSPHERE — controlled colour, borrowed from a client's brand
+//
+// EMITS CSS. Loaded once from styles.scss, never forwarded into _index.scss.
+//
+// ## The story this exists to tell
+//
+//     neutral portfolio  ->  hover / enter a project  ->  that brand's atmosphere
+//
+// The portfolio's own surface is warm paper and stays that way. A project brings
+// a tinted paper, a deeper plate tone and one accent — enough that entering
+// Designed by G feels different from entering Nader Coffee, and far short of the
+// page turning into the client's website. The AY system remains the system.
+//
+// ## How it works, and why it needs no component to cooperate
+//
+// `AtmosphereDirective` binds a project's eight colours onto an element as
+// --atmos-* custom properties. This file then **rebinds the semantic tokens** from
+// them, on that element. Custom properties inherit through Angular's component
+// boundaries, so every descendant that already reads `var(--color-text-primary)`
+// — which is all of them, because stylelint forbids anything else — adapts with no
+// change of its own. There is no per-component theme code anywhere.
+//
+// ## Why @property, and why the transition lives here
+//
+// Unregistered custom properties are not animatable: the surface would snap from
+// paper to brand. Registering them with a `<color>` syntax makes them interpolate,
+// and because `var()` substitution is live, every token derived from them
+// interpolates too — one transition drives the whole page.
+//
+// Their `initial-value` is the neutral token it replaces, which is what makes the
+// neutral state the *default* rather than a second code path: the directive simply
+// removes the properties when no project is active, they fall back to these
+// values, and the transition runs in that direction as well. `initial-value` must
+// be a literal, so these are the only place the warm ramp is repeated — keep them
+// in step with _tokens-primitive.scss.
+// =============================================================================
+
+@use 'breakpoints' as bp;
+
+@property --atmos-surface {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #fdfcfb; // --warm-50
+}
+
+@property --atmos-surface-strong {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #eceae6; // --warm-200
+}
+
+@property --atmos-border {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #e4e2dd; // --warm-250
+}
+
+@property --atmos-text {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #2e2d2c; // --warm-800
+}
+
+@property --atmos-text-secondary {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #51504f; // --warm-700
+}
+
+@property --atmos-text-muted {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #6e6d6c; // --warm-600
+}
+
+@property --atmos-accent {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #2e2d2c; // --warm-800
+}
+
+@property --atmos-glow {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #8c8b8a; // --warm-500
+}
+
+// Slow on purpose. This is the page entering a project, not a hover highlight —
+// at 200ms it reads as a colour glitch.
+:root {
+  --dur-atmosphere: 900ms;
+}
+
+.atmosphere {
+  // Present whether or not a project is active: the class is what carries the
+  // transition, so the return to neutral animates too.
+  --color-background: var(--atmos-surface);
+  --color-surface: var(--atmos-surface);
+  --color-surface-elevated: var(--atmos-surface);
+  --color-surface-nested: var(--atmos-surface-strong);
+  --color-surface-sunken: var(--atmos-surface-strong);
+  --color-accent-muted: var(--atmos-surface-strong);
+  --color-border: var(--atmos-border);
+  --color-divider: var(--atmos-border);
+  --color-border-interactive: var(--atmos-text-muted);
+  --color-border-strong: var(--atmos-text);
+  --color-text-primary: var(--atmos-text);
+  --color-text-secondary: var(--atmos-text-secondary);
+  --color-text-muted: var(--atmos-text-muted);
+  --color-accent: var(--atmos-accent);
+  --color-accent-hover: var(--atmos-text);
+
+  // NOT rebound, deliberately:
+  //   --color-focus          the ring must be one constant colour, or focus stops
+  //                          being recognisable as focus (see _a11y.scss)
+  //   --color-surface-inverse 2B's white-on-transparent logo needs a dark plate
+  //                          on every surface, tinted or not
+  //   --color-error/-success/-warning  status is not a brand's to restyle
+
+  background-color: var(--color-background);
+  transition:
+    --atmos-surface var(--dur-atmosphere) var(--ease-out),
+    --atmos-surface-strong var(--dur-atmosphere) var(--ease-out),
+    --atmos-border var(--dur-atmosphere) var(--ease-out),
+    --atmos-text var(--dur-atmosphere) var(--ease-out),
+    --atmos-text-secondary var(--dur-atmosphere) var(--ease-out),
+    --atmos-text-muted var(--dur-atmosphere) var(--ease-out),
+    --atmos-accent var(--dur-atmosphere) var(--ease-out),
+    --atmos-glow var(--dur-atmosphere) var(--ease-out),
+    background-color var(--dur-atmosphere) var(--ease-out);
+}
+
+// The colour still arrives — it is information about the project, not decoration
+// — it simply arrives at once instead of travelling.
+@include bp.mq-reduced-motion {
+  .atmosphere {
+    transition: none;
+  }
+}
+
+// System colours replace the palette wholesale here, and a brand tint on top of
+// them would fight the user's own contrast choice.
+@include bp.mq-forced-colors {
+  .atmosphere {
+    background-color: Canvas;
+  }
+}

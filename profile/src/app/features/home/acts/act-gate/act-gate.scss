@@ -63,6 +63,19 @@
   padding-block-end: var(--space-1);
 }
 
+// What the platform is for. Below the name, inside the header rule, so it reads
+// as a subtitle to the gate rather than as body copy competing with the plates.
+.gate__summary {
+  @include ds.body;
+
+  grid-column: 1 / -1;
+  max-inline-size: 52ch;
+  margin-block-start: var(--space-3);
+  color: var(--color-text-secondary);
+  font-size: var(--fs-body-sm);
+  text-wrap: pretty;
+}
+
 // -----------------------------------------------------------------------------
 // Plates
 //
@@ -153,7 +166,8 @@
   // beside a headline is a header, and the point of beat 1 is that it is not one
   // yet.
   .gate__eyebrow,
-  .gate__count {
+  .gate__count,
+  .gate__summary {
     opacity: var(--settle, 1);
   }
 
@@ -194,7 +208,8 @@
   }
 
   .gate__eyebrow,
-  .gate__count {
+  .gate__count,
+  .gate__summary {
     opacity: 1;
   }
 }

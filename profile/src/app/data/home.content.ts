@@ -75,9 +75,15 @@ export const HOME_CONTENT: HomeContent = {
     // /contact. The Arabic is Ahmed's own wording, not a translation of the
     // English line — see PROFESSIONAL_TITLE.
     role: PROFESSIONAL_TITLE,
+    // Business first, platforms second.
+    //
+    // This line used to open with the tooling — "enterprise Angular applications,
+    // Magento 2 storefronts, Shopify themes" — which answers a question no client
+    // asked. It now says what the work is *for*, and names the platforms only as
+    // the means. No superlatives, no "solutions", no "next level".
     lede: {
-      en: 'I build enterprise Angular applications at 2B, customise Magento 2 storefronts at scale, and develop Shopify themes for independent brands.',
-      ar: 'أبني تطبيقات Angular مؤسسية في 2B، وأخصّص متاجر Magento 2 على نطاق واسع، وأطوّر قوالب Shopify لعلامات تجارية مستقلة.',
+      en: 'I build websites and online stores that help businesses sell, present their products, and be found by the customers looking for them.',
+      ar: 'أبني مواقع ومتاجر إلكترونية تساعد الأعمال على البيع وعرض منتجاتها والوصول إلى العملاء الذين يبحثون عنها.',
     },
     meta: [
       {
@@ -85,8 +91,9 @@ export const HOME_CONTENT: HomeContent = {
         value: { en: 'Front-End Developer at 2B', ar: 'مطوّر واجهات أمامية في 2B' },
       },
       {
+        // Shopify first, matching the order the showcase is presented in.
         label: { en: 'Focus', ar: 'التخصص' },
-        value: { en: 'Angular · Magento · Shopify', ar: 'Angular · Magento · Shopify' },
+        value: { en: 'Shopify · Angular · Magento', ar: 'Shopify · Angular · Magento' },
       },
       {
         label: { en: 'Languages', ar: 'اللغات' },
@@ -110,9 +117,12 @@ export const HOME_CONTENT: HomeContent = {
       en: 'Projects shipped',
       ar: 'مشروعاً منجزاً',
     },
+    // What the work does for the businesses that commissioned it — stores that
+    // sell, sites that present a brand, platforms that run on their own admin.
+    // Concise on purpose: this act is a single screen, not a services page.
     lede: {
-      en: 'Across three platforms, for enterprise teams and independent brands. A selection follows.',
-      ar: 'عبر ثلاث منصّات، لفرق مؤسسية وعلامات تجارية مستقلة. وفيما يلي مختارات منها.',
+      en: 'Stores that sell, sites that present a brand, platforms that run on their own admin. For independent brands and for enterprise teams. A selection follows.',
+      ar: 'متاجر تبيع، ومواقع تعرّف بعلامة، ومنصّات تُدار بلوحة تحكّم خاصة بها. لعلامات مستقلة ولفرق مؤسسية. وفيما يلي مختارات منها.',
     },
   },
   gates: {

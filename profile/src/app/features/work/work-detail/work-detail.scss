@@ -4,22 +4,86 @@
   display: block;
 }
 
-// The page has a measure for its type and a full-bleed moment for its cover, so
-// the article itself is not the container — each band claims its own width.
 .detail {
+  @include ds.container;
+
   display: block;
   padding-block: var(--space-12) var(--space-24);
 }
 
-// Everything except the cover sits on this measure. The brief is NOT listed: it
-// lives inside the header, so it inherits this column instead of taking its own
-// and being centred in the viewport by `margin-inline: auto`.
-.detail__back,
-.detail__head,
-app-project-nav {
-  @include ds.container;
+// -----------------------------------------------------------------------------
+// The split
+//
+// The account of the project holds still; the evidence scrolls past it. A reader
+// looking at the fifth screenshot should not have to remember what the project was
+// or scroll back up to check who built which part of it.
+//
+// Two columns only where there is room for both. Below `lg` it becomes one column
+// in DOM order — the account, then the captures — which is the same sequence, just
+// stacked.
+// -----------------------------------------------------------------------------
+.detail__split {
+  display: grid;
+  gap: var(--space-12);
+  grid-template-columns: minmax(0, 1fr);
 
-  max-inline-size: 64rem;
+  @include ds.mq(lg) {
+    // The media column is the wider of the two: the screenshots are the evidence,
+    // and at an even split a 1600px capture is too small to read.
+    gap: var(--space-16);
+    grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+    // Deliberately NOT `align-items: start`. Both items stretch to the row, which
+    // is what gives the sticky box inside the aside somewhere to travel. Setting
+    // `start` here sized the aside to its own content and the pane on /work lost
+    // all its travel in Sprint 8.5 for exactly this reason.
+  }
+}
+
+// Second column, first in the DOM. Logical by construction: column 2 is the right
+// in English and the left in Arabic, so the layout mirrors with the language
+// without a single directional override.
+.detail__aside {
+  min-inline-size: 0;
+
+  @include ds.mq(lg) {
+    grid-column: 2;
+    grid-row: 1;
+  }
+}
+
+.detail__media {
+  min-inline-size: 0;
+
+  @include ds.mq(lg) {
+    grid-column: 1;
+    grid-row: 1;
+  }
+}
+
+// The sticky element is the inner wrapper, not the grid item.
+//
+// `position: sticky` can only travel inside its own containing block. The item is
+// the containing block, so it has to be the full height of the row — which is why
+// the parent uses `align-items: start` on the *item* while this box, inside it,
+// does the sticking. Getting this backwards on /work in Sprint 8.5 gave the pane
+// exactly zero travel and it left the viewport with the first row.
+@include ds.mq(lg) {
+  .detail__pinned {
+    position: sticky;
+    // Clears the sticky site header.
+    inset-block-start: var(--space-12);
+    // A ceiling, not a scroll container.
+    //
+    // The account has to fit a viewport to stay pinned, and everything above was
+    // sized against a measurement of what it actually needs: 1065px at first, on an
+    // 804px budget. Trimmed — a shorter object, inline identity rows, a smaller
+    // brief and tighter joins — it now comes in around 830px, so nothing scrolls
+    // inside it at 1080 and above. Below that the overflow is a few dozen pixels
+    // and this line is what stops those pixels being unreachable. Never clipped,
+    // and no scrollbar reserved when it is not needed.
+    max-block-size: calc(100dvh - var(--space-16));
+    overflow-y: auto;
+  }
 }
 
 // -----------------------------------------------------------------------------
@@ -27,30 +91,13 @@ app-project-nav {
 // -----------------------------------------------------------------------------
 .detail__back {
   @include ds.label;
-}
-
-// ds.mono replaces every property ds.label would set, so these take mono only.
-.detail__index,
-.detail__stack {
-  @include ds.mono;
-
-  font-size: var(--fs-caption);
-}
-
-.detail__back,
-.detail__index,
-.detail__fact dt,
-.detail__private-note {
-  color: var(--color-text-muted);
-}
-
-.detail__back {
   @include ds.focus-visible;
 
   display: flex;
   align-items: center;
   gap: var(--space-2);
-  margin-block-end: var(--space-12);
+  margin-block-end: var(--space-10);
+  color: var(--color-text-muted);
   text-decoration: none;
 }
 
@@ -58,36 +105,49 @@ app-project-nav {
   color: var(--color-text-primary);
 }
 
+// ds.mono replaces every property ds.label would set, so this takes mono only.
+.detail__index {
+  @include ds.mono;
+
+  color: var(--color-text-muted);
+  font-size: var(--fs-caption);
+}
+
 // -----------------------------------------------------------------------------
 // Identity — type first, no logo chip
 //
-// The name at display scale is the identity. A bordered logo chip above it made
-// the page open like a CMS record header.
+// The name at display scale is the identity. A bordered logo chip above it made the
+// page open like a CMS record header.
 // -----------------------------------------------------------------------------
 .detail__head {
   display: flex;
   flex-direction: column;
-  align-items: start;
   gap: var(--space-2);
+  align-items: start;
 }
 
+// heading-1, not display-1: this column is roughly a third of the page and shares
+// a viewport's height with three fact groups, a paragraph and — on two projects —
+// a 3D object. At display scale every two-word name took three lines and 70px of a
+// budget that does not have 70px to spare.
 .detail__title {
-  @include ds.display-1;
+  @include ds.heading-1;
 
   color: var(--color-text-primary);
-  line-height: 0.88;
+  line-height: 0.95;
 }
 
-// The field / market / domain triad is `project-facts` in its `identity`
-// variant — the same object as the build facts below the cover, at a different
-// weight. Only its placement in the flex header belongs here.
 .detail__identity {
-  align-self: stretch;
+  margin-block-start: var(--space-4);
 }
 
-.detail__stack {
-  margin-block-start: var(--space-4);
-  color: var(--color-text-muted);
+.detail__brief {
+  @include ds.body;
+
+  margin-block: var(--space-5) 0;
+  color: var(--color-text-secondary);
+  font-size: var(--fs-body-sm);
+  text-wrap: pretty;
 }
 
 .detail__actions {
@@ -111,32 +171,34 @@ app-project-nav {
 
 .detail__private-note {
   @include ds.caption;
+
+  color: var(--color-text-muted);
 }
 
 // -----------------------------------------------------------------------------
-// Brief — what the business actually is
+// The object
 //
-// Sits between the identity and the cover, so the reader knows what they are
-// looking at before they look at it.
+// Above the name in the pinned column, so entering the page shows the thing the
+// business sells before it names it. Short: it is secondary to the captures beside
+// it, and it has to share the column with the whole account of the project.
+// Absent on five of the seven projects, and under reduced motion on all of them.
 // -----------------------------------------------------------------------------
-.detail__brief {
-  @include ds.heading-3;
-
-  max-inline-size: 46ch;
-  margin-block-start: var(--space-10);
-  color: var(--color-text-secondary);
-  font-weight: var(--weight-light);
-  text-wrap: pretty;
+.detail__object {
+  block-size: 20vh;
+  // 8rem, not 9: at 9 the one project that has both an object and a long brief came
+  // out 14px over the budget on a 900px-tall window. Measured, then trimmed.
+  max-block-size: 8rem;
+  min-block-size: 6.5rem;
+  margin-block-end: var(--space-4);
 }
 
 // -----------------------------------------------------------------------------
-// Cover — the one full-bleed moment
+// Media
 //
-// Breaks the 64rem measure the type sits on. This is the only place on the page
-// where the work is larger than the words about it.
+// The cover leads at the column's full width; the gallery follows in the same
+// column, so every capture is one scroll away from the last.
 // -----------------------------------------------------------------------------
 .detail__cover {
-  margin-block: var(--space-12);
   background-color: var(--color-surface-sunken);
   box-shadow: var(--elevation-3-shadow);
 }
@@ -147,6 +209,3 @@ app-project-nav {
   inline-size: 100%;
   block-size: auto;
 }
-
-// The facts list is `project-facts` and the gallery is `project-gallery`; each
-// owns its own styles, which is what keeps this file inside the 4 kB budget.

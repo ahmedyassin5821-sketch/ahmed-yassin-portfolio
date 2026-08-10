@@ -7,7 +7,14 @@ import {
   actProgress,
   gateBeat,
 } from './act-timeline';
-import { CAMERA_PATH_DESKTOP, CAMERA_PATH_MOBILE, CameraKey, sampleCamera } from './camera-path';
+import { PROJECTS } from '@data/projects.data';
+import {
+  CAMERA_PATH_DESKTOP,
+  CAMERA_PATH_MOBILE,
+  CORRIDOR,
+  CameraKey,
+  sampleCamera,
+} from './camera-path';
 import { buildTypePlanes } from './corridor-layout';
 import { clamp, easeInOutCubic, lerp, normalise, smoothstep } from './easing';
 
@@ -64,11 +71,41 @@ describe('act timeline', () => {
   });
 
   it('derives exactly three platform gates, in travel order', () => {
-    expect(GATE_ACTS.map((a) => a.platform)).toEqual(['angular', 'magento', 'shopify']);
+    // Shopify first: the showcase's priority order, and the same order PROJECTS
+    // is written in. The reader meets the platforms in one sequence everywhere.
+    expect(GATE_ACTS.map((a) => a.platform)).toEqual(['shopify', 'angular', 'magento']);
 
     for (let i = 1; i < GATE_ACTS.length; i++) {
       expect(GATE_ACTS[i].start).toBeGreaterThanOrEqual(GATE_ACTS[i - 1].end);
     }
+  });
+
+  it('walks the gates in the order the showcase presents them', () => {
+    // The corridor and the index must agree. If PROJECTS were reordered and the
+    // timeline were not, the reader would walk Shopify -> Angular -> Magento on
+    // one page and Angular -> Magento -> Shopify on the other.
+    const firstAppearance = GATE_ACTS.map((act) =>
+      PROJECTS.findIndex((p) => p.platform === act.platform),
+    );
+
+    expect(firstAppearance.every((i) => i >= 0)).toBe(true);
+    for (let i = 1; i < firstAppearance.length; i++) {
+      expect(firstAppearance[i]).toBeGreaterThan(firstAppearance[i - 1]);
+    }
+  });
+
+  it('sends the camera deeper at every gate, whatever order the platforms are in', () => {
+    // The depths are assigned by travel order rather than per platform, and this
+    // is what that buys: reordering the showcase cannot make the camera fly to
+    // the far end of the corridor first and then come back.
+    const depths = GATE_ACTS.map((act) => CORRIDOR.gates[act.platform!]);
+
+    expect(depths.length).toBe(3);
+    for (let i = 1; i < depths.length; i++) {
+      expect(depths[i]).toBeLessThan(depths[i - 1]);
+    }
+    expect(depths[0]).toBeLessThan(CORRIDOR.count);
+    expect(depths[depths.length - 1]).toBeGreaterThan(CORRIDOR.exit);
   });
 
   it('throws on an unknown act rather than returning undefined', () => {
@@ -122,7 +159,7 @@ describe('gate beats', () => {
     // the DOM, where it is legible, selectable and indexable.
     const planes = buildTypePlanes('20+');
 
-    expect(planes.map((p) => p.text)).toEqual(['20+', 'ANGULAR', 'MAGENTO', 'SHOPIFY']);
+    expect(planes.map((p) => p.text)).toEqual(['20+', 'SHOPIFY', 'ANGULAR', 'MAGENTO']);
 
     for (const gate of GATE_ACTS) {
       const word = planes.find((p) => p.text === gate.platform!.toUpperCase())!;

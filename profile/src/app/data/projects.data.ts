@@ -55,12 +55,37 @@ const angular: readonly Project[] = [
       ar: 'منصة لإدارة الموارد البشرية موجّهة للسوق المصري. تغطي ملفات الموظفين والحضور والأذونات بالساعات والجزاءات والرواتب، مع لوحات تحكّم حسب الصلاحية ومسارات موافقة، وتتعامل مباشرة مع قواعد قانون العمل والتأمينات الاجتماعية والضرائب في مصر.',
     },
     role: {
-      en: 'Front-End / Angular Developer',
-      ar: 'مطوّر واجهات أمامية / Angular',
+      en: 'Front-End Developer',
+      ar: 'مطوّر واجهات أمامية',
+    },
+    // The project's team, stated because the real composition is known. Ahmed was
+    // one of the three front-end developers; the backend was not his work, and
+    // the product is not his. Nothing here is estimated.
+    team: {
+      en: '3 Front-End Developers · 4 Backend Developers',
+      ar: '٣ مطوّري واجهات أمامية · ٤ مطوّري خدمات خلفية',
+    },
+    contribution: {
+      en: 'Front-end development of the platform’s screens and workflows, as one of the front-end developers on the project team.',
+      ar: 'تطوير واجهات شاشات المنصة ومساراتها، كأحد مطوّري الواجهات الأمامية في فريق المشروع.',
     },
     technologies: ['Angular', 'TypeScript', 'SCSS'],
     theme: null,
     dashboard: true,
+    // Sampled from the supplied mark: #11282b, a very dark slate beside cool
+    // greys. NAS's own artwork is effectively monochrome, so its atmosphere is a
+    // cool graphite rather than a hue it does not have.
+    atmosphere: {
+      surface: '#f6f7f8',
+      surfaceStrong: '#e4e7e8',
+      border: '#cad0d3',
+      text: '#1b2123',
+      textSecondary: '#3f494d',
+      textMuted: '#586368',
+      accent: '#11282b',
+      glow: '#5eb4bf',
+    },
+    sculpture: null,
     // An internal system. There is no public address to link to.
     url: null,
     logo: {
@@ -126,12 +151,32 @@ const angular: readonly Project[] = [
       ar: 'المنصة المؤسسية لشركة الطبيعة للحلول البيئية والزراعية ذ.م.م في الإمارات، المتخصصة في زراعة أشجار وغابات المانغروف وصيانتها، وإعداد الدراسات البيئية، وتطوير المشاريع البيئية والعمرانية والسياحة البيئية. الموقع العام ثنائي اللغة تدعمه لوحة تحكّم لإدارة المشاريع والخدمات والمقالات لكل لغة.',
     },
     role: {
-      en: 'Front-End / Angular Developer',
-      ar: 'مطوّر واجهات أمامية / Angular',
+      en: 'Front-End Developer',
+      ar: 'مطوّر واجهات أمامية',
+    },
+    // Not stated: the composition of this project's team is not known, and a
+    // headcount is not something to estimate. Nor is "· Solo" claimed here — the
+    // site is backed by an admin system, so sole authorship is not established.
+    team: null,
+    contribution: {
+      en: 'Front-end development of the bilingual public site and of the admin screens that manage its content.',
+      ar: 'تطوير واجهات الموقع العام ثنائي اللغة وشاشات الإدارة التي تدير محتواه.',
     },
     technologies: ['Angular', 'TypeScript'],
     theme: null,
     dashboard: true,
+    // Sampled from the mark: #7dc261, the leaf green of the logo's flame.
+    atmosphere: {
+      surface: '#f6f9f4',
+      surfaceStrong: '#e5eddf',
+      border: '#ccdcc1',
+      text: '#1d2d11',
+      textSecondary: '#425e2e',
+      textMuted: '#5b7a45',
+      accent: '#447b2d',
+      glow: '#7ac05d',
+    },
+    sculpture: null,
     url: 'https://www.neas.ae/',
     logo: {
       ...M.nature.logo,
@@ -208,13 +253,34 @@ const magento: readonly Project[] = [
       ar: 'المتجر الإلكتروني لشركة 2B، إحدى شركات تجزئة الإلكترونيات الاستهلاكية في مصر، ويبيع الحاسبات والهواتف والأجهزة المنزلية والتلفزيونات والصوتيات والألعاب عبر الإنترنت وعبر فروعها. وإلى جانب الكتالوج والسلة وإتمام الشراء، يوفّر الاستلام من الفرع وخطط التقسيط من عدة جهات تمويل مصرية.',
     },
     role: {
-      en: 'Front-End Magento Developer',
-      ar: 'مطوّر واجهات أمامية Magento',
+      en: 'Front-End Developer',
+      ar: 'مطوّر واجهات أمامية',
+    },
+    // A backend team worked alongside him. Its size is not stated because it is
+    // not known, and this project must never read as "built the whole platform".
+    team: null,
+    contribution: {
+      en: 'Front-end implementation and Magento theme development, in collaboration with a backend team.',
+      ar: 'تنفيذ الواجهات الأمامية وتطوير قالب Magento، بالتعاون مع فريق للخدمات الخلفية.',
     },
     technologies: ['Magento 2', 'PHTML', 'LESS', 'JavaScript'],
     // The revamp Ahmed contributed to ran on 2B's new Wide theme.
     theme: 'Wide',
     dashboard: false,
+    // Their mark is white-and-orange artwork made for a dark neutral ground —
+    // #f37021 exactly, read from the SVG source. So the paper is graphite, as the
+    // logo's own ground is, and the orange arrives as the accent.
+    atmosphere: {
+      surface: '#f6f7f7',
+      surfaceStrong: '#e4e6e8',
+      border: '#cbcfd2',
+      text: '#1c1f22',
+      textSecondary: '#40464c',
+      textMuted: '#596066',
+      accent: '#ba4b08',
+      glow: '#f3762a',
+    },
+    sculpture: null,
     url: 'https://2b.com.eg/',
     logo: {
       ...M['2b'].logo,
@@ -282,13 +348,33 @@ const magento: readonly Project[] = [
       ar: 'متجر مصري للأجهزة المستوردة والمجدّدة — حاسبات محمولة ومكتبية وأجهزة Microsoft Surface وهواتف — تُباع كأجهزة مستعملة مفحوصة بحالة تشغيل جيدة وبسعر أقل من الجديد. يُفحص كل جهاز قبل التسليم ويُشحن بضمان وفترة استبدال.',
     },
     role: {
-      // Stated in the CV: "Sole Front-End Magento developer".
-      en: 'Sole Front-End Magento Developer',
-      ar: 'مطوّر واجهات Magento الوحيد',
+      en: 'Front-End Developer',
+      ar: 'مطوّر واجهات أمامية',
+    },
+    team: null,
+    contribution: {
+      // The CV says "Sole Front-End Magento developer" — the only front-end
+      // developer on the project, which is not the same as having built the
+      // platform. Both halves of that are said explicitly here.
+      en: 'Sole front-end developer on the project: Magento theme development and storefront implementation, in collaboration with a backend team.',
+      ar: 'مطوّر الواجهات الأمامية الوحيد في المشروع: تطوير قالب Magento وتنفيذ واجهة المتجر، بالتعاون مع فريق للخدمات الخلفية.',
     },
     technologies: ['Magento 2', 'PHTML', 'JavaScript'],
     theme: 'Porto',
     dashboard: false,
+    // Sampled from the mark: near-black type #222021 with a green "e" #34b643.
+    // Graphite-dominant, as the logo is, with the green as the accent.
+    atmosphere: {
+      surface: '#f6f8f6',
+      surfaceStrong: '#e4e8e4',
+      border: '#cad3cb',
+      text: '#1a241c',
+      textSecondary: '#3e4e40',
+      textMuted: '#576959',
+      accent: '#23802d',
+      glow: '#50cd5f',
+    },
+    sculpture: null,
     url: 'https://esterad.com.eg/',
     logo: {
       ...M.esterad.logo,
@@ -350,10 +436,35 @@ const shopify: readonly Project[] = [
       en: 'The direct-to-consumer store for Designed by G, an Egyptian avant-garde fashion label. It sells denim, shirting, outerwear and bags in named collections and limited one-of-one pieces, alongside collaborations with Egyptian artists — a catalogue that runs from everyday basics to couture price points.',
       ar: 'المتجر المباشر للمستهلك لعلامة Designed by G، وهي علامة أزياء مصرية ذات طابع طليعي. تبيع الدنيم والقمصان والجاكيتات والحقائب ضمن تجميعات مسمّاة وقطع فريدة محدودة، إلى جانب تعاونات مع فنانين مصريين — كتالوج يمتد من القطع اليومية إلى أسعار الأزياء الراقية.',
     },
-    role: { en: 'Shopify Developer', ar: 'مطوّر Shopify' },
+    // Two things, said in one line: the build was his, and so were the visuals.
+    // "Visual Design" is scoped to this project — it is not, and must not become,
+    // the professional title in `PROFESSIONAL_TITLE`.
+    role: { en: 'Shopify Developer · Visual Design', ar: 'مطوّر Shopify · تصميم بصري' },
+    // No separate backend team on the Shopify work, and no other developers to
+    // state. Absence of a team row is itself the accurate answer here.
+    team: null,
+    contribution: {
+      en: 'Handled the Shopify implementation independently — theme and custom sections — and produced the store’s visual assets: logos, banners and storefront graphics.',
+      ar: 'تنفيذ متجر Shopify بشكل مستقل — القالب والأقسام المخصّصة — مع إنتاج الأصول البصرية للمتجر: الشعارات واللافتات ورسومات الواجهة.',
+    },
     technologies: ['Shopify', 'Liquid', 'JavaScript'],
     theme: null,
     dashboard: false,
+    // Sampled from the mark: #771415 oxblood running down to #2d0809 near-black.
+    // The red/black the brand actually uses, as a tinted paper rather than a field.
+    atmosphere: {
+      surface: '#f9f4f4',
+      surfaceStrong: '#eddfdf',
+      border: '#dcc1c1',
+      text: '#2d1111',
+      textSecondary: '#5e2e2e',
+      textMuted: '#7a4545',
+      accent: '#771415',
+      glow: '#df3f41',
+    },
+    // No object. A jacket cannot be built from primitives without looking like a
+    // blob, and an abstract shape standing in for a garment is worse than none.
+    sculpture: null,
     url: 'https://www.designedby-g.com/',
     logo: {
       ...M['designed-by-g'].logo,
@@ -421,10 +532,27 @@ const shopify: readonly Project[] = [
       en: 'A direct-to-consumer coffee platform serving the Egyptian market. It sells Turkish, espresso, American, Arabic, specialty and flavoured coffee — ground and whole bean, from 10 g sachets to one-kilogram bags — with bundles that pair beans with brewing equipment.',
       ar: 'منصة قهوة تبيع مباشرة للمستهلك في السوق المصري. تقدّم القهوة التركي والإسبريسو والأمريكي والعربي والمختصة وبنكهات مميّزة — مطحونة وحبوباً كاملة، من أظرف 10 جرام إلى أكياس الكيلو — مع عروض تجمع البن مع أدوات التحضير.',
     },
-    role: { en: 'Shopify Developer', ar: 'مطوّر Shopify' },
+    role: { en: 'Shopify Developer · Visual Design', ar: 'مطوّر Shopify · تصميم بصري' },
+    team: null,
+    contribution: {
+      en: 'Handled the Shopify implementation independently — theme and custom sections — and produced the store’s visual assets: logos, banners and storefront graphics.',
+      ar: 'تنفيذ متجر Shopify بشكل مستقل — القالب والأقسام المخصّصة — مع إنتاج الأصول البصرية للمتجر: الشعارات واللافتات ورسومات الواجهة.',
+    },
     technologies: ['Shopify', 'Liquid'],
     theme: null,
     dashboard: false,
+    // Sampled from the mark: #2e2018 through #5f4c30 — roasted-bean browns.
+    atmosphere: {
+      surface: '#f9f7f4',
+      surfaceStrong: '#ede6df',
+      border: '#dccec1',
+      text: '#2d1e11',
+      textSecondary: '#5e452e',
+      textMuted: '#7a5e45',
+      accent: '#5f4c30',
+      glow: '#bc9762',
+    },
+    sculpture: 'coffee-bean',
     url: 'https://www.nader-coffee.com/',
     logo: {
       ...M['nader-coffee'].logo,
@@ -481,10 +609,31 @@ const shopify: readonly Project[] = [
       en: 'Vivace Perfumes — “House of Artisanal Fragrance” — retails niche and artisanal perfume houses such as Areej Le Doré, Agar Aura, Laurent Smal, Elixir Attar and Aton alongside its own Vivace line. It runs from stores in the UAE and Qatar, with a multi-currency storefront, worldwide delivery and instalment payment.',
       ar: 'Vivace Perfumes — «بيت العطور الحرفية» — تبيع عطور دور نيتشية وحرفية مثل Areej Le Doré وAgar Aura وLaurent Smal وElixir Attar وAton، إلى جانب خطها الخاص Vivace. تعمل من متاجرها في الإمارات وقطر، بمتجر متعدد العملات وتوصيل عالمي ودفع بالتقسيط.',
     },
+    // No design contribution claimed here. The visual work was stated for
+    // Designed by G and Nader Coffee specifically, and extending it to a third
+    // project would be inventing a responsibility.
     role: { en: 'Shopify Developer', ar: 'مطوّر Shopify' },
+    team: null,
+    contribution: {
+      en: 'Handled the Shopify implementation independently — theme, custom sections and the multi-brand storefront structure.',
+      ar: 'تنفيذ متجر Shopify بشكل مستقل — القالب والأقسام المخصّصة وبنية المتجر متعدد الماركات.',
+    },
     technologies: ['Shopify', 'Liquid'],
     theme: null,
     dashboard: false,
+    // Sampled from the mark: #103b3e, the deep teal of the VIVACE wordmark — the
+    // same teal the storefront's own header carries.
+    atmosphere: {
+      surface: '#f4f9f9',
+      surfaceStrong: '#dfeced',
+      border: '#c1dadc',
+      text: '#112b2d',
+      textSecondary: '#2e5b5e',
+      textMuted: '#45777a',
+      accent: '#103b3e',
+      glow: '#4dc8d1',
+    },
+    sculpture: 'perfume-bottle',
     url: 'https://www.vivace.shop/',
     logo: {
       ...M.vivace.logo,
@@ -554,7 +703,20 @@ const shopify: readonly Project[] = [
  */
 export const PROJECTS_SHIPPED = 20;
 
-export const PROJECTS: readonly Project[] = [...angular, ...magento, ...shopify];
+/**
+ * The showcase, in priority order: **Shopify, then Angular, then Magento.**
+ *
+ * Shopify leads because it is the work that is most completely Ahmed's — the
+ * storefront and, on two of the three, the visual assets as well — and because
+ * selling online is what most businesses arriving here are trying to do.
+ *
+ * This array is the single source of the ordering. `/work`, its category
+ * sections, the numerals 01–07, the detail pages' previous/next, and the order of
+ * the Home corridor's gates are all derived from it, so the hierarchy is stated
+ * once. Changing it here changes it everywhere — including the depth each gate
+ * sits at in the corridor, which `camera-path.ts` derives from `GATE_ACTS`.
+ */
+export const PROJECTS: readonly Project[] = [...shopify, ...angular, ...magento];
 
 /**
  * Platform labels.
@@ -569,19 +731,28 @@ export const PLATFORM_LABELS: Record<ProjectPlatform, Localized> = {
 };
 
 /**
- * Platform groups — the three strata of the Home composition.
+ * Platform groups — the three strata, in the same priority as `PROJECTS`.
  *
- * Order is deliberate and matches the header narrative: Angular first (the role
- * being applied for), Magento second (the enterprise depth), Shopify third (the
- * independent client work).
+ * Each summary says what the platform does *for a business*, not what it is made
+ * of. A reader deciding whether to hire someone is asking what they will get, and
+ * "reusable component systems" answers a different question.
  */
 export const PLATFORM_GROUPS: readonly PlatformGroup[] = [
+  {
+    platform: 'shopify',
+    label: 'Shopify',
+    summary: {
+      en: 'Shopify stores that turn a product range into an online shopping experience — and, where it was mine to do, the visual assets they present.',
+      ar: 'متاجر Shopify تحوّل تشكيلة المنتجات إلى تجربة شراء عبر الإنترنت — ومعها الأصول البصرية التي تعرضها، حيث كان ذلك من عملي.',
+    },
+    projects: shopify,
+  },
   {
     platform: 'angular',
     label: 'Angular',
     summary: {
-      en: 'Enterprise applications, complex dashboards, and reusable component systems.',
-      ar: 'تطبيقات مؤسسية ولوحات تحكّم معقّدة وأنظمة مكوّنات قابلة لإعادة الاستخدام.',
+      en: 'Custom web experiences for businesses that need more than a standard storefront — a platform, a catalogue, or a system with its own admin.',
+      ar: 'تجارب ويب مخصّصة للأعمال التي تحتاج أكثر من متجر جاهز — منصة أو كتالوج أو نظام بلوحة إدارة خاصة به.',
     },
     projects: angular,
   },
@@ -589,19 +760,10 @@ export const PLATFORM_GROUPS: readonly PlatformGroup[] = [
     platform: 'magento',
     label: 'Magento',
     summary: {
-      en: 'High-traffic storefronts — theme customisation, module overrides, and performance.',
-      ar: 'متاجر عالية الزيارات — تخصيص القوالب وتجاوز الوحدات وتحسين الأداء.',
+      en: 'Storefronts built to carry a large catalogue, and the operational detail that comes with retail at scale.',
+      ar: 'متاجر مبنية لتحمل كتالوجات كبيرة، وما يرافق التجزئة الواسعة من تفاصيل تشغيلية.',
     },
     projects: magento,
-  },
-  {
-    platform: 'shopify',
-    label: 'Shopify',
-    summary: {
-      en: 'Custom Liquid themes and bespoke sections for independent brands.',
-      ar: 'قوالب Liquid مخصّصة وأقسام مصمّمة خصيصاً لعلامات تجارية مستقلة.',
-    },
-    projects: shopify,
   },
 ];
 

@@ -1,8 +1,18 @@
 <dl class="facts">
   @for (fact of facts(); track fact.label) {
-    <div class="facts__row">
+    <div class="facts__row" [class.facts__row--wide]="fact.wide">
       <dt>{{ fact.label }}</dt>
-      <dd dir="auto">
+      <!--
+        No `dir="auto"` on the value.
+
+        It auto-detected "Magento" and "Wide" as LTR, which aligned those values to
+        the *left* of their column in Arabic while their labels stayed on the right
+        — a label and its value at opposite edges of the same cell, which reads as
+        two unrelated things. The value now takes the page's direction, and Latin
+        runs inside it are handled by `.ltr-isolate`, which is what that class is
+        for: it isolates the run for the bidi algorithm without moving the block.
+      -->
+      <dd>
         @if (fact.isolate) {
           <span class="ltr-isolate">{{ fact.value }}</span>
         } @else {
