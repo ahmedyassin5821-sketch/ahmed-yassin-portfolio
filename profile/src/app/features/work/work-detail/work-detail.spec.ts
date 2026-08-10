@@ -96,9 +96,22 @@ describe('Work detail', () => {
       const { el } = await render(project.slug);
 
       for (const img of Array.from(el.querySelectorAll<HTMLImageElement>('.detail img'))) {
-        expect(img.getAttribute('alt')?.length).toBeGreaterThan(0);
+        // Every image reserves its box, without exception — that is what stops the
+        // page shifting as captures decode.
         expect(Number(img.getAttribute('width'))).toBeGreaterThan(0);
         expect(Number(img.getAttribute('height'))).toBeGreaterThan(0);
+
+        // Alt text is required unless the image is *declared* decorative by an
+        // aria-hidden ancestor. The project logo is exactly that: the name is an
+        // h1 immediately below it, so describing the artwork too would only repeat
+        // it. Checked as "hidden from the a11y tree", not as "alt is empty", so a
+        // genuinely missing alt still fails here.
+        const decorative = img.closest('[aria-hidden="true"]') !== null;
+        if (decorative) {
+          expect(img.getAttribute('alt')).toBe('');
+        } else {
+          expect(img.getAttribute('alt')?.length).toBeGreaterThan(0);
+        }
       }
     }
   });
@@ -107,9 +120,12 @@ describe('Work detail', () => {
     for (const project of PROJECTS) {
       const { el } = await render(project.slug);
       const identity = el.querySelector('.detail__identity')?.textContent ?? '';
+      const category = el.querySelector('.detail__category')?.textContent ?? '';
 
-      // Field, market and domain, above the fold and above any technology.
-      expect(identity).toContain(project.field.en);
+      // The category now sits beside the platform under the name — "Shopify ·
+      // Coffee / Food & Beverage" is one statement about what this project is — and
+      // the market and domain follow in the facts.
+      expect(category).toContain(project.field.en);
       expect(identity).toContain(project.market.en);
       expect(identity).toContain(project.domain.en);
 
@@ -144,12 +160,13 @@ describe('Work detail', () => {
       ),
     ).map(marker);
 
-    // The business context comes before the technology list, his role comes
-    // between them, and the imagery comes last — a reader places the work, learns
-    // who did what, is told how it was made, and only then is shown the proof.
+    // Role FIRST among the fact blocks, ahead of market and domain and well ahead of
+    // the technology list. On a page describing someone else's business, which part
+    // of it was his is the thing a reader most needs and the thing most easily lost;
+    // in Sprint 9 it was a small label in the middle of a list.
     expect(blocks).toEqual([
-      'detail__identity',
       'detail__role',
+      'detail__identity',
       'facts--build',
       'detail__brief',
       'detail__cover',
@@ -188,6 +205,49 @@ describe('Work detail', () => {
     // The sticky box is inside the grid item, never the item itself: the item has
     // to stay full-height for sticky to have anywhere to travel.
     expect(aside.querySelector('.detail__pinned')).not.toBeNull();
+  });
+
+  it('states role, contribution and team in that order, and gives role the weight', async () => {
+    const { el } = await render('nas-hr');
+    const labels = Array.from(el.querySelectorAll('.detail__role dt')).map((d) =>
+      d.textContent?.trim(),
+    );
+
+    // The order the sprint asked for: what he was, what he did, who else was on it.
+    expect(labels).toEqual([
+      WORK_CONTENT.labels.role.en,
+      WORK_CONTENT.labels.contribution.en,
+      WORK_CONTENT.labels.team.en,
+    ]);
+
+    // And the role is the first thing in the block, so the emphasis rule that
+    // targets it cannot drift onto another row.
+    expect(
+      el.querySelector('.detail__role .facts__row:first-child dt')?.textContent?.trim(),
+    ).toBe(WORK_CONTENT.labels.role.en);
+  });
+
+  it('names the platform and the category beside the project name', async () => {
+    for (const project of PROJECTS) {
+      const { el } = await render(project.slug);
+      const category = el.querySelector('.detail__category');
+
+      expect(category?.textContent).toContain(project.field.en);
+      // The platform is a product name and stays Latin in Arabic, so it is isolated.
+      expect(category?.querySelector('.ltr-isolate')?.textContent?.trim().length).toBeGreaterThan(
+        0,
+      );
+    }
+  });
+
+  it('shows the client’s own mark on their page', async () => {
+    for (const project of PROJECTS) {
+      const { el } = await render(project.slug);
+      const logo = el.querySelector('.detail__logo');
+
+      expect(logo?.getAttribute('aria-hidden')).toBe('true');
+      expect(logo?.querySelector('img')?.getAttribute('src')).toBe(project.logo.src);
+    }
   });
 
   it('separates his role, the project team and his contribution', async () => {
@@ -265,9 +325,12 @@ describe('Work detail', () => {
       expect(el.querySelectorAll('.detail__object').length).toBe(project.sculpture ? 1 : 0);
     }
 
-    // Two of seven. The rest have no shape that can be built from primitives
-    // without looking fake, and an abstract stand-in says nothing about a business.
+    // Three of seven, all things the business actually sells. The remaining four —
+    // an HR platform, an electronics catalogue, a refurbisher, a mangrove nursery —
+    // have no shape that can be built from primitives without looking fake, and an
+    // abstract stand-in says nothing about a business.
     expect(PROJECTS.filter((p) => p.sculpture !== null).map((p) => p.slug)).toEqual([
+      'designed-by-g',
       'nader-coffee',
       'vivace',
     ]);

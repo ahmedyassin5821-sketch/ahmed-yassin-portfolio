@@ -66,8 +66,8 @@ const angular: readonly Project[] = [
       ar: '٣ مطوّري واجهات أمامية · ٤ مطوّري خدمات خلفية',
     },
     contribution: {
-      en: 'Front-end development of the platform’s screens and workflows, as one of the front-end developers on the project team.',
-      ar: 'تطوير واجهات شاشات المنصة ومساراتها، كأحد مطوّري الواجهات الأمامية في فريق المشروع.',
+      en: 'Front-end development as one member of the front-end team.',
+      ar: 'تطوير الواجهات الأمامية كأحد أعضاء فريق الواجهات الأمامية.',
     },
     technologies: ['Angular', 'TypeScript', 'SCSS'],
     theme: null,
@@ -76,14 +76,14 @@ const angular: readonly Project[] = [
     // greys. NAS's own artwork is effectively monochrome, so its atmosphere is a
     // cool graphite rather than a hue it does not have.
     atmosphere: {
-      surface: '#f6f7f8',
-      surfaceStrong: '#e4e7e8',
-      border: '#cad0d3',
-      text: '#1b2123',
-      textSecondary: '#3f494d',
-      textMuted: '#586368',
+      surface: '#ecf0f4',
+      surfaceStrong: '#d2dce4',
+      border: '#aebfcb',
+      text: '#121c23',
+      textSecondary: '#314451',
+      textMuted: '#495e6c',
       accent: '#11282b',
-      glow: '#5eb4bf',
+      glow: '#5cb6c1',
     },
     sculpture: null,
     // An internal system. There is no public address to link to.
@@ -167,14 +167,14 @@ const angular: readonly Project[] = [
     dashboard: true,
     // Sampled from the mark: #7dc261, the leaf green of the logo's flame.
     atmosphere: {
-      surface: '#f6f9f4',
-      surfaceStrong: '#e5eddf',
-      border: '#ccdcc1',
-      text: '#1d2d11',
-      textSecondary: '#425e2e',
-      textMuted: '#5b7a45',
-      accent: '#447b2d',
-      glow: '#7ac05d',
+      surface: '#eff6e9',
+      surfaceStrong: '#d8e9cc',
+      border: '#b9d5a5',
+      text: '#18290d',
+      textSecondary: '#3d5b27',
+      textMuted: '#56773e',
+      accent: '#3b6d27',
+      glow: '#79c15c',
     },
     sculpture: null,
     url: 'https://www.neas.ae/',
@@ -260,10 +260,10 @@ const magento: readonly Project[] = [
     // not known, and this project must never read as "built the whole platform".
     team: null,
     contribution: {
-      en: 'Front-end implementation and Magento theme development, in collaboration with a backend team.',
-      ar: 'تنفيذ الواجهات الأمامية وتطوير قالب Magento، بالتعاون مع فريق للخدمات الخلفية.',
+      en: 'Front-end and Magento theme work, as part of a project with a backend team.',
+      ar: 'العمل على الواجهات الأمامية وقالب Magento، كجزء من مشروع يعمل فيه فريق البنية التحتية.',
     },
-    technologies: ['Magento 2', 'PHTML', 'LESS', 'JavaScript'],
+    technologies: ['Magento 2', 'PHTML', 'HTML', 'CSS', 'JavaScript'],
     // The revamp Ahmed contributed to ran on 2B's new Wide theme.
     theme: 'Wide',
     dashboard: false,
@@ -271,13 +271,13 @@ const magento: readonly Project[] = [
     // #f37021 exactly, read from the SVG source. So the paper is graphite, as the
     // logo's own ground is, and the orange arrives as the accent.
     atmosphere: {
-      surface: '#f6f7f7',
-      surfaceStrong: '#e4e6e8',
-      border: '#cbcfd2',
-      text: '#1c1f22',
-      textSecondary: '#40464c',
-      textMuted: '#596066',
-      accent: '#ba4b08',
+      surface: '#edeff3',
+      surfaceStrong: '#d4dae1',
+      border: '#b2bbc7',
+      text: '#151a21',
+      textSecondary: '#363f4c',
+      textMuted: '#4e5967',
+      accent: '#9e3f06',
       glow: '#f3762a',
     },
     sculpture: null,
@@ -356,8 +356,8 @@ const magento: readonly Project[] = [
       // The CV says "Sole Front-End Magento developer" — the only front-end
       // developer on the project, which is not the same as having built the
       // platform. Both halves of that are said explicitly here.
-      en: 'Sole front-end developer on the project: Magento theme development and storefront implementation, in collaboration with a backend team.',
-      ar: 'مطوّر الواجهات الأمامية الوحيد في المشروع: تطوير قالب Magento وتنفيذ واجهة المتجر، بالتعاون مع فريق للخدمات الخلفية.',
+      en: 'Sole front-end developer on the project, working with a backend team.',
+      ar: 'مطوّر الواجهات الأمامية الوحيد في المشروع، بالعمل مع فريق البنية التحتية.',
     },
     technologies: ['Magento 2', 'PHTML', 'JavaScript'],
     theme: 'Porto',
@@ -365,13 +365,13 @@ const magento: readonly Project[] = [
     // Sampled from the mark: near-black type #222021 with a green "e" #34b643.
     // Graphite-dominant, as the logo is, with the green as the accent.
     atmosphere: {
-      surface: '#f6f8f6',
-      surfaceStrong: '#e4e8e4',
-      border: '#cad3cb',
-      text: '#1a241c',
-      textSecondary: '#3e4e40',
-      textMuted: '#576959',
-      accent: '#23802d',
+      surface: '#ecf4ee',
+      surfaceStrong: '#d2e4d8',
+      border: '#aecbb8',
+      text: '#122318',
+      textSecondary: '#31513c',
+      textMuted: '#496c55',
+      accent: '#1c6d26',
       glow: '#50cd5f',
     },
     sculpture: null,
@@ -444,8 +444,8 @@ const shopify: readonly Project[] = [
     // state. Absence of a team row is itself the accurate answer here.
     team: null,
     contribution: {
-      en: 'Handled the Shopify implementation independently — theme and custom sections — and produced the store’s visual assets: logos, banners and storefront graphics.',
-      ar: 'تنفيذ متجر Shopify بشكل مستقل — القالب والأقسام المخصّصة — مع إنتاج الأصول البصرية للمتجر: الشعارات واللافتات ورسومات الواجهة.',
+      en: 'Independent Shopify build, plus the visual assets it presents — logos, banners and designs.',
+      ar: 'تنفيذ مستقل لمتجر Shopify، مع الأصول البصرية التي يعرضها — الشعارات واللافتات والتصميمات.',
     },
     technologies: ['Shopify', 'Liquid', 'JavaScript'],
     theme: null,
@@ -453,18 +453,19 @@ const shopify: readonly Project[] = [
     // Sampled from the mark: #771415 oxblood running down to #2d0809 near-black.
     // The red/black the brand actually uses, as a tinted paper rather than a field.
     atmosphere: {
-      surface: '#f9f4f4',
-      surfaceStrong: '#eddfdf',
-      border: '#dcc1c1',
-      text: '#2d1111',
-      textSecondary: '#5e2e2e',
-      textMuted: '#7a4545',
+      surface: '#f6e9e9',
+      surfaceStrong: '#e9cccc',
+      border: '#d5a5a5',
+      text: '#290d0d',
+      textSecondary: '#5b2727',
+      textMuted: '#773e3e',
       accent: '#771415',
       glow: '#df3f41',
     },
-    // No object. A jacket cannot be built from primitives without looking like a
-    // blob, and an abstract shape standing in for a garment is worse than none.
-    sculpture: null,
+    // A jacket, on the user's explicit instruction after Sprint 9 had left this
+    // `null`. Built as a garment on a hanger from lathed and extruded primitives —
+    // see `sculpture-scene.ts` for what that does and does not attempt.
+    sculpture: 'jacket',
     url: 'https://www.designedby-g.com/',
     logo: {
       ...M['designed-by-g'].logo,
@@ -535,22 +536,22 @@ const shopify: readonly Project[] = [
     role: { en: 'Shopify Developer · Visual Design', ar: 'مطوّر Shopify · تصميم بصري' },
     team: null,
     contribution: {
-      en: 'Handled the Shopify implementation independently — theme and custom sections — and produced the store’s visual assets: logos, banners and storefront graphics.',
-      ar: 'تنفيذ متجر Shopify بشكل مستقل — القالب والأقسام المخصّصة — مع إنتاج الأصول البصرية للمتجر: الشعارات واللافتات ورسومات الواجهة.',
+      en: 'Independent Shopify build, plus the visual assets it presents — logos, banners and designs.',
+      ar: 'تنفيذ مستقل لمتجر Shopify، مع الأصول البصرية التي يعرضها — الشعارات واللافتات والتصميمات.',
     },
     technologies: ['Shopify', 'Liquid'],
     theme: null,
     dashboard: false,
     // Sampled from the mark: #2e2018 through #5f4c30 — roasted-bean browns.
     atmosphere: {
-      surface: '#f9f7f4',
-      surfaceStrong: '#ede6df',
-      border: '#dccec1',
-      text: '#2d1e11',
-      textSecondary: '#5e452e',
-      textMuted: '#7a5e45',
+      surface: '#f6efe9',
+      surfaceStrong: '#e9dacc',
+      border: '#d5bba5',
+      text: '#291a0d',
+      textSecondary: '#5b3f27',
+      textMuted: '#77593e',
       accent: '#5f4c30',
-      glow: '#bc9762',
+      glow: '#c1985c',
     },
     sculpture: 'coffee-bean',
     url: 'https://www.nader-coffee.com/',
@@ -615,8 +616,8 @@ const shopify: readonly Project[] = [
     role: { en: 'Shopify Developer', ar: 'مطوّر Shopify' },
     team: null,
     contribution: {
-      en: 'Handled the Shopify implementation independently — theme, custom sections and the multi-brand storefront structure.',
-      ar: 'تنفيذ متجر Shopify بشكل مستقل — القالب والأقسام المخصّصة وبنية المتجر متعدد الماركات.',
+      en: 'Independent Shopify build — theme, custom sections and the multi-brand storefront structure.',
+      ar: 'تنفيذ مستقل لمتجر Shopify — القالب والأقسام المخصّصة وبنية المتجر متعدد الماركات.',
     },
     technologies: ['Shopify', 'Liquid'],
     theme: null,
@@ -624,12 +625,12 @@ const shopify: readonly Project[] = [
     // Sampled from the mark: #103b3e, the deep teal of the VIVACE wordmark — the
     // same teal the storefront's own header carries.
     atmosphere: {
-      surface: '#f4f9f9',
-      surfaceStrong: '#dfeced',
-      border: '#c1dadc',
-      text: '#112b2d',
-      textSecondary: '#2e5b5e',
-      textMuted: '#45777a',
+      surface: '#e9f5f6',
+      surfaceStrong: '#cce7e9',
+      border: '#a5d1d5',
+      text: '#0d2729',
+      textSecondary: '#27585b',
+      textMuted: '#3e7477',
       accent: '#103b3e',
       glow: '#4dc8d1',
     },

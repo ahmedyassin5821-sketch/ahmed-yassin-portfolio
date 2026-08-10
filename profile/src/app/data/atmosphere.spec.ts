@@ -49,10 +49,14 @@ describe('project atmospheres', () => {
       expect(contrast(a.textSecondary, a.surface)).toBeGreaterThanOrEqual(4.5);
       expect(contrast(a.textMuted, a.surface)).toBeGreaterThanOrEqual(4.5);
       // The accent is a brand's real colour, darkened only as far as legibility
-      // needs — but it is used on text, so it has to clear AA too.
+      // needs — but it carries the role line at heading scale, so it has to clear AA
+      // on BOTH grounds. Measured only against the paper, three brands passed there
+      // and failed on the plate the role block actually sits on.
       expect(contrast(a.accent, a.surface)).toBeGreaterThanOrEqual(4.5);
-      // Plates and image grounds take primary text as well.
+      expect(contrast(a.accent, a.surfaceStrong)).toBeGreaterThanOrEqual(4.5);
+      // Plates and image grounds take primary and secondary text as well.
       expect(contrast(a.text, a.surfaceStrong)).toBeGreaterThanOrEqual(7);
+      expect(contrast(a.textSecondary, a.surfaceStrong)).toBeGreaterThanOrEqual(4.5);
     }
   });
 
@@ -60,8 +64,13 @@ describe('project atmospheres', () => {
     for (const project of PROJECTS) {
       // A tinted paper, not the brand colour at full strength: the portfolio stays
       // the portfolio and the brand arrives as an atmosphere inside it.
-      expect(luminance(project.atmosphere.surface)).toBeGreaterThan(0.8);
-      expect(luminance(project.atmosphere.surfaceStrong)).toBeGreaterThan(0.65);
+      //
+      // Sprint 9.1 deepened both steps deliberately — Sprint 9's tint was correct
+      // and nearly invisible — so these floors are lower than they were. They are
+      // still floors: below them the ground stops being paper and the page becomes
+      // the client's site, which is the thing the whole system is arranged to avoid.
+      expect(luminance(project.atmosphere.surface)).toBeGreaterThan(0.75);
+      expect(luminance(project.atmosphere.surfaceStrong)).toBeGreaterThan(0.55);
     }
   });
 

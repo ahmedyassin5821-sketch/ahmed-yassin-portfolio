@@ -7,6 +7,7 @@ import { PLATFORM_LABELS, PROJECTS, projectBySlug, projectNeighbours } from '@da
 import { WORK_CONTENT } from '@data/work.content';
 import { AtmosphereDirective } from '@shared/directives/atmosphere.directive';
 import { Icon } from '@shared/ui/icon/icon';
+import { ProjectLogo } from '@shared/ui/project-logo/project-logo';
 import { TextLink } from '@shared/ui/text-link/text-link';
 import { ProjectFacts, ProjectFact } from '../project-facts/project-facts';
 import { ProjectGallery } from '../project-gallery/project-gallery';
@@ -35,6 +36,7 @@ import { ProjectSculpture } from '../project-sculpture/project-sculpture';
     Icon,
     TextLink,
     AtmosphereDirective,
+    ProjectLogo,
     ProjectFacts,
     ProjectGallery,
     ProjectNav,
@@ -82,6 +84,11 @@ export class WorkDetail {
     return {
       name: resolveLocalized(project.name, locale),
       platformLabel: resolveLocalized(PLATFORM_LABELS[project.platform], locale),
+      logo: {
+        src: project.logo.src,
+        width: project.logo.width,
+        height: project.logo.height,
+      },
       role: resolveLocalized(project.role, locale),
       // `null` where the project's team is genuinely not known. The row is then
       // omitted rather than filled with an estimate.
@@ -143,10 +150,11 @@ export class WorkDetail {
   });
 
   /**
-   * What the business is — field, market, domain.
+   * Where the business trades and what kind of product it is.
    *
-   * Deliberately the first thing on the page, above any technology: a reader
-   * should be able to say what this project *is* before a platform is named.
+   * `field` is not here: it moved into the header beside the platform, where it
+   * belongs — "Shopify · Coffee / Food & Beverage" is one statement about what this
+   * project is, and splitting it across two blocks made the reader assemble it.
    */
   protected readonly identity = computed<ProjectFact[]>(() => {
     const p = this.content();
@@ -154,7 +162,6 @@ export class WorkDetail {
 
     const labels = this.c().labels;
     return [
-      { label: labels.field, value: p.field },
       { label: labels.market, value: p.market },
       { label: labels.domain, value: p.domain },
     ];
@@ -176,10 +183,13 @@ export class WorkDetail {
     if (!p) return [];
 
     const labels = this.c().labels;
+    // Role, then what he actually did, then who else was on it. The team row is a
+    // qualification of the two above it, so it follows them rather than splitting
+    // them apart.
     return [
       { label: labels.role, value: p.role },
-      ...(p.team ? [{ label: labels.team, value: p.team }] : []),
       { label: labels.contribution, value: p.contribution, wide: true },
+      ...(p.team ? [{ label: labels.team, value: p.team, wide: true }] : []),
     ];
   });
 

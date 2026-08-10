@@ -57,7 +57,7 @@ export interface ProjectAtmosphere {
  * can be made that actually reads as the business — most cannot, and those carry
  * `null` rather than an abstract shape standing in for one.
  */
-export type SculptureKind = 'perfume-bottle' | 'coffee-bean';
+export type SculptureKind = 'perfume-bottle' | 'coffee-bean' | 'jacket';
 
 /**
  * A real image, with the geometry the encoder measured.

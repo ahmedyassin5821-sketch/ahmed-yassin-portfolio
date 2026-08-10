@@ -59,20 +59,43 @@
           -->
           <header class="detail__head">
             <p class="detail__index" aria-hidden="true">{{ indexLabel() }}</p>
+
+            <!--
+              The client's own mark, above their name. Decorative — the name is right
+              below it as an h1 — but it is the strongest single signal that the page
+              belongs to this brand, which is what the atmosphere is for.
+            -->
+            <app-project-logo class="detail__logo" [logo]="p.logo" [slug]="slug()" />
+
             <h1 id="detail-title" class="detail__title" dir="auto">{{ p.name }}</h1>
+
+            <!--
+              Platform and category on one line under the name: what kind of thing
+              this is, before anything about who made it.
+            -->
+            <p class="detail__category">
+              <span class="ltr-isolate">{{ p.platformLabel }}</span>
+              <span class="detail__category-sep" aria-hidden="true">·</span>
+              <span>{{ p.field }}</span>
+            </p>
           </header>
 
-          <!-- Field, market, domain: the three facts that place the business. -->
-          <app-project-facts class="detail__identity" variant="identity" [facts]="identity()" />
-
           <!--
-            His part in it, separated from what the project is. The team row appears
-            only where the project's real composition is known, and it is labelled
-            "Project team" so it can never be read as his own.
+            His part in it, given the weight it deserves.
+
+            This block leads the account now, ahead of the market and domain facts:
+            a reader arriving on a project page is being told what the work *was*,
+            and the role was previously a small label in the middle of a list. The
+            role value is set at heading scale in the brand's accent, and the block
+            takes a rule above and below so it reads as a statement rather than as
+            another row of metadata.
           -->
           <app-project-facts class="detail__role" variant="role" [facts]="roleFacts()" />
 
-          <!-- How it was built. After the role, because it answers a later question. -->
+          <!-- Market and domain: where it trades and what kind of product it is. -->
+          <app-project-facts class="detail__identity" variant="identity" [facts]="identity()" />
+
+          <!-- How it was built. -->
           <app-project-facts variant="build" [facts]="facts()" />
 
           <!-- What the business actually is, in two or three sentences. -->

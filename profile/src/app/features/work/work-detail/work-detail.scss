@@ -89,8 +89,15 @@
 // -----------------------------------------------------------------------------
 // Back
 // -----------------------------------------------------------------------------
-.detail__back {
+// Grouped by mixin: each `@include` emits the whole property set, and three copies
+// of `ds.label` in one file is what pushed this stylesheet past its 4 kB budget.
+.detail__back,
+.detail__category,
+.detail__private-label {
   @include ds.label;
+}
+
+.detail__back {
   @include ds.focus-visible;
 
   display: flex;
@@ -137,8 +144,30 @@
   line-height: 0.95;
 }
 
+.detail__logo {
+  --logo-inline-size: 7rem;
+  --logo-block-size: 2.5rem;
+  --logo-padding: 0;
+
+  margin-block-end: var(--space-1);
+}
+
+// Platform and category, one line under the name. The platform is a product name
+// and stays Latin in both languages, so it is bidi-isolated in the template.
+.detail__category {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-block-start: var(--space-1);
+  color: var(--color-accent);
+}
+
+.detail__category-sep {
+  color: var(--color-text-muted);
+}
+
 .detail__identity {
-  margin-block-start: var(--space-4);
+  margin-block-start: 0;
 }
 
 .detail__brief {
@@ -164,8 +193,6 @@
 }
 
 .detail__private-label {
-  @include ds.label;
-
   color: var(--color-text-primary);
 }
 
@@ -184,12 +211,13 @@
 // Absent on five of the seven projects, and under reduced motion on all of them.
 // -----------------------------------------------------------------------------
 .detail__object {
-  block-size: 20vh;
-  // 8rem, not 9: at 9 the one project that has both an object and a long brief came
-  // out 14px over the budget on a 900px-tall window. Measured, then trimmed.
-  max-block-size: 8rem;
-  min-block-size: 6.5rem;
-  margin-block-end: var(--space-4);
+  block-size: 22vh;
+  // 10rem. At 8 the objects were specks in the middle of the band — the sprint asked
+  // for them to be seen. This costs the pinned column 32px, which the measurements
+  // below `.detail__pinned` account for.
+  max-block-size: 10rem;
+  min-block-size: 7rem;
+  margin-block-end: var(--space-3);
 }
 
 // -----------------------------------------------------------------------------
@@ -200,6 +228,7 @@
 // -----------------------------------------------------------------------------
 .detail__cover {
   background-color: var(--color-surface-sunken);
+  border: var(--border-hairline) solid var(--color-border);
   box-shadow: var(--elevation-3-shadow);
 }
 

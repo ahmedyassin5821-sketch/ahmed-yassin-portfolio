@@ -1759,3 +1759,101 @@ which is the entire argument for asserting the absence of things.
 | Split layout | **77 / 77** browser checks: column sides in LTR *and* RTL, DOM order, which blocks are in which column, sticky with real travel, the account still on screen mid-gallery, every project fitting at 1080, stacked below `lg` at 390/768, 0px overflow |
 | The mark | absent at rest, present on hover *and* on keyboard focus, the correct project's artwork, at the top of the frame, on a scrim, mirrored to the reading edge in Arabic, gone on leaving |
 | Sprint 9 suite | **263 / 263**, re-run after both changes |
+
+---
+
+## 23. Sprint 9.1 — role prominence, deeper atmospheres, three sculptures
+
+### The role now leads the account
+
+The information order on a detail page is number → name → platform · category →
+**ROLE → CONTRIBUTION → PROJECT TEAM** → platform/technologies → brief → gallery.
+
+Two changes made it read that way. `field` moved out of the facts and up beside the
+platform under the name — "Shopify · Fashion / Apparel" is one statement about what
+the project is, and splitting it across two blocks made the reader assemble it. And
+the role block moved ahead of market and domain, took a rule top and bottom and the
+brand's plate tone as a ground, and its value is set at `heading-2` in the brand's
+accent.
+
+In Sprint 9 the role was a small label halfway down a list of facts — the wrong
+weight for the one thing on a page about someone else's business that says which
+part of it was his.
+
+The contributions were also rewritten to the sprint's own wording, shorter and
+flatter: "Independent Shopify build, plus the visual assets it presents", "Front-end
+development as one member of the front-end team", "Sole front-end developer on the
+project, working with a backend team".
+
+### The atmospheres got deeper, and the accent moved to the harder ground
+
+Sprint 9's papers were at L 96.8% — correct in principle and nearly invisible in
+practice. The same brand hues now sit at 94% with more chroma, the plate tone at
+86%, and every ramp still measures AAA on primary and secondary text.
+
+One real bug came out of deepening them. The accent had been checked against
+`surface` only, and the role value — the one place the accent is set at heading
+scale — sits on `surfaceStrong`. Three brands passed on the paper and failed on the
+plate: Nature 4.17:1, 2B 3.78:1, Esterad 3.92:1. The accents are now darkened
+against `surfaceStrong`, and `atmosphere.spec.ts` asserts both grounds.
+
+More of the page participates: the client's mark sits above their name in the
+header, and the cover and every gallery plate take `--color-surface-sunken` and a
+hairline in `--color-border`, both of which the atmosphere rebinds — so the imagery
+sits *in* the brand's world rather than on neutral grey islands inside it.
+
+### Three sculptures, all turning
+
+They rotate continuously on their own axis now — `rotation.y += delta * 0.26`, a
+revolution every ~24 seconds — accumulated rather than derived from scroll, so
+they keep turning while the reader sits still. Pointer and scroll only lean them.
+
+A **jacket** was added for Designed by G, which Sprint 9 had refused on the grounds
+that a garment from primitives becomes a blob. Asked for directly, it took two
+attempts and the first proved the original objection: a near-circular torso with the
+sleeves tucked against it rendered as a dark red canister. What fixed it was the
+outline — the torso flattened hard front-to-back (`scale.z = 0.44`), the sleeves
+moved clearly outside the silhouette at ±0.6 and angled away, plus a collar and a
+placket. The hanger from the first attempt was dropped: at this size it was clutter.
+
+The **flacon** was refined — a chamfer off the base, a waist, a shoulder, a rolled
+lip and a tapered stopper, all extra points on one revolve — and a translucent inner
+shell meant to suggest glass was tried and removed, because without an environment
+to refract it only greyed the form.
+
+The **bean** needed a third correction, and continuous rotation is what exposed it:
+the crease existed only on the front face, so once the object turned it presented a
+plain brown ellipsoid half the time. Both faces are now creased, the front more
+deeply than the back, as a real bean is.
+
+All three are framed per object (`CAMERA_DISTANCE`) because a bottle, a bean and a
+garment are not the same shape, and one distance left each of them small in the
+middle of the band.
+
+### The cost, measured
+
+The larger role block and the 10rem object band added to the pinned column. Every
+project still fits exactly at 1080 — the common desktop height — with needs from
+768px (Nature) to 940px (Designed by G, Vivace). At 900px tall the overshoot is
+3–100px depending on the project, absorbed by the column's own `overflow-y: auto`,
+which is a deliberate trade: shrinking the role line and the objects to satisfy the
+shortest common desktop window would give up the two things this sprint was about.
+
+### Verification (Sprint 9.1)
+
+| Gate | Result |
+| --- | --- |
+| Typecheck, stylelint | clean |
+| Tests | 188 / 20 files |
+| Build | zero warnings, 12 prerendered, initial 95.52 kB gz — unchanged |
+| Sprint 9 suite, re-run | **279 / 279** |
+| Split-layout suite | **77 / 77**, including every project fitting at 1080 |
+| Marquee suite | **98 / 98** |
+| SSR | all seven roles, the team row on NAS HR alone, the platform · category line and the client's mark in the prerendered HTML of all seven pages |
+| Ordering | `/work` still serves designed-by-g, nader-coffee, vivace, nas-hr, nature, 2b, esterad |
+
+One test was wrong rather than one feature: `describes every image and reserves its
+box` asserted a non-empty `alt` on every image in the detail page, which the new
+decorative logo legitimately fails. It now requires alt text *unless* the image is
+declared decorative by an `aria-hidden` ancestor — so a genuinely missing alt still
+fails, which the blanket rule would no longer have caught.

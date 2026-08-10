@@ -20,8 +20,14 @@
   gap: var(--space-12);
 }
 
+// The plate a capture sits on takes the project's own tone — `--color-surface-sunken`
+// is rebound by the atmosphere — so the imagery sits *in* the brand's world rather
+// than on neutral grey islands inside it. A hairline in the brand's border colour
+// does the same for the edge, where a screenshot's own white would otherwise dissolve
+// into a light paper.
 .gallery__shots figure {
   background-color: var(--color-surface-sunken);
+  border: var(--border-hairline) solid var(--color-border);
   box-shadow: var(--elevation-3-shadow);
 }
 
