@@ -96,15 +96,46 @@ describe('Work detail', () => {
       const { el } = await render(project.slug);
 
       for (const img of Array.from(el.querySelectorAll<HTMLImageElement>('.detail img'))) {
-        // Logos are decorative — the name is beside them as real text — so an
-        // empty alt is correct there and required everywhere else.
-        const isLogo = !!img.closest('app-project-logo');
-        if (!isLogo) expect(img.getAttribute('alt')?.length).toBeGreaterThan(0);
-
+        expect(img.getAttribute('alt')?.length).toBeGreaterThan(0);
         expect(Number(img.getAttribute('width'))).toBeGreaterThan(0);
         expect(Number(img.getAttribute('height'))).toBeGreaterThan(0);
       }
     }
+  });
+
+  it('leads with the business, and states the brief before the cover', async () => {
+    for (const project of PROJECTS) {
+      const { el } = await render(project.slug);
+      const identity = el.querySelector('.detail__identity')?.textContent ?? '';
+
+      // Field, market and domain, above the fold and above any technology.
+      expect(identity).toContain(project.field.en);
+      expect(identity).toContain(project.market.en);
+      expect(identity).toContain(project.domain.en);
+
+      expect(el.querySelector('.detail__brief')?.textContent?.trim()).toBe(project.brief.en);
+    }
+
+    // Order matters: someone should know what the business is before they look
+    // at a screenshot of it.
+    const { el } = await render('nader-coffee');
+    const nodes = Array.from(
+      el.querySelectorAll('.detail__identity, .detail__brief, .detail__cover'),
+    );
+    // Compared by the block class only: `.detail__identity` is app-project-facts,
+    // which also carries its variant class on the host.
+    expect(nodes.map((n) => n.classList[0])).toEqual([
+      'detail__identity',
+      'detail__brief',
+      'detail__cover',
+    ]);
+  });
+
+  it('never states the size of the showcase as a career total', async () => {
+    const { el } = await render('vivace');
+    const text = el.textContent ?? '';
+
+    expect(text).not.toContain(`${PROJECTS.length} projects`);
   });
 
   it('offers previous and next for every project, wrapping at the ends', async () => {

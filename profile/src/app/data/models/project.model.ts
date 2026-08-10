@@ -39,28 +39,43 @@ export interface Project {
 
   readonly platform: ProjectPlatform;
 
+  // ---------------------------------------------------------------------------
+  // The business
+  //
+  // A portfolio that only says "Shopify storefront" describes the tooling and
+  // not the work. These three fields say *what the business is* before any
+  // technology is named, and every one of them is taken from the client's own
+  // public site or from a published source — never inferred from a screenshot.
+  // ---------------------------------------------------------------------------
+
+  /** Geography the business serves — "Egypt", "United Arab Emirates". */
+  readonly market: Localized;
+
+  /** Industry — "Coffee / Food & Beverage", "HR Technology". */
+  readonly field: Localized;
+
+  /** What kind of digital product it is — "Coffee e-commerce". */
+  readonly domain: Localized;
+
   /**
-   * What the product is — "Fashion / Streetwear / E-commerce".
+   * Two or three sentences on what the business actually does and what the
+   * platform does for it.
    *
-   * Distinct from `platform`, which is what it was built with. Together they are
-   * the two-line identity every project presentation leads with, and the pair is
-   * what shows range: three platforms across seven very different sectors.
+   * Describes the *product*, not Ahmed's contribution — that is `role`, and
+   * conflating the two would imply he owns businesses he built pages for.
    */
-  readonly projectType: Localized;
+  readonly brief: Localized;
 
-  /** Ahmed's role on the project. */
+  /** Ahmed's role on the project, as supported by the CV. */
   readonly role: Localized;
-
-  /** One or two lines. This is a portfolio, not a case study. */
-  readonly summary: Localized;
 
   /**
    * Technologies actually used — from the brief, the CV, or visible in the
    * supplied captures. Never inferred to pad the list.
    */
-  readonly technology: readonly string[];
+  readonly technologies: readonly string[];
 
-  /** A named third-party theme, where one was used. */
+  /** A named third-party or in-house theme, where one was used. */
   readonly theme: string | null;
 
   /** Whether the work included a dashboard or admin system. */
@@ -70,23 +85,18 @@ export interface Project {
    * Live URL, or `null` for work that has no public address.
    *
    * `null` is a real state, not missing data: NAS HR is an internal system. The
-   * UI marks it as private rather than rendering a dead link.
+   * UI marks it as internal rather than rendering a dead link. This is also the
+   * only source of a project's status — deriving it means the label and the link
+   * can never disagree, which a separate `status` field would eventually allow.
    */
   readonly url: string | null;
 
-  readonly logo: ProjectImage | null;
+  readonly logo: ProjectImage;
 
-  /**
-   * The card image, and the lead image on the detail page.
-   *
-   * `null` for a project whose assets have not been supplied yet — Vivace today.
-   * The UI renders the token-styled `MediaPlaceholder` frame rather than stock
-   * photography or an invented screenshot, so the gap is legible instead of
-   * disguised. Populating it later is a data edit and nothing else.
-   */
-  readonly cover: ProjectImage | null;
+  /** The preview image, and the lead image on the detail page. */
+  readonly cover: ProjectImage;
 
-  /** Everything after the cover. Lazy-loaded. Empty until assets arrive. */
+  /** Everything after the cover. Lazy-loaded. */
   readonly screenshots: readonly ProjectImage[];
 
   readonly featured: boolean;

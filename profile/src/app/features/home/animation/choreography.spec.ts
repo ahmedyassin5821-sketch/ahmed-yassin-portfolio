@@ -1,5 +1,14 @@
-import { ACT_TIMELINE, GATE_ACTS, actAt, actById, actProgress } from './act-timeline';
+import {
+  ACT_TIMELINE,
+  GATE_ACTS,
+  GATE_BEATS,
+  actAt,
+  actById,
+  actProgress,
+  gateBeat,
+} from './act-timeline';
 import { CAMERA_PATH_DESKTOP, CAMERA_PATH_MOBILE, CameraKey, sampleCamera } from './camera-path';
+import { buildTypePlanes } from './corridor-layout';
 import { clamp, easeInOutCubic, lerp, normalise, smoothstep } from './easing';
 
 /**
@@ -65,6 +74,87 @@ describe('act timeline', () => {
   it('throws on an unknown act rather than returning undefined', () => {
     // Guards against a renamed act silently producing a dead component.
     expect(() => actById('nope' as never)).toThrow();
+  });
+
+  it('gives the three gates most of the scroll, because that is where the work is', () => {
+    const gateSpan = GATE_ACTS.reduce((sum, act) => sum + (act.end - act.start), 0);
+
+    // The four beats inside each gate need room; below about half the scroll a
+    // beat lasts under half a screen and the platform name and the screenshots
+    // read as arriving together.
+    expect(gateSpan).toBeGreaterThan(0.5);
+  });
+});
+
+describe('gate beats', () => {
+  it('runs settle -> image -> info, strictly in order and inside the act', () => {
+    // Out of order, the screenshot would arrive before the platform name has
+    // given up the frame — which is the confusion the beats exist to remove.
+    expect(GATE_BEATS.settle).toBeGreaterThan(0);
+    expect(GATE_BEATS.image).toBeGreaterThan(GATE_BEATS.settle);
+    expect(GATE_BEATS.info).toBeGreaterThan(GATE_BEATS.image);
+    expect(GATE_BEATS.info).toBeLessThan(1);
+  });
+
+  it('leaves the reader time to look before the act ends', () => {
+    // The last beat lands with a hold still to come; without it the information
+    // would arrive and immediately fade.
+    expect(1 - GATE_BEATS.info).toBeGreaterThanOrEqual(0.25);
+  });
+
+  it('maps every beat into its own act, in ascending order', () => {
+    for (const act of GATE_ACTS) {
+      const settle = gateBeat(act, 'settle');
+      const image = gateBeat(act, 'image');
+      const info = gateBeat(act, 'info');
+
+      expect(settle).toBeGreaterThan(act.start);
+      expect(info).toBeLessThan(act.end);
+      expect(image).toBeGreaterThan(settle);
+      expect(info).toBeGreaterThan(image);
+    }
+  });
+
+  it('puts only type in the corridor — no project screenshots', () => {
+    // Screenshots were tried as textured planes and removed: seen from behind,
+    // which is most of the time, a plane renders its texture mirrored, so the
+    // reader was shown a backwards screenshot flying past. The work belongs in
+    // the DOM, where it is legible, selectable and indexable.
+    const planes = buildTypePlanes('20+');
+
+    expect(planes.map((p) => p.text)).toEqual(['20+', 'ANGULAR', 'MAGENTO', 'SHOPIFY']);
+
+    for (const gate of GATE_ACTS) {
+      const word = planes.find((p) => p.text === gate.platform!.toUpperCase())!;
+      // Each word is gated to its own act, so the reader never sees SHOPIFY
+      // behind the ANGULAR gate.
+      expect(word.from).toBeLessThan(gate.start);
+      // And it leaves as the screenshot arrives, rather than sitting behind the
+      // work as a full-frame watermark for the rest of the act.
+      expect(word.to).toBeCloseTo(gateBeat(gate, 'image'), 10);
+      expect(word.to).toBeLessThan(gate.end);
+    }
+  });
+
+  it('never lets one gate’s word appear while the previous gate is being read', () => {
+    // The regression this exists for: with a fixed ±0.06 lead-in, MAGENTO was
+    // legible at 0.47 — two thirds of the way through reading Angular's
+    // projects. Windows have to scale with the act, not sit at a fixed offset.
+    const planes = buildTypePlanes('20+');
+
+    for (let i = 1; i < GATE_ACTS.length; i++) {
+      const previous = GATE_ACTS[i - 1];
+      const gate = GATE_ACTS[i];
+      const word = planes.find((p) => p.text === gate.platform!.toUpperCase())!;
+
+      // Must not appear before the previous gate's information has been read.
+      expect(word.from).toBeGreaterThan(gateBeat(previous, 'info'));
+    }
+
+    // Same for the count: it fills the frame at display scale, and it was still
+    // ghosting behind "Angular".
+    const count = planes.find((p) => p.text === '20+')!;
+    expect(count.to).toBeLessThanOrEqual(GATE_ACTS[0].start);
   });
 });
 
@@ -133,14 +223,34 @@ describe('camera path', () => {
     });
   }
 
-  it('gives mobile a dwell at each gate that desktop does not have', () => {
-    // Mobile settles and holds; desktop glides. Measured as near-zero travel
-    // across a gate boundary.
-    const travel = (path: readonly CameraKey[], from: number, to: number) =>
-      Math.abs(sampleCamera(path, from).z - sampleCamera(path, to).z);
+  const travel = (path: readonly CameraKey[], from: number, to: number) =>
+    Math.abs(sampleCamera(path, from).z - sampleCamera(path, to).z);
 
-    expect(travel(CAMERA_PATH_MOBILE, 0.62, 0.65)).toBeLessThan(
-      travel(CAMERA_PATH_DESKTOP, 0.62, 0.65),
+  it('holds at every gate while its beats play, on both paths', () => {
+    // The camera must be near-still across the window where the reader is being
+    // shown a screenshot and then read its details. A camera still dollying
+    // through would drag the presenting plane out of frame mid-hand-off.
+    for (const [name, path] of paths) {
+      for (const gate of GATE_ACTS) {
+        const beats = travel(path, gateBeat(gate, 'settle'), gateBeat(gate, 'info'));
+        const span = gateBeat(gate, 'info') - gateBeat(gate, 'settle');
+        // The equivalent-length window ending at the gate's start — the approach.
+        const approach = travel(path, gate.start - span, gate.start);
+
+        expect(`${name}:${gate.id}:${beats < approach}`).toBe(`${name}:${gate.id}:true`);
+      }
+    }
+  });
+
+  it('keeps mobile stiller than desktop at a gate', () => {
+    // Mobile settles hard and holds; desktop eases. Same grammar, different
+    // amplitude — a phone viewport smears a continuous dolly.
+    const gate = actById('magento');
+    const from = gateBeat(gate, 'settle');
+    const to = gateBeat(gate, 'info');
+
+    expect(travel(CAMERA_PATH_MOBILE, from, to)).toBeLessThan(
+      travel(CAMERA_PATH_DESKTOP, from, to),
     );
   });
 

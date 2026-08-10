@@ -2,17 +2,6 @@ import { Routes } from '@angular/router';
 
 import { DEV_ROUTES } from './dev/dev.routes';
 
-/**
- * Route data consumed by `RouteStub` through `withComponentInputBinding()`.
- *
- * Every entry below is scaffolding replaced by a real feature in a later sprint.
- * When that happens, swap `loadComponent` and drop the `data` block.
- */
-const STUB = (heading: string, note: string) => ({
-  loadComponent: () => import('./route-stub/route-stub').then((m) => m.RouteStub),
-  data: { heading, note, eyebrow: 'Coming soon' },
-});
-
 export const routes: Routes = [
   {
     path: '',
@@ -34,17 +23,17 @@ export const routes: Routes = [
   },
   {
     path: 'about',
-    ...STUB('About', 'Background, experience, and approach arrive in a later sprint.'),
+    loadComponent: () => import('./features/about/about').then((m) => m.About),
     title: 'About — Ahmed Yassin',
   },
   {
     path: 'cv',
-    ...STUB('CV', 'The full CV, and a downloadable version, arrive in a later sprint.'),
+    loadComponent: () => import('./features/cv/cv').then((m) => m.Cv),
     title: 'CV — Ahmed Yassin',
   },
   {
     path: 'contact',
-    ...STUB('Contact', 'The contact form arrives with its endpoint in a later sprint.'),
+    loadComponent: () => import('./features/contact/contact').then((m) => m.Contact),
     title: 'Contact — Ahmed Yassin',
   },
 

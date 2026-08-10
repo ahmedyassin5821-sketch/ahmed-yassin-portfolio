@@ -20,19 +20,17 @@
             (focused)="setActive($event)"
             [statusLabels]="statusLabels()"
             [viewLabel]="c().a11y.viewProject.replace('{name}', project.name)"
-            [placeholderLabel]="c().labels.awaitingAssets"
           />
         </li>
       }
     </ol>
 
-    <!-- Decorative: every project's name, category and stack is real text in the
-         rows beside it. Holds the first project until the reader moves. -->
+    <!-- Decorative: every project's name, field, market and stack is real text
+         in the rows beside it. Holds the first project until the reader moves. -->
     <app-work-preview
       class="work__preview"
       [projects]="previews()"
       [activeSlug]="activeSlug()"
-      [placeholderLabel]="c().labels.awaitingAssets"
     />
   </div>
 </section>

@@ -1,0 +1,87 @@
+<div class="cv">
+  <app-page-head
+    class="cv__head"
+    [eyebrow]="c().eyebrow"
+    [title]="c().title"
+    [lede]="c().lede"
+    headingId="cv-title"
+  >
+    <!--
+      A plain anchor, not TextLink: this is a download, and `download` renames
+      the saved file (the stored one carries a typo in its name). Same-origin, so
+      the attribute is honoured.
+    -->
+    <a class="cv__download" [href]="file" [attr.download]="downloadName" target="_blank" rel="noopener">
+      {{ c().download }}
+      <span class="sr-only">{{ c().downloadNote }}</span>
+    </a>
+  </app-page-head>
+
+  <p class="cv__role"><span class="ltr-isolate" dir="auto">{{ title() }}</span></p>
+
+  <div class="cv__body">
+    <section class="cv__section" aria-labelledby="cv-profile">
+      <h2 class="cv__heading" id="cv-profile">{{ c().sections.profile }}</h2>
+      <p class="cv__profile">{{ profile() }}</p>
+    </section>
+
+    <app-cv-section
+      class="cv__section"
+      sectionId="cv-experience"
+      [heading]="c().sections.experience"
+      [entries]="experience()"
+    />
+
+    <!--
+      The CV lists projects as prose; /work presents seven of them in full. This
+      states the counts and points there rather than printing a worse copy.
+    -->
+    <section class="cv__section" aria-labelledby="cv-projects">
+      <h2 class="cv__heading" id="cv-projects">{{ c().sections.projects }}</h2>
+      <p class="cv__note">{{ projectsNote() }}</p>
+      <a class="cv__link" routerLink="/work">{{ c().viewWork }}</a>
+    </section>
+
+    <app-cv-section
+      class="cv__section"
+      sectionId="cv-education"
+      [heading]="c().sections.education"
+      [entries]="education()"
+    />
+
+    <app-cv-section
+      class="cv__section"
+      sectionId="cv-certifications"
+      [heading]="c().sections.certifications"
+      [entries]="certifications()"
+    />
+
+    <section class="cv__section" aria-labelledby="cv-skills">
+      <h2 class="cv__heading" id="cv-skills">{{ c().sections.skills }}</h2>
+
+      <dl class="cv__skills">
+        @for (group of skills(); track group.label) {
+          <div class="cv__skill-group">
+            <dt>{{ group.label }}</dt>
+            <!-- One joined line per group: a column of single words reads as a
+                 tag cloud, which is the one thing a CV must not look like. -->
+            <dd><span class="ltr-isolate">{{ group.items.join(' · ') }}</span></dd>
+          </div>
+        }
+      </dl>
+    </section>
+
+    <section class="cv__section" aria-labelledby="cv-languages">
+      <h2 class="cv__heading" id="cv-languages">{{ c().sections.languages }}</h2>
+
+      <dl class="cv__skills">
+        @for (language of languages(); track language.name) {
+          <div class="cv__skill-group">
+            <dt>{{ language.name }}</dt>
+            <dd>{{ language.level }}</dd>
+          </div>
+        }
+      </dl>
+    </section>
+  </div>
+</div>

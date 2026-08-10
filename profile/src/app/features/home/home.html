@@ -32,12 +32,21 @@
     -->
     <div class="home__acts">
       @for (act of acts; track act.id) {
+        <!--
+          Each act carries its own window, and a gate additionally carries the
+          three beat fractions from GATE_BEATS. Bound rather than written into
+          the stylesheet so the timeline stays the single source of the timing:
+          the CSS derives every ramp from these, and so does the WebGL hand-off.
+        -->
         <div
           class="home__act"
           [class.is-current]="act.id === currentAct()"
           [attr.data-act]="act.id"
           [style.--act-start]="act.start"
           [style.--act-end]="act.end"
+          [style.--beat-settle]="beats.settle"
+          [style.--beat-image]="beats.image"
+          [style.--beat-info]="beats.info"
         >
           @switch (act.id) {
             @case ('mark') {

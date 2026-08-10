@@ -1,13 +1,23 @@
 import { CORRIDOR } from './camera-path';
-import { GATE_ACTS } from './act-timeline';
+import { GATE_ACTS, actById, gateBeat } from './act-timeline';
 
 /**
  * Where everything sits in the corridor.
  *
  * Computed from the same `CORRIDOR` depths the camera path is written against,
  * so a plane can never end up somewhere the camera does not fly. Pure and
- * framework-free: the Angular wrapper feeds it project data, the scene consumes
+ * framework-free: the Angular wrapper feeds it the labels, the scene consumes
  * the result, and it is testable without either.
+ *
+ * ## Type only
+ *
+ * The corridor used to hang each project's screenshot as a textured plane. They
+ * are gone. Seen from behind — which is most of the time, because the camera
+ * flies past them — a plane renders its texture mirrored, so the reader was
+ * shown a backwards screenshot; and when one was squared up to the camera for
+ * the gate hand-off it simply duplicated the DOM plate landing over it at the
+ * same moment. The scene now carries the mark and the words; the work is
+ * presented in the DOM, where it is legible, selectable and indexable.
  */
 
 export interface TypePlaneSpec {
@@ -29,89 +39,60 @@ export interface TypePlaneSpec {
   readonly to: number;
 }
 
-export interface ProjectPlaneSpec {
-  readonly slug: string;
-  /** `null` for a project whose imagery has not been supplied — Vivace today. */
-  readonly src: string | null;
-  readonly z: number;
-  readonly offsetX: number;
-  readonly offsetY: number;
-  /**
-   * The first project of a gate. This one plane performs the hand-off: as the
-   * camera closes on the gate it leaves the periphery, squares up to the camera
-   * and grows, so the DOM plate that lands next appears to be the same object.
-   * The others stay peripheral scenery throughout.
-   */
-  readonly isLead: boolean;
-  /** Scroll position at which the gate's DOM takes over. */
-  readonly gateAt: number;
-}
-
-/** Minimal shape the layout needs. Keeps `three` and Angular out of this file. */
-export interface CorridorProject {
-  readonly slug: string;
-  readonly platform: string;
-  readonly src: string | null;
-}
-
 /**
  * The typographic gates: the project count, then one word per platform.
  *
  * Offsets alternate so the camera does not fly down a perfectly symmetrical
  * tunnel — a corridor with everything dead-centre reads as a screensaver.
+ *
+ * ## Windows are relative to each act, not absolute
+ *
+ * A word may only be legible inside its own act plus a short lead-in and
+ * tail-out, and both are measured as a fraction of that act's own span. Fixed
+ * offsets do not survive a retimed timeline: with a ±0.06 lead-in and 0.20-long
+ * gates, MAGENTO became legible at 0.47 — while the reader was still two thirds
+ * of the way through reading Angular's projects. Verified by rendering, not by
+ * reasoning about it.
  */
 export function buildTypePlanes(countLabel: string): readonly TypePlaneSpec[] {
+  const count = actById('count');
+  const countSpan = count.end - count.start;
+
   const planes: TypePlaneSpec[] = [
-    { text: countLabel, z: CORRIDOR.count, offsetX: 0, scale: 1.35, from: 0.22, to: 0.54 },
+    {
+      text: countLabel,
+      z: CORRIDOR.count,
+      offsetX: 0,
+      scale: 1.35,
+      from: count.start - countSpan * 0.25,
+      // Ends with its own act. The camera passes z = −38 partway through the
+      // count act, so every frame after that was dead window anyway — and
+      // leaving it open past the boundary is how this word ended up still
+      // ghosting behind "Angular".
+      to: count.end,
+    },
   ];
 
   GATE_ACTS.forEach((act, index) => {
     const platform = act.platform!;
+    const span = act.end - act.start;
+
     planes.push({
       text: platform.toUpperCase(),
       z: CORRIDOR.gates[platform],
       offsetX: index % 2 === 0 ? -2.4 : 2.4,
       scale: 1,
-      from: act.start - 0.06,
-      to: act.end + 0.02,
+      from: act.start - span * 0.1,
+      // Leaves as that gate's screenshot arrives.
+      //
+      // This is the beat the whole sequence turns on: the word says what the
+      // platform is, then gets out of the way of the work. Held to the end of the
+      // act it stayed ten units from a holding camera — filling the frame — and
+      // the project plates read as printed on top of a watermark. The platform is
+      // still named in the DOM header the name settled into.
+      to: gateBeat(act, 'image'),
     });
   });
-
-  return planes;
-}
-
-/**
- * Project planes, hung just past their platform's gate.
- *
- * They step back and alternate side to side, so passing a gate reads as flying
- * between that platform's work rather than at a wall of it.
- */
-export function buildProjectPlanes(
-  projects: readonly CorridorProject[],
-): readonly ProjectPlaneSpec[] {
-  const planes: ProjectPlaneSpec[] = [];
-
-  for (const act of GATE_ACTS) {
-    const platform = act.platform!;
-    const gateZ = CORRIDOR.gates[platform];
-    const forPlatform = projects.filter((p) => p.platform === platform);
-
-    forPlatform.forEach((project, index) => {
-      planes.push({
-        slug: project.slug,
-        src: project.src,
-        isLead: index === 0,
-        gateAt: act.start,
-        z: gateZ + CORRIDOR.planeOffset + index * CORRIDOR.planeStep,
-        // Far enough out to be cropped by the frame edges. Once the DOM gained
-        // a real editorial plate for every project, a plane sitting behind it
-        // rendered the same screenshot twice — which reads as a bug, not depth.
-        // Out here they are peripheral scenery the camera passes.
-        offsetX: index % 2 === 0 ? -12 : 12,
-        offsetY: index % 2 === 0 ? 2.4 : -2.4,
-      });
-    });
-  }
 
   return planes;
 }

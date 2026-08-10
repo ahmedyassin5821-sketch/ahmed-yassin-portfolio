@@ -1,0 +1,88 @@
+@use 'index' as ds;
+
+:host {
+  display: block;
+}
+
+.about {
+  @include ds.container;
+
+  max-inline-size: 64rem;
+  padding-block: var(--space-16) var(--space-24);
+}
+
+.about__role {
+  @include ds.label;
+
+  margin-block-start: var(--space-6);
+  color: var(--color-text-muted);
+}
+
+.about__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-16);
+  margin-block-start: var(--space-16);
+}
+
+.about__heading {
+  @include ds.label;
+
+  padding-block-end: var(--space-3);
+  border-block-end: var(--border-hairline) solid var(--color-border-strong);
+  color: var(--color-text-primary);
+}
+
+.about__prose {
+  @include ds.body;
+
+  max-inline-size: 68ch;
+  margin-block-start: var(--space-6);
+  color: var(--color-text-secondary);
+  text-wrap: pretty;
+}
+
+.about__note {
+  @include ds.caption;
+
+  max-inline-size: 56ch;
+  margin-block-start: var(--space-6);
+  color: var(--color-text-muted);
+}
+
+.about__link {
+  @include ds.label;
+  @include ds.focus-visible;
+
+  display: inline-block;
+  margin-block-start: var(--space-3);
+  color: var(--color-text-primary);
+  text-decoration: underline;
+  text-underline-offset: 0.3em;
+}
+
+// Ruled rows, matching the CV. Three platforms, each with what it covers.
+.about__row {
+  display: grid;
+  gap: var(--space-1) var(--space-8);
+  padding-block: var(--space-5);
+  border-block-end: var(--border-hairline) solid var(--color-border);
+
+  @include ds.mq(md) {
+    grid-template-columns: 10rem minmax(0, 1fr);
+  }
+}
+
+.about__row dt {
+  @include ds.heading-3;
+
+  color: var(--color-text-primary);
+}
+
+.about__row dd {
+  @include ds.body;
+
+  color: var(--color-text-secondary);
+  font-size: var(--fs-body-sm);
+  text-wrap: pretty;
+}

@@ -1,0 +1,47 @@
+<div class="about">
+  <app-page-head
+    class="about__head"
+    [eyebrow]="c().eyebrow"
+    [title]="c().title"
+    [lede]="c().lede"
+    headingId="about-title"
+  />
+
+  <p class="about__role"><span dir="auto">{{ role() }}</span> — {{ location }}</p>
+
+  <div class="about__body">
+    <section class="about__section" aria-labelledby="about-profile">
+      <h2 class="about__heading" id="about-profile">{{ c().profileHeading }}</h2>
+      <!-- The CV's own profile paragraph, not a paraphrase of it. -->
+      <p class="about__prose">{{ profile() }}</p>
+    </section>
+
+    <section class="about__section" aria-labelledby="about-practice">
+      <h2 class="about__heading" id="about-practice">{{ c().practiceHeading }}</h2>
+
+      <dl class="about__practice">
+        @for (group of practice(); track group.label) {
+          <div class="about__row">
+            <dt><span class="ltr-isolate">{{ group.label }}</span></dt>
+            <dd>{{ group.summary }}</dd>
+          </div>
+        }
+      </dl>
+
+      <p class="about__note">{{ workNote() }}</p>
+      <a class="about__link" routerLink="/work">{{ c().viewWork }}</a>
+    </section>
+
+    <section class="about__section" aria-labelledby="about-now">
+      <h2 class="about__heading" id="about-now">{{ c().nowHeading }}</h2>
+
+      <p class="about__prose" dir="auto">
+        {{ now().title }}@if (now().organisation) {, {{ now().organisation }}}
+        <span class="ltr-isolate">({{ now().period }})</span>
+      </p>
+
+      <p class="about__note">{{ c().cvNote }}</p>
+      <a class="about__link" routerLink="/cv">{{ c().viewCv }}</a>
+    </section>
+  </div>
+</div>

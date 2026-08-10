@@ -1,0 +1,117 @@
+@use 'index' as ds;
+
+:host {
+  display: block;
+}
+
+.cv {
+  @include ds.container;
+
+  max-inline-size: 64rem;
+  padding-block: var(--space-16) var(--space-24);
+}
+
+// The professional title sits under the head as its own line, mono and tracked,
+// so it reads as a caption on the document rather than a second lede.
+.cv__role {
+  @include ds.label;
+
+  margin-block-start: var(--space-6);
+  color: var(--color-text-muted);
+}
+
+// The download is the one control on the page, so it is the one thing with a
+// border — everything else is ruled type.
+.cv__download {
+  @include ds.label;
+  @include ds.focus-visible;
+
+  display: inline-flex;
+  align-items: center;
+  padding-block: var(--space-3);
+  padding-inline: var(--space-5);
+  border: var(--border-emphasis) solid var(--color-text-primary);
+  color: var(--color-text-primary);
+  text-decoration: none;
+  transition:
+    background-color var(--dur-base) var(--ease-out),
+    color var(--dur-base) var(--ease-out);
+}
+
+.cv__download:hover {
+  background-color: var(--color-text-primary);
+  color: var(--color-background);
+}
+
+.cv__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-16);
+  margin-block-start: var(--space-16);
+}
+
+.cv__heading {
+  @include ds.label;
+
+  padding-block-end: var(--space-3);
+  border-block-end: var(--border-hairline) solid var(--color-border-strong);
+  color: var(--color-text-primary);
+}
+
+.cv__profile,
+.cv__note {
+  @include ds.body;
+
+  max-inline-size: 68ch;
+  margin-block-start: var(--space-6);
+  color: var(--color-text-secondary);
+  text-wrap: pretty;
+}
+
+.cv__link {
+  @include ds.label;
+  @include ds.focus-visible;
+
+  display: inline-block;
+  margin-block-start: var(--space-4);
+  color: var(--color-text-primary);
+  text-decoration: underline;
+  text-underline-offset: 0.3em;
+}
+
+// -----------------------------------------------------------------------------
+// Skills and languages
+//
+// Ruled rows, same device as the CV entries. Never chips: a portfolio that
+// renders forty skills as forty pills is a tag cloud with a border radius.
+// -----------------------------------------------------------------------------
+.cv__skill-group {
+  display: grid;
+  gap: var(--space-1) var(--space-8);
+  padding-block: var(--space-5);
+  border-block-end: var(--border-hairline) solid var(--color-border);
+
+  @include ds.mq(md) {
+    grid-template-columns: 10rem minmax(0, 1fr);
+  }
+}
+
+.cv__skill-group dt {
+  @include ds.label;
+
+  color: var(--color-text-muted);
+}
+
+.cv__skill-group dd {
+  @include ds.body;
+
+  color: var(--color-text-primary);
+  font-size: var(--fs-body-sm);
+  text-wrap: pretty;
+}
+
+@include ds.mq-reduced-motion {
+  .cv__download {
+    transition: none;
+  }
+}

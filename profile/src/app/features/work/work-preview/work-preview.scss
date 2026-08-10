@@ -7,14 +7,29 @@
   // carries its own image instead.
   @include ds.mq(md) {
     display: block;
+    // THE fix for "the preview scrolls away and I have to go back up".
+    //
+    // `position: sticky` can only travel inside its own containing block, and
+    // this host is the grid item that holds it. While the grid used
+    // `align-items: start` the item was sized to its content — the same height
+    // as the pane — so the pane had exactly zero travel and left the viewport
+    // with the first row. Stretching the item to the full height of the index
+    // beside it is what gives sticky something to stick *within*.
+    block-size: 100%;
   }
 }
 
 .preview {
   position: sticky;
-  // Clears the sticky header, and sits low enough to read as centred against
-  // the list rather than pinned to the top of it.
-  inset-block-start: 24vh;
+  // Clears the sticky header, and sits low enough to read as optically centred
+  // against the list rather than pinned to the top of it.
+  inset-block-start: 18vh;
+}
+
+// The frame, separate from the sticky box so the caption below it is not inside
+// the clipped, aspect-locked media area.
+.preview__frame {
+  position: relative;
   aspect-ratio: var(--ratio-screenshot);
   overflow: hidden;
   background-color: var(--color-surface-sunken);
@@ -38,6 +53,32 @@
   block-size: 100%;
   object-fit: cover;
   object-position: top center;
+}
+
+// The caption is the second half of the connection between list and pane: it
+// names what is on screen, so the pane is legible even mid-scroll when the
+// matching row has passed out of view.
+.preview__caption {
+  display: flex;
+  gap: var(--space-3);
+  justify-content: space-between;
+  margin-block-start: var(--space-3);
+}
+
+.preview__name,
+.preview__field {
+  @include ds.mono;
+
+  font-size: var(--fs-caption);
+}
+
+.preview__name {
+  color: var(--color-text-primary);
+}
+
+.preview__field {
+  color: var(--color-text-muted);
+  text-align: end;
 }
 
 // A cross-fade is the motion; without it the swap is instant, which is correct

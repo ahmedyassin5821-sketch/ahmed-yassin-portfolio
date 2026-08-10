@@ -16,9 +16,15 @@ export interface ChoreographyTargets {
 /**
  * Desktop travels further than mobile — the mobile choreography settles at each
  * gate rather than gliding, so it needs less distance to say the same thing, and
- * a phone should not have to scroll twelve screens to reach the footer.
+ * a phone should not have to scroll fourteen screens to reach the footer.
+ *
+ * Raised from 12/7 when the gates gained their four-beat sequence. Each gate now
+ * owns roughly a fifth of the scroll and plays four beats inside it; at the old
+ * distance a beat lasted under half a screen, which is fast enough that the
+ * platform name and the screenshots read as arriving together — the exact
+ * confusion the beats exist to remove.
  */
-const TRAVEL_SCREENS = { desktop: 12, mobile: 7 } as const;
+const TRAVEL_SCREENS = { desktop: 14, mobile: 9 } as const;
 
 /**
  * All Home scroll choreography, in one place.

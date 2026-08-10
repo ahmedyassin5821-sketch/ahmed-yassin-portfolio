@@ -11,10 +11,11 @@
   padding-block: var(--space-12) var(--space-24);
 }
 
-// Everything except the cover sits on this measure.
+// Everything except the cover sits on this measure. The brief is NOT listed: it
+// lives inside the header, so it inherits this column instead of taking its own
+// and being centred in the viewport by `margin-inline: auto`.
 .detail__back,
 .detail__head,
-.detail__summary,
 app-project-nav {
   @include ds.container;
 
@@ -24,9 +25,7 @@ app-project-nav {
 // -----------------------------------------------------------------------------
 // Back
 // -----------------------------------------------------------------------------
-.detail__back,
-.detail__category,
-.detail__fact dt {
+.detail__back {
   @include ds.label;
 }
 
@@ -79,12 +78,15 @@ app-project-nav {
   line-height: 0.88;
 }
 
-.detail__category {
-  margin-block-start: var(--space-4);
-  color: var(--color-text-primary);
+// The field / market / domain triad is `project-facts` in its `identity`
+// variant — the same object as the build facts below the cover, at a different
+// weight. Only its placement in the flex header belongs here.
+.detail__identity {
+  align-self: stretch;
 }
 
 .detail__stack {
+  margin-block-start: var(--space-4);
   color: var(--color-text-muted);
 }
 
@@ -112,6 +114,22 @@ app-project-nav {
 }
 
 // -----------------------------------------------------------------------------
+// Brief — what the business actually is
+//
+// Sits between the identity and the cover, so the reader knows what they are
+// looking at before they look at it.
+// -----------------------------------------------------------------------------
+.detail__brief {
+  @include ds.heading-3;
+
+  max-inline-size: 46ch;
+  margin-block-start: var(--space-10);
+  color: var(--color-text-secondary);
+  font-weight: var(--weight-light);
+  text-wrap: pretty;
+}
+
+// -----------------------------------------------------------------------------
 // Cover — the one full-bleed moment
 //
 // Breaks the 64rem measure the type sits on. This is the only place on the page
@@ -123,23 +141,12 @@ app-project-nav {
   box-shadow: var(--elevation-3-shadow);
 }
 
+.detail__cover picture,
 .detail__cover img {
   display: block;
   inline-size: 100%;
   block-size: auto;
 }
 
-.detail__summary {
-  @include ds.heading-3;
-
-  max-inline-size: 34ch;
-  color: var(--color-text-secondary);
-  font-weight: var(--weight-light);
-  text-wrap: pretty;
-}
-
 // The facts list is `project-facts` and the gallery is `project-gallery`; each
 // owns its own styles, which is what keeps this file inside the 4 kB budget.
-
-// The gallery is `project-gallery`, which owns its own styles — that is what
-// keeps this file inside the 4 kB per-component budget.

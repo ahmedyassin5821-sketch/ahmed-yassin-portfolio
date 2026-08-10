@@ -313,5 +313,64 @@ export const PROJECT_MEDIA = {
         height: 844
       }
     }
+  },
+  vivace: {
+    logo: {
+      src: '/projects/vivace/logo.webp',
+      srcset: null,
+      width: 400,
+      height: 52
+    },
+    shots: {
+      home: {
+        src: '/projects/vivace/home-1600.webp',
+        srcset: '/projects/vivace/home-800.webp 800w, /projects/vivace/home-1600.webp 1600w',
+        avif: '/projects/vivace/home-800.avif 800w, /projects/vivace/home-1600.avif 1600w',
+        width: 1600,
+        height: 743
+      },
+      brands: {
+        src: '/projects/vivace/brands-1600.webp',
+        srcset: '/projects/vivace/brands-800.webp 800w, /projects/vivace/brands-1600.webp 1600w',
+        avif: null,
+        width: 1600,
+        height: 662
+      },
+      menu: {
+        src: '/projects/vivace/menu-1600.webp',
+        srcset: '/projects/vivace/menu-800.webp 800w, /projects/vivace/menu-1600.webp 1600w',
+        avif: null,
+        width: 1600,
+        height: 463
+      },
+      merchandising: {
+        src: '/projects/vivace/merchandising-1600.webp',
+        srcset: '/projects/vivace/merchandising-800.webp 800w, /projects/vivace/merchandising-1600.webp 1600w',
+        avif: null,
+        width: 1600,
+        height: 654
+      },
+      product: {
+        src: '/projects/vivace/product-1242.webp',
+        srcset: '/projects/vivace/product-800.webp 800w, /projects/vivace/product-1242.webp 1242w',
+        avif: null,
+        width: 1242,
+        height: 762
+      },
+      cart: {
+        src: '/projects/vivace/cart-693.webp',
+        srcset: '/projects/vivace/cart-693.webp 693w',
+        avif: null,
+        width: 693,
+        height: 838
+      },
+      checkout: {
+        src: '/projects/vivace/checkout-1229.webp',
+        srcset: '/projects/vivace/checkout-800.webp 800w, /projects/vivace/checkout-1229.webp 1229w',
+        avif: null,
+        width: 1229,
+        height: 800
+      }
+    }
   }
 } as const;

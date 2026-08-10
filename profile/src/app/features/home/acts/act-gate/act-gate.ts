@@ -80,18 +80,19 @@ export class ActGate {
       return {
         slug: project.slug,
         name: resolveLocalized(project.name, locale),
-        category: resolveLocalized(project.projectType, locale),
+        // The industry, then where it trades. Two short lines that say what the
+        // business is before the stack says how it was built.
+        field: resolveLocalized(project.field, locale),
+        market: resolveLocalized(project.market, locale),
         stack,
         url: project.url,
-        image: project.cover
-          ? {
-              src: project.cover.src,
-              srcset: project.cover.srcset,
-              width: project.cover.width,
-              height: project.cover.height,
-              alt: resolveLocalized(project.cover.alt, locale),
-            }
-          : null,
+        image: {
+          src: project.cover.src,
+          srcset: project.cover.srcset,
+          width: project.cover.width,
+          height: project.cover.height,
+          alt: resolveLocalized(project.cover.alt, locale),
+        },
       };
     });
   });

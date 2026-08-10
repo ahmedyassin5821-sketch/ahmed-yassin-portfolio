@@ -36,7 +36,7 @@ import { DsBlock } from '../ui/ds-block';
     >
       <div class="stack" lang="ar" dir="rtl">
         <p class="t-display-2">أحمد ياسين</p>
-        <h2 class="t-h1">مهندس واجهات أمامية وتجارة إلكترونية</h2>
+        <h2 class="t-h1">مبرمج مواقع ومتاجر إلكترونية</h2>
         <p class="t-body">
           أطوّر تطبيقات <span class="ltr-isolate">Angular</span> للمؤسسات، ومتاجر
           <span class="ltr-isolate">Magento 2</span> و<span class="ltr-isolate">Shopify</span>، مع

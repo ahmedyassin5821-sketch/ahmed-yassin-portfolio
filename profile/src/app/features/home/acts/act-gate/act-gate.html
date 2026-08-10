@@ -20,13 +20,14 @@
   -->
   <ul class="gate__plates" role="list">
     @for (project of projects(); track project.slug) {
-      <li class="gate__plate" [class.is-lead]="$first">
+      <!-- --stagger paces the supporting plates so they cascade in after the
+           lead has been read rather than all arriving together. -->
+      <li class="gate__plate" [class.is-lead]="$first" [style.--stagger]="$index - 1">
         <app-project-figure
           [project]="project"
           [index]="offset() + $index"
           [variant]="$first ? 'lead' : 'support'"
           [align]="$first ? 'end' : 'start'"
-          [placeholderLabel]="c().placeholderLabel"
           [viewLabel]="c().viewLabel"
         />
       </li>

@@ -2,21 +2,47 @@
 
 :host {
   display: block;
+}
+
+// How it was built. Sits below the cover, ruled above only.
+:host(.facts--build) {
   margin-block: var(--space-12);
   padding-block-start: var(--space-6);
   // A single rule above, not a box around.
   border-block-start: var(--border-hairline) solid var(--color-border);
 }
 
+// What the business is. Opens the page, ruled above and below so the triad reads
+// as one banded statement rather than three loose lines.
+:host(.facts--identity) {
+  inline-size: 100%;
+  margin-block-start: var(--space-6);
+  padding-block: var(--space-4);
+  border-block: var(--border-hairline) solid var(--color-border);
+}
+
 .facts {
   display: grid;
-  gap: var(--space-6);
+  gap: var(--space-4);
   grid-template-columns: 1fr;
 
   // Two columns, not four at the widest tier: there are only ever a handful of
   // facts, and a four-across row strands them as a thin band of labels.
   @include ds.mq(sm) {
+    gap: var(--space-6);
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+// The triad is three facts, so it gets three columns rather than a 2 + 1 orphan.
+:host(.facts--identity) .facts {
+  @include ds.mq(sm) {
+    grid-template-columns: 1fr;
+  }
+
+  @include ds.mq(md) {
+    gap: var(--space-8);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
@@ -24,6 +50,10 @@
   display: flex;
   min-inline-size: 0;
   flex-direction: column;
+  gap: var(--space-1);
+}
+
+:host(.facts--build) .facts__row {
   gap: var(--space-2);
 }
 

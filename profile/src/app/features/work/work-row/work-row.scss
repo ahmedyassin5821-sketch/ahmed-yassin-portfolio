@@ -75,17 +75,27 @@
   @include ds.focus-ring;
 }
 
-.row__category {
+.row__field {
   @include ds.label;
 
   margin-block-start: var(--space-3);
   color: var(--color-text-primary);
 }
 
+// Where it trades and what kind of product it is. Secondary to the field, ahead
+// of the stack — the reader is placing a business, not a repository.
+.row__context {
+  @include ds.body;
+
+  margin-block-start: var(--space-1);
+  color: var(--color-text-secondary);
+  font-size: var(--fs-body-sm);
+}
+
 .row__stack {
   @include ds.mono;
 
-  margin-block-start: var(--space-1);
+  margin-block-start: var(--space-2);
   color: var(--color-text-muted);
   font-size: var(--fs-caption);
 }
@@ -141,10 +151,36 @@
   :host(.is-active) .row__name {
     opacity: 1;
   }
+
+  // A second, non-opacity signal. Dimming alone is ambiguous at a glance — it
+  // reads as "those are unavailable" rather than "this one is showing" — so the
+  // active row also takes a rule in the index column and a solid numeral.
+  :host(.is-active) .row__index {
+    color: var(--color-text-primary);
+  }
+
+  // Grown on the inline axis rather than scaled: `transform-origin` has no
+  // logical keyword, so a scaleX marker would extend from the wrong edge in
+  // Arabic. `inline-size` mirrors for free, and this is a 1px rule — the layout
+  // cost of animating it is not measurable.
+  .row__index::before {
+    display: block;
+    inline-size: 0;
+    block-size: var(--border-hairline);
+    margin-block-end: var(--space-2);
+    background-color: var(--color-text-primary);
+    transition: inline-size var(--dur-base) var(--ease-out);
+    content: '';
+  }
+
+  :host(.is-active) .row__index::before {
+    inline-size: var(--space-6);
+  }
 }
 
 @include ds.mq-reduced-motion {
-  .row__name {
+  .row__name,
+  .row__index::before {
     transition: none;
   }
 }

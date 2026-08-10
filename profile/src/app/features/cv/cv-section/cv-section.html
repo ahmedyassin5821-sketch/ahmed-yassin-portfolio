@@ -1,0 +1,33 @@
+<section class="section" [attr.aria-labelledby]="sectionId()">
+  <h2 class="section__heading" [id]="sectionId()">{{ heading() }}</h2>
+
+  <ol class="section__list" role="list">
+    @for (entry of entries(); track entry.title + entry.period) {
+      <li class="entry">
+        <!--
+          The period takes its own column at wider widths, so a reader scanning
+          for dates never has to read the titles to find them.
+        -->
+        <p class="entry__period">
+          <span class="ltr-isolate">{{ entry.period }}</span>
+        </p>
+
+        <div class="entry__body">
+          <h3 class="entry__title" dir="auto">{{ entry.title }}</h3>
+
+          @if (entry.organisation) {
+            <p class="entry__org" dir="auto">{{ entry.organisation }}</p>
+          }
+
+          @if (entry.points.length) {
+            <ul class="entry__points">
+              @for (point of entry.points; track point) {
+                <li>{{ point }}</li>
+              }
+            </ul>
+          }
+        </div>
+      </li>
+    }
+  </ol>
+</section>

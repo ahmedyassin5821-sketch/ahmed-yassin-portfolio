@@ -12,9 +12,7 @@
 // Head
 //
 // The platform is the largest thing in the act — it is the gate the camera
-// passes through, and the DOM should read with the same weight. The rule beneath
-// it is skewed to the monogram's own leg angle, so the page's line work and the
-// 3D share one geometry.
+// passes through, and the DOM should read with the same weight.
 // -----------------------------------------------------------------------------
 .gate__head {
   display: grid;
@@ -39,6 +37,20 @@
 
   color: var(--color-text-primary);
   line-height: 0.9;
+  // Shrink-wrapped so beat 1 can enlarge it without the *box* growing past the
+  // container. As a full-width block, scaling from any origin moved edges that
+  // had nothing in them — which reads as an overflow in an audit and makes the
+  // real question (is the word clipped?) unanswerable.
+  inline-size: fit-content;
+  max-inline-size: 100%;
+  // Grows away from the reading edge, so the word stays anchored where it sits
+  // instead of expanding into the gutter. `transform-origin` has no logical
+  // keyword, hence the explicit RTL override below.
+  transform-origin: 0 50%;
+}
+
+:host-context([dir='rtl']) .gate__name {
+  transform-origin: 100% 50%;
 }
 
 .gate__count {
@@ -63,6 +75,10 @@
   display: grid;
   gap: var(--space-8);
   grid-template-columns: 1fr;
+  // The depth the lead plate arrives out of, so beat 3 is an arrival rather than
+  // a fade. Set here because a `perspective` has to live on the parent of the
+  // transformed element.
+  perspective: 1400px;
 
   @include ds.mq(md) {
     align-items: start;
@@ -93,5 +109,92 @@
   // equal blocks butted together.
   .gate__plate:not(.is-lead) + .gate__plate:not(.is-lead) {
     padding-block-start: var(--space-2);
+  }
+}
+
+// -----------------------------------------------------------------------------
+// The four beats
+//
+// The act tells one thing at a time: the platform name alone, then it settles
+// into a header, then the lead project's screenshot, then its information, then
+// the supporting projects. The ramps (--settle / --media / --info) are published
+// by home.scss from the act window and GATE_BEATS; this block only decides what
+// they do.
+//
+// ## Why :host-context
+//
+// These rules must apply ONLY while the choreography is running. `.is-staged` is
+// added by the choreography and never appears under reduced motion, without
+// JavaScript, or if GSAP fails to load — and in those states --home-progress does
+// not exist, so every ramp would evaluate to 0 and the whole gate would render
+// at opacity 0. Scoping to the staged ancestor is what keeps the fallback a
+// plain, fully legible document rather than a blank one.
+// -----------------------------------------------------------------------------
+:host-context(.home.is-staged) {
+  // BEAT 1 -> 2. The name owns the frame, then gives it up.
+  //
+  // Transform only: no layout property changes, so nothing reflows and the name
+  // never moves the plates below it. It rises from the optical centre of the
+  // viewport back to its resting place at the top of the act.
+  .gate__name {
+    translate: 0 calc((1 - var(--settle, 1)) * 24vh);
+    // Held to 1.28 rather than the ~1.9 the beat could carry: SHOPIFY at
+    // display-2 is already close to the container width, and scaling from the
+    // centre pushes both ends outward. Enlargement is desktop-only for the same
+    // reason — at 390px the word has no room to grow into at all.
+    scale: 1;
+
+    @include ds.mq(lg) {
+      scale: calc(1 + (1 - var(--settle, 1)) * 0.28);
+    }
+  }
+
+  // The furniture around the name is not part of beat 1 — an eyebrow and a count
+  // beside a headline is a header, and the point of beat 1 is that it is not one
+  // yet.
+  .gate__eyebrow,
+  .gate__count {
+    opacity: var(--settle, 1);
+  }
+
+  .gate__head {
+    border-block-end-color: color-mix(
+      in srgb,
+      var(--color-border-strong) calc(var(--settle, 1) * 100%),
+      transparent
+    );
+  }
+
+  // BEAT 2 -> 3 and 3 -> 4 are per-plate, and live in project-figure.scss —
+  // the media and the caption are that component's own elements.
+  //
+  // Supporting plates enter after the lead is fully read, staggered by index so
+  // they cascade rather than appearing as a block. --stagger is bound per plate
+  // in the template.
+  .gate__plate:not(.is-lead) {
+    --own: clamp(
+      0,
+      calc((var(--act-t, 1) - (var(--beat-info) + var(--stagger, 0) * 0.07)) / 0.09),
+      1
+    );
+
+    opacity: var(--own);
+    translate: 0 calc((1 - var(--own)) * var(--space-6));
+  }
+}
+
+// Belt and braces: if .is-staged were ever present under reduced motion, the
+// gate still resolves to a plain readable composition.
+@include ds.mq-reduced-motion {
+  .gate__name,
+  .gate__plate {
+    opacity: 1;
+    translate: none;
+    scale: none;
+  }
+
+  .gate__eyebrow,
+  .gate__count {
+    opacity: 1;
   }
 }

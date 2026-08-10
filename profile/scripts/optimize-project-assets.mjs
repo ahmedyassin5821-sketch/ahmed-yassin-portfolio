@@ -216,6 +216,27 @@ const PROJECTS = [
       { name: 'checkout', file: 'Screenshot 2026-08-08 183535.png' },
     ],
   },
+
+  {
+    slug: 'vivace',
+    logo: { file: 'logo.webp' },
+    shots: [
+      { name: 'home', file: 'Screenshot 2026-08-10 012530.png', cover: true },
+      { name: 'brands', file: 'Screenshot 2026-08-10 012609.png' },
+      { name: 'menu', file: 'Screenshot 2026-08-10 012850.png' },
+      { name: 'merchandising', file: 'Screenshot 2026-08-10 012732.png' },
+      { name: 'product', file: 'Screenshot 2026-08-10 012807.png' },
+      { name: 'cart', file: 'Screenshot 2026-08-10 012932.png' },
+      { name: 'checkout', file: 'Screenshot 2026-08-10 013014.png' },
+      // Excluded: 012711 (its only unique content is a collection strip; the rest
+      // of the capture is a third-party reviews widget carrying real reviewers'
+      // names and profile photos — `pii`, and too large a share of the frame to
+      // redact into anything but a grey slab), 012828 (the contact page, which is
+      // nothing but the client's branch addresses and phone numbers), 012626 and
+      // 012638 (near-duplicates of the brands grid), 012727 (a crop of 012732),
+      // 012915 (quick-view modal, redundant beside the product page).
+    ],
+  },
 ];
 
 /**

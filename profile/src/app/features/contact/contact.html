@@ -1,0 +1,58 @@
+<div class="contact">
+  <app-page-head
+    class="contact__head"
+    [eyebrow]="c().eyebrow"
+    [title]="c().title"
+    [lede]="c().lede"
+    headingId="contact-title"
+  />
+
+  <!--
+    The address, at display scale. It is the one thing on the page someone came
+    for, so it is not buried in a list of equal-weight rows.
+  -->
+  <p class="contact__email">
+    <a class="contact__email-link" [href]="'mailto:' + email">
+      <span class="ltr-isolate">{{ email }}</span>
+    </a>
+  </p>
+
+  <p class="contact__note">{{ c().noFormNote }}</p>
+
+  <dl class="contact__facts">
+    <div class="contact__row">
+      <dt>{{ c().locationLabel }}</dt>
+      <dd>{{ location }}</dd>
+    </div>
+    <div class="contact__row">
+      <dt>{{ c().languagesLabel }}</dt>
+      <dd>{{ languages() }}</dd>
+    </div>
+    <div class="contact__row">
+      <dt>{{ c().roleLabel }}</dt>
+      <dd dir="auto">{{ role() }}</dd>
+    </div>
+  </dl>
+
+  <section class="contact__section" aria-labelledby="contact-profiles">
+    <h2 class="contact__heading" id="contact-profiles">{{ c().profilesHeading }}</h2>
+
+    <ul class="contact__profiles" role="list">
+      @for (profile of profiles; track profile.href) {
+        <li>
+          <!-- TextLink carries rel="noopener noreferrer", the external glyph and
+               the localised new-tab warning. -->
+          <app-text-link [href]="profile.href">
+            {{ profile.label }} — <span class="ltr-isolate">{{ profile.display }}</span>
+          </app-text-link>
+        </li>
+      }
+    </ul>
+  </section>
+
+  <section class="contact__section" aria-labelledby="contact-cv">
+    <h2 class="contact__heading" id="contact-cv">{{ c().cvHeading }}</h2>
+    <p class="contact__note">{{ c().cvNote }}</p>
+    <a class="contact__link" routerLink="/cv">{{ c().viewCv }}</a>
+  </section>
+</div>

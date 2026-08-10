@@ -69,7 +69,7 @@
 .figure__index {
   @include ds.mono;
 
-  grid-row: 1 / span 3;
+  grid-row: 1 / span 4;
   color: var(--color-text-muted);
   font-size: var(--fs-body-sm);
   line-height: 1.2;
@@ -94,15 +94,17 @@
   text-underline-offset: 0.2em;
 }
 
-// The category is the line that lets someone place the work instantly, so it is
-// set as prominently as the technology and above it in the hierarchy.
-.figure__category {
+// The field is the line that lets someone place the work instantly, so it is set
+// as prominently as the technology and above it in the hierarchy. The market
+// follows it, and the stack — the least interesting fact about a business — last.
+.figure__field {
   @include ds.label;
 
   margin-block-start: var(--space-2);
   color: var(--color-text-primary);
 }
 
+.figure__market,
 .figure__stack {
   @include ds.mono;
 
@@ -148,4 +150,52 @@
 
 :host(.figure--end) .figure__meta {
   grid-area: meta;
+}
+
+// -----------------------------------------------------------------------------
+// The lead plate's two beats
+//
+// BEAT 3 — the screenshot arrives, alone, coming forward out of the depth its
+// parent establishes. The camera is holding still at this point, so the plate is
+// the only thing moving in the frame.
+//
+// BEAT 4 — its name, field, market and stack follow. Separating them is the
+// whole point: the reader looks at the work before reading about it.
+//
+// Only the lead runs these; supporting plates enter as whole units from
+// act-gate.scss. Scoped to the staged ancestor so the ramps do not evaluate to
+// zero in the reduced-motion / no-JS document, where they do not exist.
+// -----------------------------------------------------------------------------
+:host-context(.home.is-staged) {
+  .figure__media {
+    opacity: 1;
+  }
+
+  .figure__meta {
+    opacity: 1;
+  }
+}
+
+:host-context(.home.is-staged).figure--lead {
+  .figure__media {
+    opacity: var(--media, 1);
+    // translateZ, not scale: inside the gate's `perspective` this is a genuine
+    // arrival out of depth rather than a flat grow, which is what makes it read
+    // as continuous with the plane behind it.
+    transform: translateZ(calc((1 - var(--media, 1)) * -260px));
+  }
+
+  .figure__meta {
+    opacity: var(--info, 1);
+    translate: 0 calc((1 - var(--info, 1)) * var(--space-5));
+  }
+}
+
+@include ds.mq-reduced-motion {
+  .figure__media,
+  .figure__meta {
+    opacity: 1;
+    translate: none;
+    transform: none;
+  }
 }

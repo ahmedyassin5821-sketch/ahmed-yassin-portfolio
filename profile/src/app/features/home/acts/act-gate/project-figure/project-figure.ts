@@ -1,12 +1,12 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 
-import { MediaPlaceholder } from '@shared/ui/media-placeholder/media-placeholder';
-
 export interface ProjectFigureData {
   readonly slug: string;
   readonly name: string;
-  /** "Coffee · E-commerce" — what the product is. */
-  readonly category: string;
+  /** "Coffee / Food & Beverage" — the industry. */
+  readonly field: string;
+  /** "Egypt" — where the business trades. */
+  readonly market: string;
   /** "Shopify · Dashboard" — what it was built with. */
   readonly stack: string;
   readonly url: string | null;
@@ -16,7 +16,7 @@ export interface ProjectFigureData {
     readonly width: number;
     readonly height: number;
     readonly alt: string;
-  } | null;
+  };
 }
 
 /**
@@ -42,7 +42,6 @@ export interface ProjectFigureData {
 @Component({
   selector: 'app-project-figure',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [MediaPlaceholder],
   templateUrl: './project-figure.html',
   styleUrl: './project-figure.scss',
   host: {
@@ -60,8 +59,6 @@ export class ProjectFigure {
 
   /** Which side the media sits on. Logical — mirrors in RTL. */
   readonly align = input<'start' | 'end'>('start');
-
-  readonly placeholderLabel = input<string>('');
 
   /** Announced on the link, so it is not read as a bare project name. */
   readonly viewLabel = input<string>('');

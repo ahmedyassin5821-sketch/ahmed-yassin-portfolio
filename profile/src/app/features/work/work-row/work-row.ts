@@ -1,30 +1,29 @@
 import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
-import { MediaPlaceholder } from '@shared/ui/media-placeholder/media-placeholder';
-
 export interface WorkRowData {
   readonly slug: string;
   readonly name: string;
-  /** "E-commerce / Electronics" — what the product is. */
-  readonly category: string;
+  /** The industry — "Coffee / Food & Beverage". */
+  readonly field: string;
+  /** "Egypt · Coffee e-commerce" — where it trades and what kind of product it is. */
+  readonly context: string;
   /** "Magento · Porto" — what it was built with. */
   readonly stack: string;
   /**
-   * Why there is no link, when there is none.
+   * Whether there is a public address.
    *
-   * `live` has a public address; `private` is an internal system; `pending` is
-   * work whose address has not been supplied yet. Collapsing the last two into
-   * one label misrepresents both.
+   * `internal` is a fact about the work, not missing data: NAS HR has no public
+   * URL because it is an internal system.
    */
-  readonly linkStatus: 'live' | 'private' | 'pending';
+  readonly linkStatus: 'live' | 'private';
   readonly image: {
     readonly src: string;
     readonly srcset: string | null;
     readonly width: number;
     readonly height: number;
     readonly alt: string;
-  } | null;
+  };
 }
 
 /**
@@ -40,7 +39,13 @@ export interface WorkRowData {
  *
  * The whole row is one link. The link wraps only the name and is stretched by a
  * pseudo-element, so the accessible name stays "NAS HR" rather than swallowing
- * the category, the stack and the link marker into one unreadable label.
+ * the field, the market, the stack and the link marker into one unreadable
+ * label.
+ *
+ * ## What it says
+ *
+ * Field, then market and domain, then the stack. The business before the
+ * tooling — a reader should be able to place the work without opening it.
  *
  * ## Its image
  *
@@ -52,7 +57,7 @@ export interface WorkRowData {
 @Component({
   selector: 'app-work-row',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, MediaPlaceholder],
+  imports: [RouterLink],
   templateUrl: './work-row.html',
   styleUrl: './work-row.scss',
   host: {
@@ -69,7 +74,6 @@ export class WorkRow {
   /** Keyed by `linkStatus`, so the row never decides what the states mean. */
   readonly statusLabels = input<Record<string, string>>({});
   readonly viewLabel = input<string>('');
-  readonly placeholderLabel = input<string>('');
 
   /** Raised on pointer or keyboard focus so the pane can follow the reader. */
   readonly focused = output<string>();

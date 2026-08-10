@@ -1,18 +1,16 @@
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
-
-import { MediaPlaceholder } from '@shared/ui/media-placeholder/media-placeholder';
+import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 
 export interface WorkPreviewData {
   readonly slug: string;
   readonly name: string;
-  readonly category: string;
+  readonly field: string;
   readonly image: {
     readonly src: string;
     readonly srcset: string | null;
     readonly width: number;
     readonly height: number;
     readonly alt: string;
-  } | null;
+  };
 }
 
 /**
@@ -25,6 +23,14 @@ export interface WorkPreviewData {
  * the reader moves down a column of names and the corresponding screenshot
  * holds beside it.
  *
+ * ## Why it has to stick, properly
+ *
+ * The first version was `position: sticky` inside a grid item that was sized to
+ * its own content, which gives sticky zero travel — so hovering the sixth
+ * project changed an image that had left the viewport five rows earlier. The
+ * host now stretches to the height of the index beside it (see the stylesheet),
+ * which is what makes the pane stay in view for the whole list.
+ *
  * ## It is an enhancement, never the content
  *
  * The pane shows whichever project is active, defaulting to the first — so with
@@ -32,14 +38,13 @@ export interface WorkPreviewData {
  * than an empty frame. Every image it can show also exists on its own row below
  * `md`, and every project is reachable as a link regardless.
  *
- * Decorative by contract: `aria-hidden`. The name, category and stack of every
- * project are real text in the rows beside it, so nothing here is the only copy
- * of anything.
+ * Decorative by contract: `aria-hidden`. The name, field, market and stack of
+ * every project are real text in the rows beside it, so nothing here is the only
+ * copy of anything — including the caption, which repeats the row it points at.
  */
 @Component({
   selector: 'app-work-preview',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [MediaPlaceholder],
   templateUrl: './work-preview.html',
   styleUrl: './work-preview.scss',
   host: {
@@ -53,7 +58,10 @@ export class WorkPreview {
   /** Slug of the project currently being shown. */
   readonly activeSlug = input.required<string>();
 
-  readonly placeholderLabel = input<string>('');
+  /** Falls back to the first project, which is also what the pane shows. */
+  protected readonly active = computed(
+    () => this.projects().find((p) => p.slug === this.activeSlug()) ?? this.projects()[0] ?? null,
+  );
 
   /** The pane occupies roughly a third of the page at its widest. */
   protected readonly sizes = '(min-width: 64rem) 34vw, 40vw';

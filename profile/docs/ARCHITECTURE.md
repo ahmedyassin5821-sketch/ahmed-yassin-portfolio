@@ -958,9 +958,13 @@ webgl/scene/          framework-free — no Angular import anywhere below here
 ├── aperture-scene.ts   renderer, camera, loop; owns nothing else
 ├── monogram-layers.ts  the extruded AY sheets
 ├── type-planes.ts      headline words as canvas textures
-├── project-planes.ts   screenshots as textured planes + texture queue
 └── svg-path.ts         the minimal path parser
 ```
+
+> **Removed in Sprint 8.5:** `project-planes.ts` — project screenshots as
+> textured planes. See §16.
+
+
 
 Each subsystem builds and disposes its own resources and exposes
 `update(progress, cameraZ)`. Adding one must never require editing the loop.
@@ -1144,3 +1148,241 @@ responsibilities.
 
 `shared/ui/project-surface/` — dead, zero usages, a generation older than
 `ProjectFigure`. And `features/work/project-card/`, replaced by `work-row`.
+
+---
+
+## 15. Project research & the business/contribution split (Sprint 8.5)
+
+A portfolio that says "a Shopify storefront" has described the tooling and
+nothing else. Every project now carries two separable things, and the separation
+is the point.
+
+**The business** — `market`, `field`, `domain`, `brief`. Established from the
+client's own public site or a published source, never inferred from a screenshot.
+
+**Ahmed's part in it** — `role`, `technologies`, `theme`, `dashboard`. Taken from
+the CV in `public/Attachments/` or from what he stated directly.
+
+Describing a client's business in detail must not read as a claim to have built
+that business. Nothing in the dataset states results, metrics, traffic, revenue,
+team size, or ownership.
+
+### Sources
+
+| Project | Market | Field | Established from |
+| --- | --- | --- | --- |
+| NAS HR | Egypt | HR Technology / Enterprise Software | The product's own logo and the supplied captures — HR/attendance/payroll dashboards. The publisher is deliberately not named in the copy. |
+| Nature | UAE | Environmental & Agricultural Services | `neas.ae` — "Nature for Environmental and Agricultural Solutions L.L.C" |
+| 2B | Egypt | Consumer Electronics Retail | `2b.com.eg` — catalogue, branches, instalment providers |
+| Esterad | Egypt | Consumer Electronics / Refurbished | `esterad.com.eg/about-us` — "أجهزة مستوردة ومجدّدة", warranty and return terms |
+| Designed by G | Egypt | Fashion / Apparel | `designedby-g.com` — collections, EGP pricing, About copy |
+| Nader Coffee | Egypt | Coffee / Food & Beverage | `nader-coffee.com` — seven named coffee categories, pack sizes |
+| Vivace | UAE & Qatar | Fragrance / Luxury Retail | `vivace.shop` captures — branch addresses, brand roster, Shop Pay at checkout |
+
+Marketing superlatives on those sites ("the largest…", "20,000 customers") are
+deliberately **not** carried across. They are the client's claims, not facts about
+the work.
+
+### Detail page order
+
+Business before build, and the brief before the picture:
+
+```
+back -> 07 -> Vivace -> [FIELD | MARKET | DOMAIN] -> stack -> link
+     -> brief -> FULL-BLEED COVER -> platform/role/theme/technologies
+     -> gallery -> prev/next
+```
+
+`project-facts` renders both fact rows in two variants (`identity`, `build`) —
+the same object at two weights rather than two stylesheets that would drift.
+
+### The counts stay separate
+
+`PROJECTS_SHIPPED` (20) is the career total. `PROJECTS.length` (7) is the size of
+this selection. Every count string substitutes one or the other; none is typed as
+a word. Asserted on `/work`, `/work/:slug`, `/about` and `/cv`.
+
+---
+
+## 16. The gate beats, and why the scene lost its screenshots (Sprint 8.5)
+
+### The defect
+
+A gate showed its platform name and its project plates in the same instant. The
+reader could not tell whether they were being shown a technology or a piece of
+work, because both arrived together.
+
+### One thing at a time
+
+`GATE_BEATS` in `act-timeline.ts` divides each gate into four beats, as fractions
+of that gate's own span:
+
+```
+  0 ------- settle .30 ------ image .48 ------ info .64 ----------- 1
+  | ANGULAR | the word       | the lead      | its name, field,   |
+  | alone,  | settles into   | project's     | market and stack   | hold
+  | large   | a header       | screenshot    | arrive             |
+```
+
+Supporting projects cascade in after `info`, staggered by index.
+
+The gates grew from 40% of the scroll to **60%**, and travel from 12/7 screens to
+**14/9**. At the old weighting a beat lasted under half a screen, which is fast
+enough that the phases read as simultaneous.
+
+**The camera holds still** across `settle` to `info` on both paths — desktop
+adopting the grammar the mobile path always had. A camera still dollying would
+drag the arriving plate out of frame while the reader was being asked to look at
+it.
+
+### One source for the timing
+
+`GATE_BEATS` is bound onto each act element in `home.html` as `--beat-settle` /
+`--beat-image` / `--beat-info`. `home.scss` derives `--act-t`, `--settle`,
+`--media` and `--info` from those plus the act window; `act-gate.scss` and
+`project-figure.scss` decide what each ramp does. No stylesheet holds a copy of
+a number.
+
+Those rules are scoped with `:host-context(.home.is-staged)`. Without that, the
+ramps evaluate to 0 under reduced motion and without JavaScript — where
+`--home-progress` does not exist — and the entire gate would render at opacity 0.
+
+### Why the project planes are gone
+
+The corridor used to hang each project's screenshot as a textured plane. Removed
+on the user's instruction, and the instruction was right:
+
+- Seen from behind — which is most of the time, because the camera flies past
+  them — a plane renders its texture **mirrored**. The reader was shown a
+  backwards screenshot.
+- Squared up to the camera for the gate hand-off, the plane simply **duplicated**
+  the DOM plate landing over it at the same moment.
+
+The scene now carries the mark and the words. The work is presented in the DOM,
+where it is legible, selectable, translatable and indexable. `ProjectPlanes`,
+`buildProjectPlanes`, `ProjectPlaneSpec`, the texture queue and the
+`textureBudget` option are all deleted — the scene loads no textures at all.
+
+### Word windows are relative to their act
+
+A type plane may only appear inside its own act, and both its lead-in and its
+tail-out are fractions of that act's span. Fixed offsets did not survive the
+retimed timeline: with a ±0.06 lead-in and 0.20-long gates, **MAGENTO became
+legible at 0.47** — two thirds of the way through reading Angular's projects.
+Found by rendering a frame, not by reasoning about the numbers.
+
+A gate word's window now closes at its own `image` beat: the word says what the
+platform is, then gets out of the way of the work. Held to the end of the act it
+sat ten units from a holding camera, filling the frame, and the project plates
+read as printed on a watermark. The platform is still named by the DOM header the
+name settled into.
+
+`TypePlanes.update` ramps the window instead of switching it. A boolean was fine
+while the camera was still approaching — the near-fade hid the transition — but a
+word that leaves while the camera holds needs a real fade.
+
+### The gate name is shrink-wrapped
+
+Beat 1 enlarges the platform name. As a full-width block, scaling it from any
+origin moved edges that had nothing in them, which reads as an overflow in an
+audit and makes the real question — is the word clipped? — unanswerable. It is now
+`inline-size: fit-content` with `transform-origin` at the reading edge, and an
+explicit RTL override because `transform-origin` has no logical keyword.
+
+---
+
+## 17. /about, /cv, /contact (Sprint 8.5)
+
+Three pages, one record. `cv.data.ts` is a transcription of the PDF that ships at
+`public/Attachments/`, and every one of these pages reads it:
+
+- **`/cv`** lays it out in full. A PDF behind a download button is invisible to
+  search, unreadable on a phone, impossible to link into and hostile to a screen
+  reader — so the document is HTML, and the file is still one control away.
+  `download` renames it on save, because the stored filename carries a typo.
+- **`/about`** reads the CV's own profile paragraph and takes "now" from the first
+  experience entry, rather than restating either.
+- **`/contact`** reduces it to the two or three facts someone needs in order to
+  write.
+
+### No contact form
+
+A form needs an endpoint. Rendering the fields before one exists ships a control
+that accepts what someone typed and silently discards it — worse than not offering
+it, because the sender believes they have written to him.
+
+### The phone number
+
+The CV lists a personal mobile. It is **not** transcribed into `cv.data.ts` and
+does not appear on any page; anyone who downloads the document still has it. That
+is the document's own disclosure, not one the site makes on his behalf. Asserted
+in `contact.spec.ts`.
+
+### The Arabic professional title
+
+`PROFESSIONAL_TITLE` in `cv.data.ts` is the single source, consumed by the Home
+hero, `/about`, `/cv` and `/contact`. The Arabic is **مبرمج مواقع ومتاجر إلكترونية**
+— Ahmed's own wording, not a translation of the English line, and not to be
+re-translated to match it. Asserted on all three pages.
+
+`page-head` (`shared/ui/`) exists because these three pages open identically and
+each carries a 4 kB style budget; `cv-section` because experience, education and
+certifications are the same shape.
+
+---
+
+## 18. The /work preview pane (Sprint 8.5)
+
+**The bug:** hovering the sixth project changed an image that had left the
+viewport five rows earlier, so the reader had to scroll back to the top to see
+what they had just done.
+
+**The cause:** `position: sticky` can only travel inside its own containing block.
+`.work__body` used `align-items: start`, which sized the preview column to its
+own content — the same height as the pane — giving sticky exactly zero travel.
+
+**The fix:** the grid item stretches to the height of the index beside it. One
+declaration; the pane now holds at `18vh` for the whole list. Verified by
+measurement at rows 1, 4 and 7: `paneFullyVisible: true` at every one.
+
+Also added: a caption naming the project on screen, a second non-opacity active
+signal in the list (a rule that grows in the index column — grown on the inline
+axis, because `transform-origin` has no logical keyword and a `scaleX` marker
+would extend from the wrong edge in Arabic), and `focusin` parity so tabbing
+through the index drives the pane exactly as hovering does.
+
+---
+
+## 19. Verification (Sprint 8.5)
+
+| Gate | Result |
+| --- | --- |
+| Typecheck, stylelint | clean |
+| Tests | 156 / 18 files |
+| Build | zero warnings, 12 prerendered, initial 94.67 kB gz |
+| SSR | `/`, `/work`, `/work/:slug`, `/about`, `/cv`, `/contact` → 200; `/nope` → 404 |
+| CV file | `/Attachments/…pdf` → 200, `application/pdf`, 85 390 bytes |
+| Responsive + RTL | **84 combinations** (7 paths × 6 widths × EN/AR): 0px overflow, exactly one `h1`, no clipped text, no image without `alt`/`width`, 0 console errors |
+| Hero beats | sampled at 100 scroll positions: name → image → info strictly sequential in all three gates, with 0.15–0.22 of the act between the name settling and the image arriving |
+| Reduced motion | never staged, canvas never built, 7/7 projects, 3/3 platforms, pane still shows images, 0 overflow, 0 errors |
+
+### Three harness bugs, for the next person
+
+The measuring tools were wrong before the page was. Each of these produced a
+confident false result:
+
+1. **`--act-t` cannot be read back** through `getComputedStyle`. An unregistered
+   custom property returns its unresolved token stream (`clamp(0, calc(…), 1)`),
+   which `parseFloat` turns into `0` — so every beat appeared to happen at the
+   same instant. Act-relative time has to be derived from `--home-progress`.
+2. **The locale switcher is an `<a hreflang>`, not a `<button>`**, and the choice
+   **persists across tabs in one browser profile**. Matching on `button` measured
+   every Arabic row in English; leaving English implicit measured half a later
+   run in Arabic. Pin the locale explicitly on every pass.
+3. **The scene damps toward its target at 0.08/frame**, and rAF in headless with
+   `--disable-gpu` runs far below 60fps. At a 700ms settle the canvas still showed
+   progress ~0.20 while the DOM was at 0.35 — which in a screenshot reads exactly
+   like "the 20+ plane is still up during the Angular gate". 3s converges.
+
+Precedent from Sprint 6 holds: the iframe harness silently froze at progress 0
+because rAF is throttled in frames. Verify the tool before trusting the result.

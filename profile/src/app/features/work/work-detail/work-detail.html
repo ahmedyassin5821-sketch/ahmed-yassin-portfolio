@@ -7,16 +7,19 @@
     </a>
 
     <!--
-      Identity before imagery. The name lands on paper at display scale and the
-      cover breaks full-bleed beneath it — the same order the Home acts read in,
-      and the reason this does not look like a case-study template.
+      The business, then the build, then the imagery.
+      A reader should be able to say what this project *is* — what industry, what
+      market, what kind of product — before a single technology is named. The
+      stack and the screenshots follow that, not the other way round.
     -->
     <header class="detail__head">
       <p class="detail__index" aria-hidden="true">{{ indexLabel() }}</p>
 
       <h1 id="detail-title" class="detail__title" dir="auto">{{ p.name }}</h1>
 
-      <p class="detail__category">{{ p.projectType }}</p>
+      <!-- Field, market, domain: the three facts that place the business. -->
+      <app-project-facts class="detail__identity" variant="identity" [facts]="identity()" />
+
       <p class="detail__stack"><span class="ltr-isolate">{{ p.stack }}</span></p>
 
       <div class="detail__actions">
@@ -37,6 +40,14 @@
           </p>
         }
       </div>
+
+      <!--
+        What the business actually is. Inside the header so it shares the title's
+        column: as a sibling it took `ds.container` and its own 46ch measure,
+        which `margin-inline: auto` then centred in the viewport — leaving the
+        paragraph floating 180px to the right of the name it describes.
+      -->
+      <p class="detail__brief">{{ p.brief }}</p>
     </header>
 
     <!--
@@ -44,31 +55,26 @@
       moment on the page where the work is larger than the words about it.
     -->
     <figure class="detail__cover">
-      @if (p.cover; as cover) {
-        <picture>
-          @if (cover.avif) {
-            <source type="image/avif" [srcset]="cover.avif" [attr.sizes]="sizes" />
-          }
-          <img
-            [src]="cover.src"
-            [attr.srcset]="cover.srcset"
-            [attr.sizes]="sizes"
-            [alt]="cover.alt"
-            [width]="cover.width"
-            [height]="cover.height"
-            loading="eager"
-            fetchpriority="high"
-            decoding="async"
-          />
-        </picture>
-      } @else {
-        <app-media-placeholder [caption]="p.name" [label]="c().labels.awaitingAssets" />
-      }
+      <picture>
+        @if (p.cover.avif) {
+          <source type="image/avif" [srcset]="p.cover.avif" [attr.sizes]="sizes" />
+        }
+        <img
+          [src]="p.cover.src"
+          [attr.srcset]="p.cover.srcset"
+          [attr.sizes]="sizes"
+          [alt]="p.cover.alt"
+          [width]="p.cover.width"
+          [height]="p.cover.height"
+          loading="eager"
+          fetchpriority="high"
+          decoding="async"
+        />
+      </picture>
     </figure>
 
-    <p class="detail__summary">{{ p.summary }}</p>
-
-    <app-project-facts [facts]="facts()" />
+    <!-- How it was built. Second, because it answers a later question. -->
+    <app-project-facts variant="build" [facts]="facts()" />
 
     @if (p.screenshots.length) {
       <app-project-gallery

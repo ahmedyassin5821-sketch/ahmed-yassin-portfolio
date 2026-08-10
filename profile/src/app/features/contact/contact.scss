@@ -1,0 +1,114 @@
+@use 'index' as ds;
+
+:host {
+  display: block;
+}
+
+.contact {
+  @include ds.container;
+
+  max-inline-size: 64rem;
+  padding-block: var(--space-16) var(--space-24);
+}
+
+// The address is the page. Set large so it is the first thing read after the
+// title — but at heading-1, not display-2: at display scale a 27-character
+// address wraps mid-word ("gmail." / "com") at every width below 1920.
+.contact__email {
+  @include ds.heading-1;
+
+  margin-block-start: var(--space-12);
+  font-weight: var(--weight-light);
+  line-height: 1.1;
+  // Only relevant on a phone, where even this scale cannot fit it on one line.
+  overflow-wrap: anywhere;
+}
+
+// A real underline rather than a bottom border: a border draws one line under
+// the whole box, so a wrapped address got a rule through the middle of it.
+.contact__email-link {
+  @include ds.focus-visible;
+
+  color: var(--color-text-primary);
+  text-decoration: underline;
+  text-decoration-color: var(--color-border);
+  text-underline-offset: 0.18em;
+  transition: text-decoration-color var(--dur-base) var(--ease-out);
+}
+
+.contact__email-link:hover {
+  text-decoration-color: var(--color-text-primary);
+}
+
+.contact__note {
+  @include ds.caption;
+
+  max-inline-size: 56ch;
+  margin-block-start: var(--space-6);
+  color: var(--color-text-muted);
+}
+
+.contact__facts {
+  margin-block-start: var(--space-12);
+}
+
+.contact__row {
+  display: grid;
+  gap: var(--space-1) var(--space-8);
+  padding-block: var(--space-5);
+  border-block-end: var(--border-hairline) solid var(--color-border);
+
+  @include ds.mq(md) {
+    grid-template-columns: 10rem minmax(0, 1fr);
+  }
+}
+
+.contact__row dt {
+  @include ds.label;
+
+  color: var(--color-text-muted);
+}
+
+.contact__row dd {
+  @include ds.body;
+
+  color: var(--color-text-primary);
+  font-size: var(--fs-body-sm);
+  text-wrap: pretty;
+}
+
+.contact__section {
+  margin-block-start: var(--space-16);
+}
+
+.contact__heading {
+  @include ds.label;
+
+  padding-block-end: var(--space-3);
+  border-block-end: var(--border-hairline) solid var(--color-border-strong);
+  color: var(--color-text-primary);
+}
+
+.contact__profiles {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin-block-start: var(--space-6);
+}
+
+.contact__link {
+  @include ds.label;
+  @include ds.focus-visible;
+
+  display: inline-block;
+  margin-block-start: var(--space-3);
+  color: var(--color-text-primary);
+  text-decoration: underline;
+  text-underline-offset: 0.3em;
+}
+
+@include ds.mq-reduced-motion {
+  .contact__email-link {
+    transition: none;
+  }
+}

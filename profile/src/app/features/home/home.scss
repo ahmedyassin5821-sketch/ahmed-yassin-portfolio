@@ -183,28 +183,58 @@
   pointer-events: auto;
 }
 
-// Gates carry the most content of any act, so they take the padding back.
+// -----------------------------------------------------------------------------
+// Gates — the four-beat sequence
+//
+// A gate no longer shows everything at once. It tells one thing at a time:
+//
+//   the platform name, alone and large
+//     -> it settles into a header
+//        -> the lead project's screenshot arrives, out of depth
+//           -> that project's name, field, market and stack arrive
+//              -> the supporting projects follow, staggered
+//
+// The camera holds still across the whole sequence, so the reader is never asked
+// to read something that is also moving past them.
+//
+// This block only publishes the ramps. `act-gate.scss` and `project-figure.scss`
+// decide what each ramp *does*, because those elements live in child components
+// and this stylesheet cannot reach them — but custom properties inherit through
+// component boundaries, so the timing stays declared once, here, beside the act
+// window it is derived from.
+//
+// --beat-settle / --beat-image / --beat-info are bound per act in home.html from
+// GATE_BEATS, so this file holds no copy of those numbers.
+// -----------------------------------------------------------------------------
 .home.is-staged .home__act[data-act='angular'],
 .home.is-staged .home__act[data-act='magento'],
 .home.is-staged .home__act[data-act='shopify'] {
+  // Gates carry the most content of any act, so they take the padding back.
   padding-block: var(--space-16) var(--space-8);
 
-  // The DOM half of the hand-off.
-  //
-  // Immediately before a gate, the scene brings that platform's lead screenshot
-  // out of the periphery, squares it to the camera and grows it. This settles
-  // the incoming plate out of depth on the same beat, so the plane appears to
-  // become the DOM element rather than being replaced by it.
-  //
-  // Scoped to gate acts on purpose: act 0 holds the LCP heading and must never
-  // be transformed. --enter (not --presence) drives it, so the settle happens on
-  // arrival and does not run backwards as the act leaves.
-  perspective: 1400px;
-  transform-style: preserve-3d;
-  // Composed with the base exit-recede rather than replacing it: a bare
-  // `scale` here would override the outgoing act's depth separation and the two
-  // gates would cross-fade at identical size again.
-  scale: calc((1 + (1 - var(--enter)) * 0.06) * (1 - (1 - var(--exit)) * 0.04));
+  // Progress through this act alone, 0→1.
+  --act-t: clamp(
+    0,
+    calc((var(--home-progress, 0) - var(--act-start)) / (var(--act-end) - var(--act-start))),
+    1
+  );
+
+  // Beat 1 -> 2. The name gives up the frame.
+  --settle: clamp(0, calc(var(--act-t) / var(--beat-settle)), 1);
+
+  // Beat 2 -> 3. The lead screenshot arrives.
+  --media: clamp(
+    0,
+    calc((var(--act-t) - var(--beat-settle)) / (var(--beat-image) - var(--beat-settle))),
+    1
+  );
+
+  // Beat 3 -> 4. Its information arrives.
+  --info: clamp(
+    0,
+    calc((var(--act-t) - var(--beat-image)) / (var(--beat-info) - var(--beat-image))),
+    1
+  );
 }
 
 // Scene-only beats carry no text at all — the camera work is the whole content.

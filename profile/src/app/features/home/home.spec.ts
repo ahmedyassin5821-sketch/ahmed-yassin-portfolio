@@ -116,14 +116,26 @@ describe('Home', () => {
     expect(text).not.toContain(`${PROJECTS.length} projects`);
   });
 
-  it('renders a media frame for every project, real or pending', async () => {
+  it('renders a real screenshot for every project — no placeholders left', async () => {
     const { el } = await render();
-    const images = el.querySelectorAll('.figure__image');
-    const placeholders = el.querySelectorAll('app-media-placeholder');
+    const images = Array.from(el.querySelectorAll<HTMLImageElement>('.figure__image'));
 
-    expect(images.length).toBe(PROJECTS.filter((p) => p.cover !== null).length);
-    expect(placeholders.length).toBe(PROJECTS.filter((p) => p.cover === null).length);
-    expect(images.length + placeholders.length).toBe(PROJECTS.length);
+    expect(images.length).toBe(PROJECTS.length);
+    // Every project has supplied assets, so nothing renders an empty frame and
+    // nothing borrows an image from elsewhere.
+    expect(images.every((i) => (i.getAttribute('src') ?? '').startsWith('/projects/'))).toBe(true);
+  });
+
+  it('states the business, not only the stack, for every project', async () => {
+    const { el } = await render();
+    const text = el.textContent ?? '';
+
+    // A gate that only says "Shopify" describes the tooling; the field and the
+    // market are what let a reader place the work.
+    for (const project of PROJECTS) {
+      expect(text).toContain(project.field.en);
+      expect(text).toContain(project.market.en);
+    }
   });
 
   it('never renders a project link without a confirmed URL', async () => {

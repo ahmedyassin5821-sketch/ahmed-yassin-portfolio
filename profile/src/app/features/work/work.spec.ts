@@ -75,19 +75,24 @@ describe('Work index', () => {
     expect(text).toContain(String(PROJECTS.length));
   });
 
-  it('renders the placeholder frame for a project whose assets are pending', async () => {
+  it('shows a real screenshot for every project, in both image paths', async () => {
     const { el } = await render();
-    const pending = PROJECTS.filter((p) => p.cover === null);
 
-    // Vivace today. No stock photography, no borrowed screenshot, no empty box.
-    expect(pending.length).toBeGreaterThan(0);
+    // Every project has supplied assets now, so there is no placeholder path
+    // left to take — and none is faked to fill a gap.
+    expect(el.querySelectorAll('.row__media img').length).toBe(PROJECTS.length);
+    expect(el.querySelectorAll('.preview__plate img').length).toBe(PROJECTS.length);
+  });
 
-    // Once in its own row (the only image path below md) and once in the sticky
-    // pane (the only image path above it). Both must be honest frames.
-    expect(el.querySelectorAll('.row__media app-media-placeholder').length).toBe(pending.length);
-    expect(el.querySelectorAll('.preview__plate app-media-placeholder').length).toBe(
-      pending.length,
-    );
+  it('states what each business is, not only what it was built with', async () => {
+    const { el } = await render();
+
+    for (const project of PROJECTS) {
+      const text = el.textContent ?? '';
+      expect(text).toContain(project.field.en);
+      expect(text).toContain(project.market.en);
+      expect(text).toContain(project.domain.en);
+    }
   });
 
   it('links every card to its detail route', async () => {
@@ -100,28 +105,50 @@ describe('Work index', () => {
     }
   });
 
-  it('distinguishes live, internal and pending rather than collapsing them', async () => {
+  it('distinguishes a live address from an internal system', async () => {
     const { el } = await render();
     const text = Array.from(el.querySelectorAll('.row__status')).map((m) =>
       m.textContent?.trim(),
     );
 
-    // Every row states its status as text; a pill made "private" read as a
+    // Every row states its status as text; a pill made "internal" read as a
     // disabled control.
     expect(text.length).toBe(PROJECTS.length);
 
     const count = (label: string) => text.filter((t) => t?.includes(label)).length;
 
-    // NAS HR has no address because it is an internal system. Vivace has none
-    // because its assets have not been supplied. Labelling Vivace "internal"
-    // would be false, so the two states are separate.
+    // NAS HR has no public address because it is an internal system. Derived
+    // from `url`, so the label can never disagree with whether a link renders.
     expect(count(WORK_CONTENT.actions.private.en)).toBe(
-      PROJECTS.filter((p) => p.url === null && p.cover !== null).length,
-    );
-    expect(count(WORK_CONTENT.actions.pending.en)).toBe(
-      PROJECTS.filter((p) => p.url === null && p.cover === null).length,
+      PROJECTS.filter((p) => p.url === null).length,
     );
     expect(count('Live')).toBe(PROJECTS.filter((p) => p.url !== null).length);
+  });
+
+  it('follows the reader with the preview, from pointer and from keyboard alike', async () => {
+    const { fixture, el } = await render();
+    const rows = Array.from(el.querySelectorAll('app-work-row'));
+    const plate = (slug: string) =>
+      el.querySelectorAll('.preview__plate')[PROJECTS.findIndex((p) => p.slug === slug)];
+
+    // Before any interaction the pane already shows real work.
+    expect(plate(PROJECTS[0].slug).classList).toContain('is-active');
+
+    // Pointer.
+    rows[3].querySelector('.row')!.dispatchEvent(new PointerEvent('pointerenter'));
+    await fixture.whenStable();
+    expect(plate(PROJECTS[3].slug).classList).toContain('is-active');
+    expect(rows[3].classList).toContain('is-active');
+
+    // Keyboard. `focusin` bubbles from the row's link, so tabbing through the
+    // index drives the pane exactly as hovering does — the pane must not be a
+    // mouse-only affordance.
+    rows[5].querySelector<HTMLAnchorElement>('.row__link')!.dispatchEvent(
+      new FocusEvent('focusin', { bubbles: true }),
+    );
+    await fixture.whenStable();
+    expect(plate(PROJECTS[5].slug).classList).toContain('is-active');
+    expect(rows[3].classList).not.toContain('is-active');
   });
 
   it('lazy-loads every row image, and loads the preview lead eagerly', async () => {
@@ -171,6 +198,12 @@ describe('Work index', () => {
     expect(text).toContain(WORK_CONTENT.index.title.ar);
     expect(text).toContain(WORK_CONTENT.index.lede.ar);
     expect(text).toContain(WORK_CONTENT.actions.private.ar);
+
+    // The business facts are translated too, not left in English beside Arabic.
+    for (const project of PROJECTS) {
+      expect(text).toContain(project.field.ar);
+      expect(text).toContain(project.market.ar);
+    }
 
     // And the English equivalents are gone.
     expect(text).not.toContain(WORK_CONTENT.index.lede.en);

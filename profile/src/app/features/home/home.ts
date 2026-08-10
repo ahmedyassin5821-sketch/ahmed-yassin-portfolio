@@ -10,7 +10,7 @@ import {
 
 import { DeviceCapabilityService } from '@core/platform/device-capability.service';
 import { ViewportService } from '@core/platform/viewport.service';
-import { ACT_TIMELINE, Act } from './animation/act-timeline';
+import { ACT_TIMELINE, Act, GATE_BEATS } from './animation/act-timeline';
 import { HomeChoreography } from './animation/home-choreography';
 import { HomeProgress } from './animation/home-progress';
 import { ActCount } from './acts/act-count/act-count';
@@ -68,6 +68,15 @@ export class Home {
 
   /** The eight acts, in order, for the template to lay out. */
   protected readonly acts: readonly Act[] = ACT_TIMELINE;
+
+  /**
+   * The gate beat fractions, bound onto every act element as custom properties.
+   *
+   * Published from here rather than typed into a stylesheet so that the DOM
+   * ramps and the WebGL hand-off are two readings of one table. Set on all acts
+   * for simplicity — only the three gates have rules that consume them.
+   */
+  protected readonly beats = GATE_BEATS;
 
   /**
    * Which act the reader is inside, derived from scroll.

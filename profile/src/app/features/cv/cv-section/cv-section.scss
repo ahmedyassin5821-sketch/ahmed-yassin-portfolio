@@ -1,0 +1,84 @@
+@use 'index' as ds;
+
+:host {
+  display: block;
+}
+
+.section__heading {
+  @include ds.label;
+
+  padding-block-end: var(--space-3);
+  border-block-end: var(--border-hairline) solid var(--color-border-strong);
+  color: var(--color-text-primary);
+}
+
+.section__list {
+  display: flex;
+  flex-direction: column;
+}
+
+// Rules between entries, never around them. The same device the work index uses,
+// so a CV and an archive read as one system rather than two templates.
+.entry {
+  display: grid;
+  gap: var(--space-1) var(--space-8);
+  padding-block: var(--space-6);
+  border-block-end: var(--border-hairline) solid var(--color-border);
+
+  @include ds.mq(md) {
+    grid-template-columns: 10rem minmax(0, 1fr);
+  }
+}
+
+.entry__period {
+  @include ds.mono;
+  @include ds.tabular;
+
+  color: var(--color-text-muted);
+  font-size: var(--fs-caption);
+  // Aligned to the cap height of the title beside it rather than its line box.
+  padding-block-start: 0.15em;
+}
+
+.entry__title {
+  @include ds.heading-3;
+
+  color: var(--color-text-primary);
+}
+
+.entry__org {
+  @include ds.body;
+
+  margin-block-start: var(--space-1);
+  color: var(--color-text-secondary);
+  font-size: var(--fs-body-sm);
+}
+
+.entry__points {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  max-inline-size: 62ch;
+  margin-block-start: var(--space-3);
+}
+
+.entry__points li {
+  @include ds.body;
+
+  position: relative;
+  padding-inline-start: var(--space-4);
+  color: var(--color-text-secondary);
+  font-size: var(--fs-body-sm);
+  text-wrap: pretty;
+}
+
+// A rule rather than a bullet glyph: the page's whole vocabulary is hairlines.
+.entry__points li::before {
+  position: absolute;
+  inset-block-start: 0.7em;
+  inset-inline-start: 0;
+  inline-size: var(--space-2);
+  block-size: var(--border-hairline);
+  background-color: var(--color-border-strong);
+  content: '';
+}

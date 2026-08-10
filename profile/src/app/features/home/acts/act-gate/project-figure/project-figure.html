@@ -1,21 +1,16 @@
 <figure class="figure">
   <div class="figure__media">
-    @if (project().image; as image) {
-      <img
-        class="figure__image"
-        [src]="image.src"
-        [attr.srcset]="image.srcset"
-        [attr.sizes]="sizes()"
-        [alt]="image.alt"
-        [width]="image.width"
-        [height]="image.height"
-        loading="lazy"
-        decoding="async"
-      />
-    } @else {
-      <!-- Assets not supplied yet. An honest frame, never a borrowed image. -->
-      <app-media-placeholder [caption]="project().name" [label]="placeholderLabel()" />
-    }
+    <img
+      class="figure__image"
+      [src]="project().image.src"
+      [attr.srcset]="project().image.srcset"
+      [attr.sizes]="sizes()"
+      [alt]="project().image.alt"
+      [width]="project().image.width"
+      [height]="project().image.height"
+      loading="lazy"
+      decoding="async"
+    />
   </div>
 
   <figcaption class="figure__meta">
@@ -34,9 +29,10 @@
       }
     </h3>
 
-    <!-- What it is, then what it was built with. Two lines, read in one glance,
-         so nobody has to parse a paragraph to place the work. -->
-    <p class="figure__category">{{ project().category }}</p>
+    <!-- What industry, where it trades, then what it was built with. Three short
+         lines, read in one glance, so nobody parses a paragraph to place it. -->
+    <p class="figure__field">{{ project().field }}</p>
+    <p class="figure__market">{{ project().market }}</p>
     <p class="figure__stack"><span class="ltr-isolate">{{ project().stack }}</span></p>
   </figcaption>
 </figure>

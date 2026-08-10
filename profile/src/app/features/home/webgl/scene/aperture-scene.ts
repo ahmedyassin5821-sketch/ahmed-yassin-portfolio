@@ -7,9 +7,8 @@ import {
   CameraKey,
   sampleCamera,
 } from '../../animation/camera-path';
-import { ProjectPlaneSpec, TypePlaneSpec } from '../../animation/corridor-layout';
+import { TypePlaneSpec } from '../../animation/corridor-layout';
 import { MonogramLayers } from './monogram-layers';
-import { ProjectPlanes } from './project-planes';
 import { TypePlanes } from './type-planes';
 
 export interface ApertureSceneOptions {
@@ -23,14 +22,17 @@ export interface ApertureSceneOptions {
   readonly directionSign: 1 | -1;
   readonly inkColor: string;
   readonly surfaceColor: string;
-  /** Headline words that live inside the corridor. */
+  /**
+   * Headline words that live inside the corridor.
+   *
+   * The ONLY content in the scene. Project screenshots were tried here as
+   * physical planes and removed: seen from behind they render mirrored, and even
+   * squared up they duplicated the DOM plate landing over them. The scene
+   * carries type and the mark; the work is presented in the DOM.
+   */
   readonly typePlanes: readonly TypePlaneSpec[];
-  /** Project screenshots hung past each gate. */
-  readonly projectPlanes: readonly ProjectPlaneSpec[];
   /** The page's real typeface, so scene type matches DOM type. */
   readonly fontFamily: string;
-  /** Maximum textures resident at once. */
-  readonly textureBudget: number;
 }
 
 /**
@@ -69,7 +71,6 @@ export class ApertureScene {
   private readonly monogram: MonogramLayers;
   private readonly exitMark: MonogramLayers;
   private readonly type: TypePlanes;
-  private readonly projects: ProjectPlanes;
 
   private frame = 0;
   private running = false;
@@ -141,14 +142,6 @@ export class ApertureScene {
       fontFamily: options.fontFamily,
     });
     this.root.add(this.type.root);
-
-    this.projects = new ProjectPlanes({
-      specs: options.projectPlanes,
-      directionSign: options.directionSign,
-      inkColor: options.inkColor,
-      textureBudget: options.textureBudget,
-    });
-    this.root.add(this.projects.root);
 
     this.applyProgress();
     this.resize();
@@ -236,7 +229,6 @@ export class ApertureScene {
     this.monogram.update(p, key.z);
     this.exitMark.update(p, key.z);
     this.type.update(p, key.z);
-    this.projects.update(p, key.z);
   }
 
   dispose(): void {
@@ -246,7 +238,6 @@ export class ApertureScene {
     this.monogram.dispose();
     this.exitMark.dispose();
     this.type.dispose();
-    this.projects.dispose();
 
     this.renderer.dispose();
     // Browsers cap simultaneous WebGL contexts. Releasing explicitly means

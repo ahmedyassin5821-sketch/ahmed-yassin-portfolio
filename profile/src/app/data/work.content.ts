@@ -5,16 +5,16 @@
  * template never holds a literal and a missing translation is a type error
  * rather than an English word appearing in an Arabic layout.
  *
- * Kept deliberately short. This is a traditional portfolio — the screenshots do
- * the explaining, and labels exist to orient rather than to narrate.
+ * Kept deliberately short. The screenshots and each project's own brief do the
+ * explaining; these labels exist to orient rather than to narrate.
  */
 export const WORK_CONTENT = {
   index: {
     eyebrow: { en: 'Selected work', ar: 'أعمال مختارة' },
     title: { en: 'Work', ar: 'الأعمال' },
     lede: {
-      en: 'Front-end and eCommerce engineering across Angular, Magento, and Shopify.',
-      ar: 'هندسة واجهات أمامية وتجارة إلكترونية عبر Angular وMagento وShopify.',
+      en: 'Front-end and eCommerce engineering across Angular, Magento, and Shopify — for enterprise teams and independent brands.',
+      ar: 'هندسة واجهات أمامية وتجارة إلكترونية عبر Angular وMagento وShopify — لفرق مؤسسية وعلامات تجارية مستقلة.',
     },
     /**
      * Two numbers, both substituted from data and neither typed as a word.
@@ -30,15 +30,17 @@ export const WORK_CONTENT = {
   },
 
   labels: {
+    /** The business, stated before any technology. */
+    market: { en: 'Market', ar: 'السوق' },
+    field: { en: 'Field', ar: 'المجال' },
+    domain: { en: 'Domain', ar: 'نوع المنتج' },
+
     platform: { en: 'Platform', ar: 'المنصة' },
-    projectType: { en: 'Type', ar: 'النوع' },
     role: { en: 'Role', ar: 'الدور' },
     technologies: { en: 'Technologies', ar: 'التقنيات' },
     theme: { en: 'Theme', ar: 'القالب' },
     dashboard: { en: 'Includes dashboard', ar: 'يشمل لوحة تحكّم' },
     screenshots: { en: 'Screenshots', ar: 'لقطات الشاشة' },
-    /** Shown in the empty media frame of a project whose assets are pending. */
-    awaitingAssets: { en: 'Imagery coming soon', ar: 'الصور قريباً' },
   },
 
   actions: {
@@ -60,12 +62,6 @@ export const WORK_CONTENT = {
      * about the work, and a pill made it read as a disabled control.
      */
     live: { en: 'Live ↗', ar: '↗ مباشر' },
-    /**
-     * Distinct from `private`. NAS HR has no public address because it is an
-     * internal system; Vivace has none because its assets have not been supplied
-     * yet. Calling the second "internal" would be false.
-     */
-    pending: { en: 'Coming soon', ar: 'قريباً' },
     backToWork: { en: 'All work', ar: 'كل الأعمال' },
     previous: { en: 'Previous', ar: 'السابق' },
     next: { en: 'Next', ar: 'التالي' },

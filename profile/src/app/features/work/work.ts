@@ -72,24 +72,24 @@ export class Work {
       return {
         slug: project.slug,
         name: resolveLocalized(project.name, locale),
-        category: resolveLocalized(project.projectType, locale),
+        field: resolveLocalized(project.field, locale),
+        // "Egypt · Coffee e-commerce" — where it trades and what kind of product
+        // it is, in one line under the industry.
+        context: [
+          resolveLocalized(project.market, locale),
+          resolveLocalized(project.domain, locale),
+        ].join(' · '),
         stack,
-        // Three states, not two: see WorkRowData.linkStatus. A project with no
-        // address and no imagery is pending, not internal.
-        linkStatus: project.url
-          ? ('live' as const)
-          : project.cover
-            ? ('private' as const)
-            : ('pending' as const),
-        image: project.cover
-          ? {
-              src: project.cover.src,
-              srcset: project.cover.srcset,
-              width: project.cover.width,
-              height: project.cover.height,
-              alt: resolveLocalized(project.cover.alt, locale),
-            }
-          : null,
+        // Derived from `url` rather than stored, so the label and the link can
+        // never disagree. NAS HR is internal; everything else is public.
+        linkStatus: project.url ? ('live' as const) : ('private' as const),
+        image: {
+          src: project.cover.src,
+          srcset: project.cover.srcset,
+          width: project.cover.width,
+          height: project.cover.height,
+          alt: resolveLocalized(project.cover.alt, locale),
+        },
       };
     });
   });
@@ -99,11 +99,11 @@ export class Work {
   /** Passed to every row, so the label set is defined once. */
   protected readonly statusLabels = computed(() => {
     const a = this.c().actions;
-    return { live: a.live, private: a.private, pending: a.pending };
+    return { live: a.live, private: a.private };
   });
 
   protected readonly previews = computed<WorkPreviewData[]>(() =>
-    this.resolved().map(({ slug, name, category, image }) => ({ slug, name, category, image })),
+    this.resolved().map(({ slug, name, field, image }) => ({ slug, name, field, image })),
   );
 
   protected setActive(slug: string): void {

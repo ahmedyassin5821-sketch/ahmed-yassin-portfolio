@@ -69,7 +69,7 @@
 /// Vertical rhythm. Section gap is always 2× block gap — the mark's own
 /// cap-to-descender ratio, so one relationship governs the page.
 @mixin section {
-  padding-block: var(--space-section);
+  // padding-block: var(--space-section);
 }
 
 @mixin stack($gap: var(--space-block)) {

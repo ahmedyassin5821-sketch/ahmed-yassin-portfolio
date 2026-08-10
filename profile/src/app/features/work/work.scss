@@ -62,7 +62,11 @@
   grid-template-columns: 1fr;
 
   @include ds.mq(md) {
-    align-items: start;
+    // Deliberately NOT `align-items: start`. That sized the preview column to
+    // its own content, leaving `position: sticky` inside it with no travel — the
+    // pane scrolled away at the first row and the reader had to go back to the
+    // top to see what hovering row six had changed. Stretched, the pane's
+    // containing block is as tall as the list, which is what sticky needs.
     gap: var(--space-12);
     // Close to even. At 1.35fr / 1fr the pane was ~500px wide, and at the
     // screenshots' own 2.26 aspect that is only ~220px tall — a thumbnail

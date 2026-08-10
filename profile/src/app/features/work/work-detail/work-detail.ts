@@ -6,7 +6,6 @@ import { localizedContent, resolveLocalized } from '@core/i18n/localized';
 import { PLATFORM_LABELS, PROJECTS, projectBySlug, projectNeighbours } from '@data/projects.data';
 import { WORK_CONTENT } from '@data/work.content';
 import { Icon } from '@shared/ui/icon/icon';
-import { MediaPlaceholder } from '@shared/ui/media-placeholder/media-placeholder';
 import { TextLink } from '@shared/ui/text-link/text-link';
 import { ProjectFacts, ProjectFact } from '../project-facts/project-facts';
 import { ProjectGallery } from '../project-gallery/project-gallery';
@@ -29,15 +28,7 @@ import { ProjectNav } from '../project-nav/project-nav';
 @Component({
   selector: 'app-work-detail',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [
-    RouterLink,
-    Icon,
-    MediaPlaceholder,
-    TextLink,
-    ProjectFacts,
-    ProjectGallery,
-    ProjectNav,
-  ],
+  imports: [RouterLink, Icon, TextLink, ProjectFacts, ProjectGallery, ProjectNav],
   templateUrl: './work-detail.html',
   styleUrl: './work-detail.scss',
 })
@@ -79,21 +70,16 @@ export class WorkDetail {
       name: resolveLocalized(project.name, locale),
       platformLabel: resolveLocalized(PLATFORM_LABELS[project.platform], locale),
       role: resolveLocalized(project.role, locale),
-      summary: resolveLocalized(project.summary, locale),
-      technology: project.technology,
+      // The business, ahead of anything technical.
+      market: resolveLocalized(project.market, locale),
+      field: resolveLocalized(project.field, locale),
+      domain: resolveLocalized(project.domain, locale),
+      brief: resolveLocalized(project.brief, locale),
+      technologies: project.technologies,
       theme: project.theme,
       dashboard: project.dashboard,
       url: project.url,
       isPrivate: project.url === null,
-      logo: project.logo
-        ? {
-            src: project.logo.src,
-            width: project.logo.width,
-            height: project.logo.height,
-            alt: resolveLocalized(project.logo.alt, locale),
-          }
-        : null,
-      projectType: resolveLocalized(project.projectType, locale),
       // "Magento · Porto · Dashboard" — one scannable line, assembled here so a
       // project that gains a theme or a dashboard needs no copy change.
       stack: [
@@ -103,17 +89,14 @@ export class WorkDetail {
       ]
         .filter(Boolean)
         .join(' · '),
-      // null until imagery is supplied; the template renders the empty frame.
-      cover: project.cover
-        ? {
-            src: project.cover.src,
-            srcset: project.cover.srcset,
-            avif: project.cover.avif ?? null,
-            width: project.cover.width,
-            height: project.cover.height,
-            alt: resolveLocalized(project.cover.alt, locale),
-          }
-        : null,
+      cover: {
+        src: project.cover.src,
+        srcset: project.cover.srcset,
+        avif: project.cover.avif ?? null,
+        width: project.cover.width,
+        height: project.cover.height,
+        alt: resolveLocalized(project.cover.alt, locale),
+      },
       screenshots: project.screenshots.map((shot) => ({
         src: shot.src,
         srcset: shot.srcset,
@@ -142,7 +125,30 @@ export class WorkDetail {
   });
 
   /**
-   * The facts, assembled once here.
+   * What the business is — field, market, domain.
+   *
+   * Deliberately the first thing on the page, above any technology: a reader
+   * should be able to say what this project *is* before a platform is named.
+   */
+  protected readonly identity = computed<ProjectFact[]>(() => {
+    const p = this.content();
+    if (!p) return [];
+
+    const labels = this.c().labels;
+    return [
+      { label: labels.field, value: p.field },
+      { label: labels.market, value: p.market },
+      { label: labels.domain, value: p.domain },
+    ];
+  });
+
+  /**
+   * How it was built, assembled once here.
+   *
+   * Market, field and domain deliberately do *not* appear: they identify the
+   * business and belong in the header, above the fold, before any technology is
+   * named. What is left here answers the later question — how the thing was
+   * made, and what part of it was Ahmed's.
    *
    * Technologies join into one line rather than a list, matching how the index
    * and the Home gates present a stack — the reader scans one string instead of
@@ -155,11 +161,10 @@ export class WorkDetail {
     const labels = this.c().labels;
     const rows: ProjectFact[] = [
       { label: labels.platform, value: p.platformLabel, isolate: true },
-      { label: labels.projectType, value: p.projectType },
       { label: labels.role, value: p.role },
       {
         label: labels.technologies,
-        value: [...p.technology, p.dashboard ? labels.dashboard : null]
+        value: [...p.technologies, p.dashboard ? labels.dashboard : null]
           .filter(Boolean)
           .join(' · '),
         isolate: true,
@@ -167,7 +172,7 @@ export class WorkDetail {
     ];
 
     return p.theme
-      ? [...rows.slice(0, 3), { label: labels.theme, value: p.theme, isolate: true }, rows[3]]
+      ? [...rows.slice(0, 2), { label: labels.theme, value: p.theme, isolate: true }, rows[2]]
       : rows;
   });
 

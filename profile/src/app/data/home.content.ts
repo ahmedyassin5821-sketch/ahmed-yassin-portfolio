@@ -1,4 +1,5 @@
 import { Localized } from '@core/i18n/localized';
+import { PROFESSIONAL_TITLE } from './cv.data';
 
 /**
  * Every user-facing string on the Home page, in both languages.
@@ -58,10 +59,10 @@ export const HOME_CONTENT: HomeContent = {
       en: 'Ahmed Yassin',
       ar: 'أحمد ياسين',
     },
-    role: {
-      en: 'Front-End & eCommerce Engineer',
-      ar: 'مهندس واجهات أمامية وتجارة إلكترونية',
-    },
+    // One source for the professional title, shared with /about, /cv and
+    // /contact. The Arabic is Ahmed's own wording, not a translation of the
+    // English line — see PROFESSIONAL_TITLE.
+    role: PROFESSIONAL_TITLE,
     lede: {
       en: 'I build enterprise Angular applications at 2B, customise Magento 2 storefronts at scale, and develop Shopify themes for independent brands.',
       ar: 'أبني تطبيقات Angular مؤسسية في 2B، وأخصّص متاجر Magento 2 على نطاق واسع، وأطوّر قوالب Shopify لعلامات تجارية مستقلة.',

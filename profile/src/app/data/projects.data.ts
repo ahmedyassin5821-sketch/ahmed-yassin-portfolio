@@ -11,10 +11,17 @@ import { PROJECT_MEDIA as M } from './project-media.generated';
  *
  * ## What is and is not written here
  *
- * Every field is either stated by Ahmed, visible in the supplied captures, or
- * carried over from the established project data. Nothing is inferred to make an
- * entry look fuller: no business results, no metrics, no team sizes, no
- * ownership or "sole developer" claims, no invented technologies.
+ * Each project carries two separable things:
+ *
+ * - **The business** — `market`, `field`, `domain`, `brief`. Established from the
+ *   client's own public site or a published source, and cited in
+ *   `docs/ARCHITECTURE.md` §15. Never inferred from a screenshot alone.
+ * - **Ahmed's part in it** — `role`, `technologies`, `theme`, `dashboard`. Taken
+ *   from the CV in `Attachments/` or from what he stated directly.
+ *
+ * Keeping them apart is the point: describing a client's business in detail must
+ * not read as a claim to have built that business. Nothing here states results,
+ * metrics, traffic, revenue, team size, or ownership.
  *
  * `url` is `null` only where there genuinely is no public address — NAS HR is an
  * internal system — and the UI marks that state instead of linking nowhere.
@@ -37,19 +44,21 @@ const angular: readonly Project[] = [
     slug: 'nas-hr',
     name: { en: 'NAS HR', ar: 'NAS HR' },
     platform: 'angular',
-    projectType: {
-      en: 'HR / Enterprise',
-      ar: 'موارد بشرية / مؤسسي',
+    market: { en: 'Egypt', ar: 'مصر' },
+    field: {
+      en: 'HR Technology / Enterprise Software',
+      ar: 'تقنيات الموارد البشرية / برمجيات المؤسسات',
+    },
+    domain: { en: 'HR management platform', ar: 'منصة إدارة موارد بشرية' },
+    brief: {
+      en: 'An HR management platform for the Egyptian market. It covers employee records, attendance, hourly leave, penalties and payroll, with role-based dashboards and approval workflows, and it handles Egyptian labour-law, social-insurance and tax rules directly.',
+      ar: 'منصة لإدارة الموارد البشرية موجّهة للسوق المصري. تغطي ملفات الموظفين والحضور والأذونات بالساعات والجزاءات والرواتب، مع لوحات تحكّم حسب الصلاحية ومسارات موافقة، وتتعامل مباشرة مع قواعد قانون العمل والتأمينات الاجتماعية والضرائب في مصر.',
     },
     role: {
       en: 'Front-End / Angular Developer',
       ar: 'مطوّر واجهات أمامية / Angular',
     },
-    summary: {
-      en: 'An HR management system with dashboards for employees, payroll, requests, and attendance.',
-      ar: 'نظام إدارة موارد بشرية مع لوحات تحكّم للموظفين والرواتب والطلبات والحضور.',
-    },
-    technology: ['Angular', 'TypeScript', 'SCSS'],
+    technologies: ['Angular', 'TypeScript', 'SCSS'],
     theme: null,
     dashboard: true,
     // An internal system. There is no public address to link to.
@@ -103,19 +112,24 @@ const angular: readonly Project[] = [
     // Both names are the brand's own — the logo carries the Arabic form.
     name: { en: 'Nature', ar: 'الطبيعة' },
     platform: 'angular',
-    projectType: {
-      en: 'Environmental / Corporate',
-      ar: 'بيئي / مؤسسي',
+    market: { en: 'United Arab Emirates', ar: 'الإمارات العربية المتحدة' },
+    field: {
+      en: 'Environmental & Agricultural Services',
+      ar: 'خدمات بيئية وزراعية',
+    },
+    domain: {
+      en: 'Corporate platform with content management',
+      ar: 'منصة مؤسسية مع إدارة محتوى',
+    },
+    brief: {
+      en: 'The corporate platform for Nature for Environmental and Agricultural Solutions L.L.C, a UAE company that cultivates and maintains mangrove trees and reserves, carries out environmental studies, and develops environmental, urban and eco-tourism projects. The bilingual public site is backed by an admin dashboard for managing projects, services and articles per language.',
+      ar: 'المنصة المؤسسية لشركة الطبيعة للحلول البيئية والزراعية ذ.م.م في الإمارات، المتخصصة في زراعة أشجار وغابات المانغروف وصيانتها، وإعداد الدراسات البيئية، وتطوير المشاريع البيئية والعمرانية والسياحة البيئية. الموقع العام ثنائي اللغة تدعمه لوحة تحكّم لإدارة المشاريع والخدمات والمقالات لكل لغة.',
     },
     role: {
       en: 'Front-End / Angular Developer',
       ar: 'مطوّر واجهات أمامية / Angular',
     },
-    summary: {
-      en: 'A corporate site for an environmental and agricultural company, with an admin dashboard for managing projects, services, and content.',
-      ar: 'موقع مؤسسي لشركة بيئية وزراعية، مع لوحة تحكّم لإدارة المشاريع والخدمات والمحتوى.',
-    },
-    technology: ['Angular', 'TypeScript'],
+    technologies: ['Angular', 'TypeScript'],
     theme: null,
     dashboard: true,
     url: 'https://www.neas.ae/',
@@ -183,20 +197,23 @@ const magento: readonly Project[] = [
     slug: '2b',
     name: { en: '2B', ar: '2B' },
     platform: 'magento',
-    projectType: {
-      en: 'Consumer Electronics / E-commerce',
-      ar: 'إلكترونيات استهلاكية / تجارة إلكترونية',
+    market: { en: 'Egypt', ar: 'مصر' },
+    field: {
+      en: 'Consumer Electronics Retail',
+      ar: 'تجزئة الإلكترونيات الاستهلاكية',
+    },
+    domain: { en: 'High-traffic e-commerce storefront', ar: 'متجر إلكتروني عالي الزيارات' },
+    brief: {
+      en: 'The online storefront of 2B, an Egyptian consumer-electronics retailer selling computers, mobiles, home appliances, televisions, audio and gaming both online and through its own branches. Beyond catalogue, cart and checkout it carries click-and-collect from those branches and instalment plans from several Egyptian finance providers.',
+      ar: 'المتجر الإلكتروني لشركة 2B، إحدى شركات تجزئة الإلكترونيات الاستهلاكية في مصر، ويبيع الحاسبات والهواتف والأجهزة المنزلية والتلفزيونات والصوتيات والألعاب عبر الإنترنت وعبر فروعها. وإلى جانب الكتالوج والسلة وإتمام الشراء، يوفّر الاستلام من الفرع وخطط التقسيط من عدة جهات تمويل مصرية.',
     },
     role: {
       en: 'Front-End Magento Developer',
       ar: 'مطوّر واجهات أمامية Magento',
     },
-    summary: {
-      en: 'An electronics e-commerce storefront — product pages, cart, instalment plans, and checkout.',
-      ar: 'متجر إلكترونيات — صفحات المنتجات والسلة وخطط التقسيط وإتمام الشراء.',
-    },
-    technology: ['Magento 2', 'PHTML', 'LESS', 'JavaScript'],
-    theme: null,
+    technologies: ['Magento 2', 'PHTML', 'LESS', 'JavaScript'],
+    // The revamp Ahmed contributed to ran on 2B's new Wide theme.
+    theme: 'Wide',
     dashboard: false,
     url: 'https://2b.com.eg/',
     logo: {
@@ -254,19 +271,22 @@ const magento: readonly Project[] = [
     slug: 'esterad',
     name: { en: 'Esterad', ar: 'Esterad' },
     platform: 'magento',
-    projectType: {
-      en: 'Technology / E-commerce',
-      ar: 'تقنية / تجارة إلكترونية',
+    market: { en: 'Egypt', ar: 'مصر' },
+    field: {
+      en: 'Consumer Electronics / Refurbished Devices',
+      ar: 'إلكترونيات استهلاكية / أجهزة مجدّدة',
+    },
+    domain: { en: 'Refurbished-device e-commerce', ar: 'تجارة إلكترونية لأجهزة مجدّدة' },
+    brief: {
+      en: 'An Egyptian storefront for imported and refurbished computing hardware — laptops, desktops, Microsoft Surface devices and phones — sold as tested used equipment in working condition at a lower price than new. Every device is inspected before delivery and ships with a warranty and a return window.',
+      ar: 'متجر مصري للأجهزة المستوردة والمجدّدة — حاسبات محمولة ومكتبية وأجهزة Microsoft Surface وهواتف — تُباع كأجهزة مستعملة مفحوصة بحالة تشغيل جيدة وبسعر أقل من الجديد. يُفحص كل جهاز قبل التسليم ويُشحن بضمان وفترة استبدال.',
     },
     role: {
-      en: 'Front-End Magento Developer',
-      ar: 'مطوّر واجهات أمامية Magento',
+      // Stated in the CV: "Sole Front-End Magento developer".
+      en: 'Sole Front-End Magento Developer',
+      ar: 'مطوّر واجهات Magento الوحيد',
     },
-    summary: {
-      en: 'An electronics storefront built on the Porto theme.',
-      ar: 'متجر إلكترونيات مبني على قالب Porto.',
-    },
-    technology: ['Magento 2', 'PHTML', 'JavaScript'],
+    technologies: ['Magento 2', 'PHTML', 'JavaScript'],
     theme: 'Porto',
     dashboard: false,
     url: 'https://esterad.com.eg/',
@@ -320,16 +340,18 @@ const shopify: readonly Project[] = [
     slug: 'designed-by-g',
     name: { en: 'Designed by G', ar: 'Designed by G' },
     platform: 'shopify',
-    projectType: {
-      en: 'Fashion / Streetwear / E-commerce',
-      ar: 'أزياء وستريت وير / تجارة إلكترونية',
+    market: { en: 'Egypt', ar: 'مصر' },
+    field: { en: 'Fashion / Apparel', ar: 'أزياء وملابس' },
+    domain: {
+      en: 'Direct-to-consumer fashion e-commerce',
+      ar: 'تجارة إلكترونية مباشرة للأزياء',
+    },
+    brief: {
+      en: 'The direct-to-consumer store for Designed by G, an Egyptian avant-garde fashion label. It sells denim, shirting, outerwear and bags in named collections and limited one-of-one pieces, alongside collaborations with Egyptian artists — a catalogue that runs from everyday basics to couture price points.',
+      ar: 'المتجر المباشر للمستهلك لعلامة Designed by G، وهي علامة أزياء مصرية ذات طابع طليعي. تبيع الدنيم والقمصان والجاكيتات والحقائب ضمن تجميعات مسمّاة وقطع فريدة محدودة، إلى جانب تعاونات مع فنانين مصريين — كتالوج يمتد من القطع اليومية إلى أسعار الأزياء الراقية.',
     },
     role: { en: 'Shopify Developer', ar: 'مطوّر Shopify' },
-    summary: {
-      en: 'A fashion storefront on Shopify — collections, product pages, size guidance, and checkout.',
-      ar: 'متجر أزياء على Shopify — التجميعات وصفحات المنتجات ودليل المقاسات وإتمام الشراء.',
-    },
-    technology: ['Shopify', 'Liquid', 'JavaScript'],
+    technologies: ['Shopify', 'Liquid', 'JavaScript'],
     theme: null,
     dashboard: false,
     url: 'https://www.designedby-g.com/',
@@ -389,16 +411,18 @@ const shopify: readonly Project[] = [
     // The Arabic form is the one on the brand's own logo.
     name: { en: 'Nader Coffee', ar: 'بن نادر' },
     platform: 'shopify',
-    projectType: {
-      en: 'Coffee / Specialty Beverage / E-commerce',
-      ar: 'قهوة ومشروبات مختصة / تجارة إلكترونية',
+    market: { en: 'Egypt', ar: 'مصر' },
+    field: { en: 'Coffee / Food & Beverage', ar: 'قهوة / أغذية ومشروبات' },
+    domain: {
+      en: 'Direct-to-consumer coffee e-commerce',
+      ar: 'تجارة إلكترونية مباشرة للقهوة',
+    },
+    brief: {
+      en: 'A direct-to-consumer coffee platform serving the Egyptian market. It sells Turkish, espresso, American, Arabic, specialty and flavoured coffee — ground and whole bean, from 10 g sachets to one-kilogram bags — with bundles that pair beans with brewing equipment.',
+      ar: 'منصة قهوة تبيع مباشرة للمستهلك في السوق المصري. تقدّم القهوة التركي والإسبريسو والأمريكي والعربي والمختصة وبنكهات مميّزة — مطحونة وحبوباً كاملة، من أظرف 10 جرام إلى أكياس الكيلو — مع عروض تجمع البن مع أدوات التحضير.',
     },
     role: { en: 'Shopify Developer', ar: 'مطوّر Shopify' },
-    summary: {
-      en: 'A coffee storefront on Shopify — categories, offers, and checkout.',
-      ar: 'متجر قهوة على Shopify — الأقسام والعروض وإتمام الشراء.',
-    },
-    technology: ['Shopify', 'Liquid'],
+    technologies: ['Shopify', 'Liquid'],
     theme: null,
     dashboard: false,
     url: 'https://www.nader-coffee.com/',
@@ -450,25 +474,73 @@ const shopify: readonly Project[] = [
     slug: 'vivace',
     name: { en: 'Vivace', ar: 'Vivace' },
     platform: 'shopify',
-    projectType: {
-      en: 'Perfume / Fragrance / E-commerce',
-      ar: 'عطور / تجارة إلكترونية',
+    market: { en: 'United Arab Emirates & Qatar', ar: 'الإمارات العربية المتحدة وقطر' },
+    field: { en: 'Fragrance / Luxury Retail', ar: 'عطور / تجزئة فاخرة' },
+    domain: { en: 'Niche perfume e-commerce', ar: 'تجارة إلكترونية للعطور النيتشية' },
+    brief: {
+      en: 'Vivace Perfumes — “House of Artisanal Fragrance” — retails niche and artisanal perfume houses such as Areej Le Doré, Agar Aura, Laurent Smal, Elixir Attar and Aton alongside its own Vivace line. It runs from stores in the UAE and Qatar, with a multi-currency storefront, worldwide delivery and instalment payment.',
+      ar: 'Vivace Perfumes — «بيت العطور الحرفية» — تبيع عطور دور نيتشية وحرفية مثل Areej Le Doré وAgar Aura وLaurent Smal وElixir Attar وAton، إلى جانب خطها الخاص Vivace. تعمل من متاجرها في الإمارات وقطر، بمتجر متعدد العملات وتوصيل عالمي ودفع بالتقسيط.',
     },
     role: { en: 'Shopify Developer', ar: 'مطوّر Shopify' },
-    summary: {
-      en: 'A perfume storefront on Shopify.',
-      ar: 'متجر عطور على Shopify.',
-    },
-    technology: ['Shopify', 'Liquid'],
+    technologies: ['Shopify', 'Liquid'],
     theme: null,
     dashboard: false,
-    // Assets — logo, screenshots and the live address — have not been supplied
-    // yet. Nothing here is guessed to fill the gap: the UI renders the token
-    // placeholder frame, and populating this is a data edit when they arrive.
-    url: null,
-    logo: null,
-    cover: null,
-    screenshots: [],
+    url: 'https://www.vivace.shop/',
+    logo: {
+      ...M.vivace.logo,
+      alt: { en: 'Vivace Perfumes logo', ar: 'شعار Vivace Perfumes' },
+    },
+    cover: {
+      ...M.vivace.shots.home,
+      alt: {
+        en: 'Vivace home page with a campaign banner for a perfume release',
+        ar: 'الصفحة الرئيسية لمتجر Vivace مع لافتة إطلاق أحد العطور',
+      },
+    },
+    screenshots: [
+      {
+        ...M.vivace.shots.brands,
+        alt: {
+          en: 'Exclusive brands grid, one panel per perfume house',
+          ar: 'شبكة الماركات الحصرية، بلوحة لكل دار عطور',
+        },
+      },
+      {
+        ...M.vivace.shots.menu,
+        alt: {
+          en: 'Multi-level brands menu open over the storefront',
+          ar: 'قائمة الماركات متعددة المستويات مفتوحة فوق المتجر',
+        },
+      },
+      {
+        ...M.vivace.shots.merchandising,
+        alt: {
+          en: 'Last-piece section listing bottles with only one unit left',
+          ar: 'قسم القطع الأخيرة الذي يعرض العبوات المتبقية بوحدة واحدة',
+        },
+      },
+      {
+        ...M.vivace.shots.product,
+        alt: {
+          en: 'Product page with size options and an illustrated note list',
+          ar: 'صفحة المنتج مع خيارات الحجم وقائمة مصوّرة للمكوّنات العطرية',
+        },
+      },
+      {
+        ...M.vivace.shots.cart,
+        alt: {
+          en: 'Cart drawer with the order subtotal',
+          ar: 'درج السلة مع الإجمالي الفرعي للطلب',
+        },
+      },
+      {
+        ...M.vivace.shots.checkout,
+        alt: {
+          en: 'Checkout payment step with card, Instapay and transfer options',
+          ar: 'خطوة الدفع مع خيارات البطاقة وInstapay والتحويل',
+        },
+      },
+    ],
     featured: true,
   },
 ];

@@ -1,0 +1,13 @@
+<header class="head">
+  <p class="head__eyebrow">{{ eyebrow() }}</p>
+  <h1 [id]="headingId()" class="head__title" dir="auto">{{ title() }}</h1>
+
+  @if (lede()) {
+    <p class="head__lede">{{ lede() }}</p>
+  }
+
+  <!-- Downloads, links, anything the page wants beside its opening. -->
+  <div class="head__actions">
+    <ng-content />
+  </div>
+</header>

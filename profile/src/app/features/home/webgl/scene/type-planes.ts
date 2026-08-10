@@ -8,6 +8,7 @@ import {
   SRGBColorSpace,
 } from 'three';
 
+import { normalise } from '../../animation/easing';
 import { TypePlaneSpec } from '../../animation/corridor-layout';
 
 /** Texture height in device pixels. 2× the largest on-screen size. */
@@ -18,6 +19,16 @@ const NEAR_FADE_DISTANCE = 8;
 
 /** Ghosted: the DOM copy of each word is the one meant to be read. */
 const PEAK_OPACITY = 0.13;
+
+/**
+ * How much scroll a word takes to arrive and to leave.
+ *
+ * The window used to be a hard boolean. That is fine while the camera is still
+ * approaching — the near-fade hides the transition — but a gate word now leaves
+ * while the camera is *holding* ten units away from it, where it fills the frame.
+ * Cutting a full-frame plane to zero in one frame is a visible pop.
+ */
+const WINDOW_FADE = 0.025;
 
 export interface TypePlanesOptions {
   readonly specs: readonly TypePlaneSpec[];
@@ -142,18 +153,28 @@ export class TypePlanes {
   /**
    * Pure function of scroll position and camera depth.
    *
-   * Two independent gates: the act window decides whether a word belongs on
+   * Two independent gates: the scroll window decides whether a word belongs on
    * screen at all, and the near-fade dissolves it as the camera arrives.
+   *
+   * A gate word's window closes as that gate's screenshot arrives, which is the
+   * point of the sequence — the word says what the platform is, then gets out of
+   * the way of the work. It is ramped rather than switched because the camera is
+   * holding still at that moment, so nothing else would hide the cut.
    */
   update(progress: number, cameraZ: number): void {
     for (const plane of this.planes) {
       const distance = cameraZ - plane.z;
       // Behind the camera, or so close it would clip: hide entirely.
       const near = Math.min(1, Math.max(0, distance / NEAR_FADE_DISTANCE));
-      const inAct = progress >= plane.spec.from && progress <= plane.spec.to;
+
+      const { from, to } = plane.spec;
+      const enter = normalise(progress, from, from + WINDOW_FADE);
+      const exit = 1 - normalise(progress, to - WINDOW_FADE, to);
+      const inWindow = Math.min(enter, exit);
+
       const material = plane.mesh.material as MeshBasicMaterial;
-      material.opacity = inAct ? near * PEAK_OPACITY : 0;
-      plane.mesh.visible = inAct && near > 0.01;
+      material.opacity = near * PEAK_OPACITY * inWindow;
+      plane.mesh.visible = inWindow > 0.01 && near > 0.01;
     }
   }
 

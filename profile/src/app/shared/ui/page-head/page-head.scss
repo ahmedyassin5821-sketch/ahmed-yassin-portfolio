@@ -1,0 +1,47 @@
+@use 'index' as ds;
+
+:host {
+  display: block;
+}
+
+.head {
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  gap: var(--space-3);
+  max-inline-size: 46rem;
+}
+
+.head__eyebrow {
+  @include ds.label;
+
+  color: var(--color-text-muted);
+}
+
+.head__title {
+  @include ds.display-1;
+
+  color: var(--color-text-primary);
+  line-height: 0.9;
+}
+
+.head__lede {
+  @include ds.body;
+
+  max-inline-size: 52ch;
+  color: var(--color-text-secondary);
+  text-wrap: pretty;
+}
+
+// Collapses to nothing when no content is projected, so a page without actions
+// gets no stray gap.
+.head__actions:empty {
+  display: none;
+}
+
+.head__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  margin-block-start: var(--space-4);
+}

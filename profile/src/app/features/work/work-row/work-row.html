@@ -9,8 +9,8 @@
     <h2 class="row__name" dir="auto">
       <!--
         One anchor, stretched over the row by ::after. Wrapping the whole article
-        would fold the category, the stack and the link marker into the link's
-        accessible name.
+        would fold the field, the market, the stack and the link marker into the
+        link's accessible name.
       -->
       <a class="row__link" [routerLink]="['/work', project().slug]">
         {{ project().name }}
@@ -18,36 +18,34 @@
       </a>
     </h2>
 
-    <!-- What it is, then what it was built with. Two scannable lines. -->
-    <p class="row__category">{{ project().category }}</p>
+    <!--
+      The business first: what industry it is in, then where it trades and what
+      kind of product it is. The stack comes last, because a reader placing the
+      work cares what it *is* before what it was built with.
+    -->
+    <p class="row__field">{{ project().field }}</p>
+    <p class="row__context">{{ project().context }}</p>
     <p class="row__stack"><span class="ltr-isolate">{{ project().stack }}</span></p>
   </div>
 
   <!--
-    Link status as text, not a pill. "Private" is a fact about the work, and a
-    dashed badge made it look like a disabled control.
+    Link status as text, not a pill. "Internal project" is a fact about the work,
+    and a dashed badge made it look like a disabled control.
   -->
   <p class="row__status">{{ statusLabel() }}</p>
 
-  <!--
-    Below `md` the row carries its own image; above it the sticky pane does.
-    Rendered in both cases so nothing depends on the observer.
-  -->
+  <!-- Below `md` the row carries its own image; above it the sticky pane does. -->
   <div class="row__media">
-    @if (project().image; as image) {
-      <img
-        class="row__image"
-        [src]="image.src"
-        [attr.srcset]="image.srcset"
-        [attr.sizes]="sizes"
-        [alt]="image.alt"
-        [width]="image.width"
-        [height]="image.height"
-        loading="lazy"
-        decoding="async"
-      />
-    } @else {
-      <app-media-placeholder [caption]="project().name" [label]="placeholderLabel()" />
-    }
+    <img
+      class="row__image"
+      [src]="project().image.src"
+      [attr.srcset]="project().image.srcset"
+      [attr.sizes]="sizes"
+      [alt]="project().image.alt"
+      [width]="project().image.width"
+      [height]="project().image.height"
+      loading="lazy"
+      decoding="async"
+    />
   </div>
 </article>

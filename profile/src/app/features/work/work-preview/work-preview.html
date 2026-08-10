@@ -1,26 +1,36 @@
 <div class="preview">
-  <!--
-    Every project is rendered and cross-faded by class rather than swapped in and
-    out of the DOM. Swapping would re-request the image on every change and flash
-    an empty frame between projects; here the browser has already decoded them.
-  -->
-  @for (project of projects(); track project.slug) {
-    <figure class="preview__plate" [class.is-active]="project.slug === activeSlug()">
-      @if (project.image; as image) {
+  <div class="preview__frame">
+    <!--
+      Every project is rendered and cross-faded by class rather than swapped in
+      and out of the DOM. Swapping would re-request the image on every change and
+      flash an empty frame between projects; here the browser has already
+      decoded them.
+    -->
+    @for (project of projects(); track project.slug) {
+      <figure class="preview__plate" [class.is-active]="project.slug === activeSlug()">
         <img
           class="preview__image"
-          [src]="image.src"
-          [attr.srcset]="image.srcset"
+          [src]="project.image.src"
+          [attr.srcset]="project.image.srcset"
           [attr.sizes]="sizes"
-          [alt]="''"
-          [width]="image.width"
-          [height]="image.height"
+          alt=""
+          [width]="project.image.width"
+          [height]="project.image.height"
           [attr.loading]="$first ? 'eager' : 'lazy'"
           decoding="async"
         />
-      } @else {
-        <app-media-placeholder [caption]="project.name" [label]="placeholderLabel()" />
-      }
-    </figure>
+      </figure>
+    }
+  </div>
+
+  <!--
+    Names what is on screen. Without it the pane is an unlabelled image once the
+    matching row has scrolled past the top of the viewport.
+  -->
+  @if (active(); as project) {
+    <p class="preview__caption">
+      <span class="preview__name" dir="auto">{{ project.name }}</span>
+      <span class="preview__field">{{ project.field }}</span>
+    </p>
   }
 </div>

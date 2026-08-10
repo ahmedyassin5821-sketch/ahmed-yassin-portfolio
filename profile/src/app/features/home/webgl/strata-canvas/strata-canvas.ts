@@ -14,8 +14,8 @@ import { DOCUMENT } from '@angular/common';
 import { DirectionService } from '@core/i18n/direction.service';
 import { DeviceCapabilityService } from '@core/platform/device-capability.service';
 import { ViewportService } from '@core/platform/viewport.service';
-import { PROJECTS, PROJECTS_SHIPPED } from '@data/projects.data';
-import { buildProjectPlanes, buildTypePlanes } from '../../animation/corridor-layout';
+import { PROJECTS_SHIPPED } from '@data/projects.data';
+import { buildTypePlanes } from '../../animation/corridor-layout';
 import { HomeProgress } from '../../animation/home-progress';
 import type { ApertureScene } from '../scene/aperture-scene';
 
@@ -102,20 +102,11 @@ export class StrataCanvas {
       // The page's own typeface, so words drawn into the scene are set in the
       // same face as the words around it rather than a WebGL-only fallback.
       fontFamily: styles.getPropertyValue('--font-display').trim() || 'system-ui, sans-serif',
+      // Type and the mark are all the scene carries. Project screenshots used to
+      // be hung here as textured planes and are gone: past the camera they
+      // render mirrored, and squared up they duplicated the DOM plate arriving
+      // over them. No textures are loaded by the scene at all now.
       typePlanes: buildTypePlanes(`${PROJECTS_SHIPPED}+`),
-      // Only projects with real imagery carry a texture; the rest render as an
-      // empty frame. Nothing is invented to fill the corridor.
-      projectPlanes: buildProjectPlanes(
-        PROJECTS.map((project) => ({
-          slug: project.slug,
-          platform: project.platform,
-          // The 800px variant: these are never shown larger than ~half the
-          // viewport, so the 1600px file would be memory spent on nothing.
-          src: project.cover ? project.cover.src.replace('-1600.webp', '-800.webp') : null,
-        })),
-      ),
-      // A mid-range phone should never be asked to hold the whole set.
-      textureBudget: lowPower ? 3 : 7,
     });
 
     this.observeVisibility();
