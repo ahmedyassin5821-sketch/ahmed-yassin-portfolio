@@ -1,0 +1,47 @@
+// A slot of the caller's choosing, so seven logos of wildly different
+// proportions — a 400×52 wordmark and a 200×200 square among them — align on one
+// row.
+//
+// ## Flex, not grid, and the reason is `max-block-size: 100%`
+//
+// A percentage max-size resolves against the containing block. For a grid item
+// that containing block is the *grid area*, and an auto-sized row track is sized
+// to the item's own content — so `max-block-size: 100%` resolved against the
+// image's own height, constrained nothing, and Nader Coffee's 200×200 mark
+// rendered 120×120 in a 36px slot. Measured, not guessed: it overflowed on four
+// of the seven logos.
+//
+// A flex item's containing block is the flex container's content box, which is
+// definite here because `block-size` is set. Both maxima then bite, and a
+// replaced element under two max constraints keeps its aspect ratio.
+:host {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  inline-size: var(--logo-inline-size, 4rem);
+  block-size: var(--logo-block-size, 2rem);
+  padding: var(--logo-padding, var(--space-1));
+  // No frame. A logo sits directly on the paper; the only exception is artwork
+  // that would be invisible there, below.
+  background-color: transparent;
+}
+
+// Never crop a logo: object-fit: cover on a wordmark clips the letters off.
+img {
+  max-inline-size: 100%;
+  max-block-size: 100%;
+  object-fit: contain;
+}
+
+// White-on-transparent artwork. See the component doc comment.
+//
+// The ground is on the image, not on the host: under the two max constraints
+// above the image's box is already exactly the artwork's box, so this paints a
+// plate the size of the mark rather than a dark field the size of a uniform slot
+// — which would read as a card around the logo, and neither the marquee nor the
+// work index has a card anywhere in it.
+:host(.is-inverse) img {
+  padding: var(--space-1);
+  background-color: var(--color-surface-inverse);
+}

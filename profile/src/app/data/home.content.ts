@@ -39,6 +39,18 @@ export interface HomeContent {
     readonly viewLabel: Localized;
     readonly placeholderLabel: Localized;
   };
+  /**
+   * The brand strip — the marks themselves, after the corridor.
+   *
+   * No per-project strings: the marquee derives every name, route and logo from
+   * `PROJECTS`, and takes each link's accessible name from
+   * `WORK_CONTENT.a11y.viewProject` so the two indexes announce a project
+   * identically.
+   */
+  readonly marquee: {
+    readonly eyebrow: Localized;
+    readonly title: Localized;
+  };
   readonly transition: {
     readonly title: Localized;
     readonly cta: Localized;
@@ -123,6 +135,20 @@ export const HOME_CONTENT: HomeContent = {
     placeholderLabel: {
       en: 'Imagery coming soon',
       ar: 'الصور قريباً',
+    },
+  },
+  marquee: {
+    eyebrow: {
+      en: 'Brands & products',
+      ar: 'علامات ومنتجات',
+    },
+    // "worked on", not "built" or "launched": one of these is an enterprise
+    // product with its own team, and the strip must not read as a claim to have
+    // made each of these businesses. No number either — the seven marks here are
+    // a selection, and counting them would contradict PROJECTS_SHIPPED.
+    title: {
+      en: 'Brands and digital products I have worked on.',
+      ar: 'علامات تجارية ومنتجات رقمية عملت عليها.',
     },
   },
   transition: {

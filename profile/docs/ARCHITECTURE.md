@@ -1386,3 +1386,117 @@ confident false result:
 
 Precedent from Sprint 6 holds: the iframe harness silently froze at progress 0
 because rAF is throttled in frames. Verify the tool before trusting the result.
+
+---
+
+## 20. The brand marquee (Sprint 9)
+
+Home names each project one act at a time, and only while the reader is inside
+that act. Nothing showed the whole set at rest. `features/home/brand-marquee/`
+does — as the clients' own artwork, which is the only identity on the page other
+than AY's.
+
+Every name, route and logo comes from `PROJECTS`, in showcase order. The
+component holds no per-project string, and each link's accessible name is
+`WORK_CONTENT.a11y.viewProject` — the same string the work index uses, so a brand
+is announced identically in both places.
+
+### It is a sibling of the stage, not an act
+
+The acts share one sticky viewport and are revealed by scroll position. A marquee
+in there would exist only for the slice of scroll belonging to its act, and would
+add to the stage's travel. So it sits after `.home` in normal flow, beginning
+where the corridor's travel ends. The choreography is untouched — asserted in
+`home.spec.ts` (`closest('.home')` must be null).
+
+### Why the items carry a margin and the row carries no `gap`
+
+The track holds the same row twice and animates one row's width, so the frame at
+100% is the frame at 0% and the restart is invisible.
+
+That only holds if half the track is exactly one row. With `gap` on the row it is
+not: a row of 7 is 7 slots and 6 gaps, the track is 14 slots and 12 gaps — there
+is no gap between the two rows either — so half the track falls one gap short and
+the strip jumps ~64px on every repeat. A trailing `margin-inline-end` on **every**
+item, including the last of each row, makes every item cost the same and the
+arithmetic exact.
+
+Verified by measuring all 13 joins: spread 0.00px, the seam identical to its
+neighbours, and the animation's end translate 1399.97px against a 1400.00px row.
+
+RTL flips `--marquee-shift` from `-50%` to `50%`, because `translate` has no
+logical form. The row is laid out from the right there, so travelling the other
+way keeps the marks entering from the reading edge in both directions.
+
+### Pause is `animation-play-state`, not JavaScript
+
+`:hover` (behind `mq-fine-pointer`, so a touch device does not get stuck paused)
+and `:focus-within` set `animation-play-state: paused` on the track. That
+suspends the animation where it stands and resumes from that same position —
+there is no offset to measure, store and restore, and therefore no way for a
+stored position and the real one to disagree. Confirmed: paused at 4067ms,
+resumed at 4350ms, never at 0.
+
+Under reduced motion the strip becomes a static wrapped set of all seven marks,
+every one still a link. The second pass is dropped — it exists only to hide the
+seam of a loop that is no longer running — and the items swap their margin for a
+`gap`, which is safe once there is no loop to keep seamless.
+
+### `ProjectLogo` moved to `shared/ui/`, and its slot must be definite
+
+Two features now show the same seven marks, so the component that knows 2B ships
+white-on-transparent artwork lives in `shared/ui/project-logo/`. Callers size the
+slot through `--logo-inline-size` / `--logo-block-size` / `--logo-padding`.
+
+It was a `display: grid` host with `max-block-size: 100%` on the image, and that
+constrained nothing. A percentage max-size resolves against the containing block;
+for a grid item that is the *grid area*, and an auto-sized row track is sized to
+the item's own content. Nader Coffee's 200×200 mark rendered 120×120 in a 36px
+slot — four of the seven logos overflowed. A flex item's containing block is the
+flex container's content box, which is definite here, so both maxima bite and a
+replaced element under two max constraints keeps its ratio.
+
+The dark ground for 2B is on the **image**, not the host: under those two
+constraints the image's box is already the artwork's box, so it paints a plate the
+size of the mark instead of a dark field the size of a uniform slot — which would
+have read as a card, and neither the strip nor the index has one.
+
+### The index rows
+
+The mark sits on the name's own line, inside `.row__heading`. It is decorative —
+the name is right there as text — and it reads the same `.is-active` host class as
+the name, the numeral and the preview pane, so there is one source of truth for
+which project is active and pointer and keyboard cannot diverge. Inactive marks
+are `grayscale(1)` at 0.5; the active one is full colour.
+
+`.row__index` gained `min-inline-size: var(--space-6)`. Each row is its own grid,
+so that column is sized per row — the numeral is 15.6px and the active-row
+indicator rule is 24px, so becoming active widened the column and shoved the logo
+and the name 8px along. Measured across all seven rows: 276px for every one now,
+active or not.
+
+### Verification (Sprint 9)
+
+| Gate | Result |
+| --- | --- |
+| Typecheck, stylelint | clean |
+| Tests | 166 / 19 files |
+| Build | zero warnings, 12 prerendered, initial 94.67 kB gz — unchanged |
+| SSR | all 14 logo `src`s in the prerendered Home, 7 in `/work`; `/nope` → 404 |
+| Browser pass | **98 / 98** checks: seam arithmetic and all 13 joins, hover pause + resume-in-place, focus pause + resume, 7 tab stops not 14, RTL direction and seam, reduced motion, 0px overflow at 320/390/768/1024/1440/1920 in EN and AR, 0 console errors, every mark contained and painted at a legible size, a mark navigates to its project |
+
+Two harness bugs, for the next person — both produced confident false results:
+
+1. **`getComputedStyle().translate` keeps a percentage.** Translate percentages
+   resolve at used-value time, so it returns `-49.999%`, not pixels.
+   `parseFloat` gives `-49.999`, which compared against a 1400px row looks like a
+   catastrophic failure.
+2. **At `currentTime === duration` an infinite animation is at the *start* of
+   iteration 2**, so it renders the `from` keyframe and translate reads `0%`.
+   Read 1ms earlier. Also: `Page.captureScreenshot`'s `clip` is in **document**
+   coordinates — a viewport-relative rect at the foot of a 12-screen page
+   captured a blank slice of the top of the document.
+
+And one measurement that was asking the wrong question: `object-fit: contain`
+letterboxes the artwork inside the element box, so the box's aspect ratio says
+nothing about whether the picture is distorted. Compute the painted size.

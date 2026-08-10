@@ -1,0 +1,220 @@
+@use 'index' as ds;
+
+:host {
+  display: block;
+}
+
+.marquee {
+  padding-block: var(--space-20) var(--space-24);
+  border-block-start: var(--border-hairline) solid var(--color-border);
+
+  // Read by the track (duration) and by every item (spacing), so the two numbers
+  // that decide the strip's speed live beside each other.
+  //
+  // Speed, not duration, is what has to stay constant: the marks are smaller and
+  // closer together on a phone, so the same duration there would be a third of
+  // the pace and read as stalled. Both pairs work out to ~28px/s.
+  --marquee-gap: var(--space-10);
+  --marquee-duration: 34s;
+  --marquee-slot-inline: 6rem;
+  --marquee-slot-block: 2.75rem;
+
+  @include ds.mq(md) {
+    --marquee-gap: var(--space-16);
+    --marquee-duration: 50s;
+    --marquee-slot-inline: 8.5rem;
+    --marquee-slot-block: 3.5rem;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Head
+//
+// Titled, so the band is a statement about the work rather than a decorative
+// logo strip with no author.
+// -----------------------------------------------------------------------------
+.marquee__head {
+  @include ds.container;
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-block-end: var(--space-12);
+}
+
+.marquee__eyebrow {
+  @include ds.label;
+
+  color: var(--color-text-muted);
+}
+
+.marquee__title {
+  @include ds.heading-2;
+
+  max-inline-size: 34ch;
+  color: var(--color-text-primary);
+  text-wrap: pretty;
+}
+
+// -----------------------------------------------------------------------------
+// The strip
+//
+// Full-bleed on purpose: the marks travel in from beyond the measure the type
+// sits in, which is what makes it read as a continuing sequence rather than as a
+// row of seven items that happens to move.
+// -----------------------------------------------------------------------------
+.marquee__viewport {
+  // clip, not hidden. `hidden` makes this a scroll container, and a keyboard
+  // focus reaching a mark near the edge would then be scrolled into view —
+  // yanking the strip sideways with no way to put it back. clip has no scroll
+  // position to move.
+  overflow: clip;
+  // Fades the marks into the paper instead of cutting them at a hard vertical
+  // line. Only the alpha of this gradient is used, and it is symmetric, so it
+  // needs no RTL mirror.
+  color: var(--color-text-primary);
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    currentcolor var(--space-16),
+    currentcolor calc(100% - var(--space-16)),
+    transparent
+  );
+}
+
+.marquee__track {
+  display: flex;
+  inline-size: max-content;
+  animation: marquee-drift var(--marquee-duration) var(--ease-linear) infinite;
+
+  // Physical, because `translate` has no logical form. In RTL the row is laid out
+  // from the right, so travelling the other way keeps the marks entering from the
+  // reading edge in both directions.
+  --marquee-shift: -50%;
+}
+
+:host-context([dir='rtl']) .marquee__track {
+  --marquee-shift: 50%;
+}
+
+// Exactly one row's width. Both rows are identical, so the frame at 100% is the
+// same picture as the frame at 0% and the restart is invisible.
+@keyframes marquee-drift {
+  from {
+    translate: 0 0;
+  }
+
+  to {
+    translate: var(--marquee-shift) 0;
+  }
+}
+
+.marquee__row {
+  display: flex;
+  flex: none;
+  align-items: center;
+}
+
+// The spacing is a trailing margin on every item — including the last of each
+// row — and deliberately NOT `gap` on the row.
+//
+// With `gap`, a row of 7 is 7 slots and 6 gaps, so the track is 14 slots and 12
+// gaps (there is no gap between the two rows either). Half of that is one gap
+// short of a row, the animation travels the wrong distance, and the strip jumps
+// by ~64px on every repeat. Margins make every item cost exactly the same, so
+// half the track is one row by construction.
+.marquee__item {
+  flex: none;
+  margin-inline-end: var(--marquee-gap);
+}
+
+.marquee__brand {
+  @include ds.focus-visible(6px);
+
+  display: grid;
+  place-items: center;
+  color: var(--color-text-primary);
+  // Held back at rest so seven client identities read as one composition rather
+  // than seven competing ones, and released completely for the mark the reader is
+  // actually on — which is also the moment the strip stops moving.
+  opacity: 0.72;
+  filter: grayscale(0.45);
+  transition:
+    opacity var(--dur-base) var(--ease-out),
+    filter var(--dur-base) var(--ease-out);
+}
+
+.marquee__brand:hover,
+.marquee__brand:focus-visible {
+  opacity: 1;
+  filter: none;
+}
+
+.marquee__logo {
+  --logo-inline-size: var(--marquee-slot-inline);
+  --logo-block-size: var(--marquee-slot-block);
+}
+
+// -----------------------------------------------------------------------------
+// Pause
+//
+// `animation-play-state: paused` holds the animation exactly where it stands and
+// resumes from that same position — there is no offset to measure, store and
+// restore, and therefore no way for a stored position and the real one to
+// disagree.
+//
+// Scoped to the strip rather than the whole section, so reading the heading does
+// not stop the marks.
+// -----------------------------------------------------------------------------
+@include ds.mq-fine-pointer {
+  .marquee__viewport:hover .marquee__track {
+    animation-play-state: paused;
+  }
+}
+
+// Keyboard parity, and the reason it is `:focus-within` and not a handler: a
+// reader tabbing through the marks must not be asked to hit a moving target.
+.marquee__viewport:focus-within .marquee__track {
+  animation-play-state: paused;
+}
+
+// -----------------------------------------------------------------------------
+// Reduced motion
+//
+// Nothing drifts, and nothing is hidden to achieve that: the strip becomes a
+// static, wrapped set of all seven marks, every one of them still a link.
+// -----------------------------------------------------------------------------
+@include ds.mq-reduced-motion {
+  .marquee__viewport {
+    padding-inline: var(--space-5);
+    mask-image: none;
+  }
+
+  .marquee__track {
+    inline-size: auto;
+    animation: none;
+  }
+
+  // The second pass exists only to hide the seam of a loop that is no longer
+  // running. Leaving it would repeat every mark for no reason.
+  .marquee__row[aria-hidden] {
+    display: none;
+  }
+
+  .marquee__row {
+    flex-wrap: wrap;
+    justify-content: center;
+    inline-size: 100%;
+    // Safe here, and correct: with no loop to keep seamless there is no reason to
+    // carry a trailing margin past the last mark on a line.
+    gap: var(--space-8) var(--marquee-gap);
+  }
+
+  .marquee__item {
+    margin-inline-end: 0;
+  }
+
+  .marquee__brand {
+    transition: none;
+  }
+}

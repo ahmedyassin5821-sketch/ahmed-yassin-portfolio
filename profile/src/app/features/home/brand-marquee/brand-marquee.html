@@ -1,0 +1,43 @@
+<section class="marquee" aria-labelledby="marquee-title">
+  <header class="marquee__head">
+    <p class="marquee__eyebrow">{{ c().eyebrow }}</p>
+    <h2 id="marquee-title" class="marquee__title">{{ c().title }}</h2>
+  </header>
+
+  <!-- clip, not hidden: `hidden` would make this a scroll container, and a
+       keyboard focus landing on a mark near the edge would then scroll it into
+       view — yanking the strip sideways under the reader. -->
+  <div class="marquee__viewport">
+    <div class="marquee__track">
+      <!--
+        The same row twice. One copy cannot loop without a jump: the moment its
+        last mark leaves the frame there is nothing behind it, so the strip has to
+        snap back. With two, the animation travels exactly one row's width and the
+        second copy has arrived where the first began — the restart renders the
+        identical frame, so there is no seam to see.
+      -->
+      @for (copy of copies; track copy) {
+        <ul class="marquee__row" role="list" [attr.aria-hidden]="copy === 1 ? 'true' : null">
+          @for (brand of brands(); track brand.slug) {
+            <li class="marquee__item">
+              <a
+                class="marquee__brand"
+                [routerLink]="['/work', brand.slug]"
+                [attr.tabindex]="copy === 1 ? -1 : null"
+              >
+                <app-project-logo
+                  class="marquee__logo"
+                  [logo]="brand.logo"
+                  [slug]="brand.slug"
+                />
+                <!-- The logo is decorative artwork with no alt, so the link's
+                     accessible name is this: "View Nader Coffee". -->
+                <span class="sr-only">{{ brand.viewLabel }}</span>
+              </a>
+            </li>
+          }
+        </ul>
+      }
+    </div>
+  </div>
+</section>

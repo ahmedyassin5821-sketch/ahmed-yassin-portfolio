@@ -17,6 +17,7 @@ import { ActCount } from './acts/act-count/act-count';
 import { ActGate } from './acts/act-gate/act-gate';
 import { ActMark } from './acts/act-mark/act-mark';
 import { ActResolve } from './acts/act-resolve/act-resolve';
+import { BrandMarquee } from './brand-marquee/brand-marquee';
 import { StrataCanvas } from './webgl/strata-canvas/strata-canvas';
 import { StrataPoster } from './webgl/strata-poster/strata-poster';
 
@@ -28,6 +29,10 @@ import { StrataPoster } from './webgl/strata-poster/strata-poster';
  * A viewport that sticks, a spacer that gives it travel, and the acts layered
  * inside it. It owns the scene because the scene now spans the whole journey
  * rather than decorating the hero.
+ *
+ * The brand strip is a *sibling* of the stage rather than an act inside it — see
+ * the note in the template. Anything inside the stage exists only for its own
+ * slice of the scroll.
  *
  * ## Two layouts, one DOM
  *
@@ -53,7 +58,7 @@ import { StrataPoster } from './webgl/strata-poster/strata-poster';
 @Component({
   selector: 'app-home',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ActMark, ActCount, ActGate, ActResolve, StrataPoster, StrataCanvas],
+  imports: [ActMark, ActCount, ActGate, ActResolve, BrandMarquee, StrataPoster, StrataCanvas],
   templateUrl: './home.html',
   styleUrl: './home.scss',
   // Provided here rather than at root so its ScrollTrigger is torn down with

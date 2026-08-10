@@ -1,9 +1,13 @@
 import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
+import { ProjectLogo, ProjectLogoImage } from '@shared/ui/project-logo/project-logo';
+
 export interface WorkRowData {
   readonly slug: string;
   readonly name: string;
+  /** The client's own mark, beside their name. */
+  readonly logo: ProjectLogoImage;
   /** The industry — "Coffee / Food & Beverage". */
   readonly field: string;
   /** "Egypt · Coffee e-commerce" — where it trades and what kind of product it is. */
@@ -40,7 +44,8 @@ export interface WorkRowData {
  * The whole row is one link. The link wraps only the name and is stretched by a
  * pseudo-element, so the accessible name stays "NAS HR" rather than swallowing
  * the field, the market, the stack and the link marker into one unreadable
- * label.
+ * label. The logo sits outside that anchor and is decorative — the reader clicks
+ * it via the stretched hit area, and it adds nothing to the announced name.
  *
  * ## What it says
  *
@@ -57,7 +62,7 @@ export interface WorkRowData {
 @Component({
   selector: 'app-work-row',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink],
+  imports: [RouterLink, ProjectLogo],
   templateUrl: './work-row.html',
   styleUrl: './work-row.scss',
   host: {

@@ -6,17 +6,30 @@
   <p class="row__index" aria-hidden="true">{{ indexLabel() }}</p>
 
   <div class="row__body">
-    <h2 class="row__name" dir="auto">
-      <!--
-        One anchor, stretched over the row by ::after. Wrapping the whole article
-        would fold the field, the market, the stack and the link marker into the
-        link's accessible name.
-      -->
-      <a class="row__link" [routerLink]="['/work', project().slug]">
-        {{ project().name }}
-        <span class="sr-only">— {{ viewLabel() }}</span>
-      </a>
-    </h2>
+    <!--
+      The client's own mark, then their name — part of the line, not a chip beside
+      it. Decorative: the name is right there as text, so announcing the logo too
+      would only repeat it.
+    -->
+    <div class="row__heading">
+      <app-project-logo
+        class="row__logo"
+        [logo]="project().logo"
+        [slug]="project().slug"
+      />
+
+      <h2 class="row__name" dir="auto">
+        <!--
+          One anchor, stretched over the row by ::after. Wrapping the whole article
+          would fold the field, the market, the stack and the link marker into the
+          link's accessible name.
+        -->
+        <a class="row__link" [routerLink]="['/work', project().slug]">
+          {{ project().name }}
+          <span class="sr-only">— {{ viewLabel() }}</span>
+        </a>
+      </h2>
+    </div>
 
     <!--
       The business first: what industry it is in, then where it trades and what

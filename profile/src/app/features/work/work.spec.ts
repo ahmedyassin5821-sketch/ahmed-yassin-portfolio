@@ -84,6 +84,35 @@ describe('Work index', () => {
     expect(el.querySelectorAll('.preview__plate img').length).toBe(PROJECTS.length);
   });
 
+  it('shows each client’s own mark beside their name', async () => {
+    const { el } = await render();
+    const rows = Array.from(el.querySelectorAll('app-work-row'));
+
+    rows.forEach((row, i) => {
+      const img = row.querySelector<HTMLImageElement>('.row__logo img');
+      expect(img?.getAttribute('src')).toBe(PROJECTS[i].logo.src);
+      // Decorative: the name is right beside it as real text, so an alt would
+      // only repeat it.
+      expect(img?.getAttribute('alt')).toBe('');
+      expect(row.querySelector('.row__logo')?.getAttribute('aria-hidden')).toBe('true');
+    });
+  });
+
+  it('drives the logo from the same active state as the row and the pane', async () => {
+    const { fixture, el } = await render();
+    const rows = Array.from(el.querySelectorAll('app-work-row'));
+
+    // There is one source of truth for which project is active. The logo has no
+    // state of its own — it reads `.is-active` on the row host, exactly as the
+    // name, the numeral and the preview pane do.
+    rows[4].querySelector('.row')!.dispatchEvent(new PointerEvent('pointerenter'));
+    await fixture.whenStable();
+
+    expect(rows[4].classList).toContain('is-active');
+    expect(rows[4].querySelector('.row__logo')).not.toBeNull();
+    expect(rows.filter((r) => r.classList.contains('is-active')).length).toBe(1);
+  });
+
   it('states what each business is, not only what it was built with', async () => {
     const { el } = await render();
 

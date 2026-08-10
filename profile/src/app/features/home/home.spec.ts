@@ -107,6 +107,19 @@ describe('Home', () => {
     }
   });
 
+  it('carries the brand strip outside the stage, so it is not tied to an act', async () => {
+    const { el } = await render();
+    const marquee = el.querySelector('app-brand-marquee');
+
+    expect(marquee).not.toBeNull();
+    // Inside `.home` it would live in the sticky viewport and only be visible for
+    // its own slice of the scroll — and it would add to the stage's travel.
+    expect(marquee!.closest('.home')).toBeNull();
+    expect(el.querySelectorAll('app-brand-marquee .marquee__brand').length).toBe(
+      PROJECTS.length * 2,
+    );
+  });
+
   it('states the career total, never the size of the showcase', async () => {
     const { el } = await render();
     const text = el.textContent ?? '';

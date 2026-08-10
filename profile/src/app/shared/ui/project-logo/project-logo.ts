@@ -1,10 +1,4 @@
-import {
-  booleanAttribute,
-  ChangeDetectionStrategy,
-  Component,
-  computed,
-  input,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 
 export interface ProjectLogoImage {
   readonly src: string;
@@ -13,13 +7,14 @@ export interface ProjectLogoImage {
 }
 
 /**
- * A client logo in a fixed chip.
+ * A client's real logo, in a slot the caller sizes.
  *
  * ## Why this is a component and not two copies of the same CSS
  *
- * The card grid and the detail page both show a logo, and both need the same
- * two non-obvious rules: `object-fit: contain` (cropping a wordmark clips the
- * letters) and a dark ground for artwork that is white-on-transparent.
+ * The brand marquee on Home and the work index both show the same seven marks,
+ * and both need the same two non-obvious rules: `object-fit: contain` (cropping a
+ * wordmark clips the letters) and a dark ground for artwork that is
+ * white-on-transparent.
  *
  * That second rule is the reason this exists. 2B's official mark fills its "2"
  * and underbar with white, so on the portfolio's warm-white paper it renders as
@@ -27,8 +22,16 @@ export interface ProjectLogoImage {
  * surface changes instead — and the decision about *which* logos need it lives
  * here, once, rather than as a `slug === '2b'` check in every consumer.
  *
- * Always decorative: every caller writes the project name beside it as real
- * text, so announcing the logo too would only repeat it.
+ * ## Sizing
+ *
+ * `--logo-block-size`, `--logo-inline-size` and `--logo-padding`, so a caller
+ * chooses the slot from its own stylesheet without this component growing a size
+ * enum that every new consumer has to extend. The slot must stay definite in both
+ * axes — the stylesheet explains why.
+ *
+ * Always decorative: every caller writes the project name beside it as real text
+ * or as the link's accessible name, so announcing the logo too would only repeat
+ * it.
  */
 @Component({
   selector: 'app-project-logo',
@@ -38,7 +41,6 @@ export interface ProjectLogoImage {
   host: {
     'aria-hidden': 'true',
     '[class.is-inverse]': 'needsDarkSurface()',
-    '[class.is-large]': 'large()',
   },
 })
 export class ProjectLogo {
@@ -46,14 +48,6 @@ export class ProjectLogo {
 
   /** Identifies artwork that cannot sit on a light ground. */
   readonly slug = input.required<string>();
-
-  /**
-   * The detail page shows a taller chip than the card grid.
-   *
-   * `booleanAttribute` so a bare `large` attribute works — without it the empty
-   * string a bare attribute passes is rejected under strict templates.
-   */
-  readonly large = input(false, { transform: booleanAttribute });
 
   /**
    * Supplied as white-on-transparent artwork.

@@ -72,3 +72,16 @@
     </div>
   </div>
 </div>
+
+<!--
+  The brand strip, outside the stage.
+
+  A sibling of `.home`, not an act inside it: the acts share one sticky viewport
+  and are revealed by scroll position, so a marquee in there would only exist for
+  the slice of the scroll that belongs to its act. Here it is an ordinary section
+  in normal flow that begins where the corridor's travel ends — which is also the
+  point in the page where the reader has just been handed off to /work — and it
+  adds nothing to the stage's height, so the choreography's scroll distance is
+  untouched.
+-->
+<app-brand-marquee />

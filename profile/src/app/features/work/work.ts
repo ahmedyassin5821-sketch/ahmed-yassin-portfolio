@@ -72,6 +72,11 @@ export class Work {
       return {
         slug: project.slug,
         name: resolveLocalized(project.name, locale),
+        logo: {
+          src: project.logo.src,
+          width: project.logo.width,
+          height: project.logo.height,
+        },
         field: resolveLocalized(project.field, locale),
         // "Egypt · Coffee e-commerce" — where it trades and what kind of product
         // it is, in one line under the industry.

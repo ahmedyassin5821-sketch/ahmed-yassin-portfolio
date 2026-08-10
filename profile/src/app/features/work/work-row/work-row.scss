@@ -35,10 +35,27 @@
   // Aligned to the cap height of the name beside it rather than its line box.
   align-self: start;
   padding-block-start: var(--space-2);
+  // As wide as the active-row indicator below, always.
+  //
+  // Each row is its own grid, so this column is sized per row — and the numeral
+  // is 15.6px while the indicator rule is 24px. Without a floor, becoming active
+  // widened the column and shoved the logo and the name 8px along. Measured: the
+  // whole line jumped on every hover.
+  min-inline-size: var(--space-6);
 }
 
 .row__body {
   grid-area: body;
+  min-inline-size: 0;
+}
+
+// Mark and name on one line, so the client's identity is part of the row's
+// headline rather than an ornament parked next to it. `min-inline-size: 0` because
+// a long name in a flex row must be allowed to wrap rather than push the row wide.
+.row__heading {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
   min-inline-size: 0;
 }
 
@@ -47,9 +64,24 @@
 .row__name {
   @include ds.display-2;
 
+  min-inline-size: 0;
   color: var(--color-text-primary);
   line-height: 0.95;
   transition: opacity var(--dur-base) var(--ease-out);
+}
+
+.row__logo {
+  --logo-inline-size: 3.5rem;
+  --logo-block-size: 1.75rem;
+
+  transition:
+    opacity var(--dur-base) var(--ease-out),
+    filter var(--dur-base) var(--ease-out);
+
+  @include ds.mq(md) {
+    --logo-inline-size: 4.5rem;
+    --logo-block-size: 2.25rem;
+  }
 }
 
 .row__link {
@@ -152,6 +184,16 @@
     opacity: 1;
   }
 
+  // The same active state, said in colour rather than in weight: the client's
+  // own identity arrives on the row the reader is on, and only there. Driven by
+  // exactly the same `.is-active` host class as the name and the numeral, so
+  // pointer and keyboard cannot diverge and the logo cannot get out of step with
+  // the preview pane.
+  :host(:not(.is-active)) .row__logo {
+    opacity: 0.5;
+    filter: grayscale(1);
+  }
+
   // A second, non-opacity signal. Dimming alone is ambiguous at a glance — it
   // reads as "those are unavailable" rather than "this one is showing" — so the
   // active row also takes a rule in the index column and a solid numeral.
@@ -180,6 +222,7 @@
 
 @include ds.mq-reduced-motion {
   .row__name,
+  .row__logo,
   .row__index::before {
     transition: none;
   }
