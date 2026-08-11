@@ -1857,3 +1857,85 @@ box` asserted a non-empty `alt` on every image in the detail page, which the new
 decorative logo legitimately fails. It now requires alt text *unless* the image is
 declared decorative by an `aria-hidden` ancestor — so a genuinely missing alt still
 fails, which the blanket rule would no longer have caught.
+
+---
+
+## 24. Two UX additions (Sprint 10.1)
+
+### The phone number, and the reversal it represents
+
+`CONTACT_PHONE` in `contact-links.ts` is the single source, in three shapes because
+each destination needs a different form of the same number and deriving them at the
+call site is how they drift: `display` for reading, `tel` in E.164 with the `+`,
+`whatsapp` as digits only — `wa.me` silently fails to resolve a chat otherwise.
+
+This reverses an earlier decision. Sprints up to 8.5 deliberately withheld the
+number, and `contact.spec.ts` asserted its *absence*. Ahmed asked for it, so that
+test now asserts the opposite, and the reasoning is recorded here rather than left as
+a puzzle for whoever reads the old comment.
+
+Wherever it appears it is wrapped in `.ltr-isolate` and set `white-space: nowrap`. A
+number beginning with `+` inside Arabic copy is otherwise reordered by the bidi
+algorithm — the sign lands at the wrong end and the reader is shown a number that is
+not the number. Asserted, not assumed.
+
+`contact-phone` is its own component because `contact.scss` carries the 4 kB
+per-component budget and the block took it 1.28 kB past it. Grouping the duplicated
+`ds.label` / `ds.focus-visible` includes recovered most of it; extraction recovered
+the rest. Same remedy as `project-facts` and `page-head`, for the same reason.
+
+### The hero scroll cue
+
+`features/home/scroll-cue/`. Type and one hairline that travels its own track. No
+mouse icon, no chevron, nothing that bounces.
+
+**It creates no second scroll system.** There is one scroll listener on the page — the
+choreography's single ScrollTrigger — and it already publishes `HomeProgress`. The
+*fade* is not even computed in TypeScript: `--home-progress` is on the staged
+ancestor, so the opacity ramp is a CSS expression the compositor evaluates with no
+change detection at all. The component contributes the one thing CSS cannot express:
+a latch.
+
+**Why a latch.** A pure function of scroll position is symmetric, so scrolling back to
+the top would return the cue and tell a reader who has already been through the
+corridor to start again. `spent` is one-way, set in an effect and never cleared. A
+`computed` cannot do this — writing a signal inside one throws.
+
+**Absent under reduced motion, deliberately.** `home.html` renders it only while
+`staged()`. Unstaged, the choreography never runs, `HomeProgress` stays at 0 forever,
+and a cue driven by it could never retire — it would sit permanently over a page that
+is an ordinary scrolling document and needs no instruction. The honest answer is no
+indicator, not a frozen one.
+
+Two placement bugs, both found by rendering rather than reasoning:
+
+1. **Clipped below the fold at scroll 0.** The cue was `position: absolute` inside the
+   stage's viewport, which is `sticky; inset-block-start: 0` — but at scroll 0 sticky
+   has not engaged, so the element still sits at its flow position *below* the sticky
+   header. Measured: the viewport spanned 73→973 in a 900px window, so the cue landed
+   at 872→941 and its lower 41px sat under the fold, at exactly the moment it matters
+   most. `position: fixed` anchors it to the window, which is what "near the bottom of
+   the viewport" actually means; it cannot leak past the hero because it is retired by
+   5% of the journey and removed from the DOM when unstaged.
+2. **Printing through the hero's own meta list.** Centred at the foot of the window it
+   crossed "FOCUS  Shopify · Angular · Magento", because that block is left-aligned and
+   reaches low. Moved to the inline-end corner, which is empty paper at every width and
+   mirrors to the left in Arabic for free. Asserted by intersecting the cue's rect with
+   every hero text node: zero overlaps at 1440 LTR, 1440 RTL and 390.
+
+The static `.mark__scroll` hint inside `act-mark` is gone. Two hints saying the same
+thing was one too many, and its CSS rule was left styling nothing.
+
+### Verification (Sprint 10.1)
+
+| Gate | Result |
+| --- | --- |
+| Typecheck, stylelint | clean |
+| Tests | pass across all spec files |
+| Build | zero warnings, prerendered, initial bundle unchanged |
+| Prerender contract | the phone present on `/contact` and in every page's footer; the cue absent (browser-only) |
+| Browser pass | the cue at rest / mid-fade / retired / after scrolling back, the hero and marquee unchanged, reduced motion, `/contact` and the footer in EN and AR with the number bidi-intact and unwrapped, and mobile — with zero hydration errors, zero console errors and zero horizontal overflow throughout.
+
+A first-visit language gate was built and then removed from this sprint: on review
+it did not read well against the rest of the identity, so the two remaining additions
+are the phone number and the scroll cue.

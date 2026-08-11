@@ -77,6 +77,10 @@ describe('App shell', () => {
     // panel; the focus trap is only the keyboard backstop.
     expect(el.querySelector('main')?.hasAttribute('inert')).toBe(true);
     expect(el.querySelector('app-footer')?.hasAttribute('inert')).toBe(true);
+
+    shell.close();
+    await fixture.whenStable();
+    expect(el.querySelector('main')?.hasAttribute('inert')).toBe(false);
   });
 
   it('sets lang and dir on the document root', async () => {

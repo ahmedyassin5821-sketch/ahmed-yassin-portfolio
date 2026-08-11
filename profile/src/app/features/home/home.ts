@@ -18,6 +18,7 @@ import { ActGate } from './acts/act-gate/act-gate';
 import { ActMark } from './acts/act-mark/act-mark';
 import { ActResolve } from './acts/act-resolve/act-resolve';
 import { BrandMarquee } from './brand-marquee/brand-marquee';
+import { ScrollCue } from './scroll-cue/scroll-cue';
 import { StrataCanvas } from './webgl/strata-canvas/strata-canvas';
 import { StrataPoster } from './webgl/strata-poster/strata-poster';
 
@@ -58,7 +59,16 @@ import { StrataPoster } from './webgl/strata-poster/strata-poster';
 @Component({
   selector: 'app-home',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ActMark, ActCount, ActGate, ActResolve, BrandMarquee, StrataPoster, StrataCanvas],
+  imports: [
+    ActMark,
+    ActCount,
+    ActGate,
+    ActResolve,
+    BrandMarquee,
+    ScrollCue,
+    StrataPoster,
+    StrataCanvas,
+  ],
   templateUrl: './home.html',
   styleUrl: './home.scss',
   // Provided here rather than at root so its ScrollTrigger is torn down with
@@ -112,6 +122,15 @@ export class Home {
 
   /** Matches the scene's own tuning, so poster and canvas agree in density. */
   protected readonly posterLayers = () => (this.viewport.isDesktop() ? 10 : 4);
+
+  /**
+   * Whether the scroll journey is actually running.
+   *
+   * Gates the scroll cue. Read from the choreography — the thing that decides —
+   * rather than re-derived from motion preference and WebGL support here, which
+   * could answer differently.
+   */
+  protected readonly staged = this.choreography.staged;
 
   constructor() {
     afterNextRender(() => {

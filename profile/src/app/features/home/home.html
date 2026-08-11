@@ -70,6 +70,19 @@
         </div>
       }
     </div>
+
+    <!--
+      "Scroll to explore", at the foot of the hero viewport.
+
+      Inside the sticky viewport rather than fixed to the window, so it belongs to
+      the hero and cannot leak over the sections that follow. Only while staged: the
+      choreography feeds its retirement, and unstaged (reduced motion, no JS) the
+      page is an ordinary document that needs no instruction — a cue driven by a
+      progress value that never changes could never retire. See ScrollCue.
+    -->
+    @if (staged()) {
+      <app-scroll-cue />
+    }
   </div>
 </div>
 

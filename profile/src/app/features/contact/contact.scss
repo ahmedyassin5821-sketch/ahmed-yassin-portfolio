@@ -11,24 +11,33 @@
   padding-block: var(--space-16) var(--space-24);
 }
 
-// The address is the page. Set large so it is the first thing read after the
-// title — but at heading-1, not display-2: at display scale a 27-character
-// address wraps mid-word ("gmail." / "com") at every width below 1920.
-.contact__email {
-  @include ds.heading-1;
-
-  margin-block-start: var(--space-12);
-  font-weight: var(--weight-light);
-  line-height: 1.1;
-  // Only relevant on a phone, where even this scale cannot fit it on one line.
-  overflow-wrap: anywhere;
+// -----------------------------------------------------------------------------
+// Grouped by mixin, not by element
+//
+// Each `@include` emits that mixin's whole property set, so three includes of
+// `ds.label` put three copies in this file. Grouping them is half of why it fits its
+// 4 kB budget; the other half is that the phone block is its own component.
+// -----------------------------------------------------------------------------
+.contact__row dt,
+.contact__heading,
+.contact__link {
+  @include ds.label;
 }
 
-// A real underline rather than a bottom border: a border draws one line under
-// the whole box, so a wrapped address got a rule through the middle of it.
-.contact__email-link {
+.contact__email-link,
+.contact__link {
   @include ds.focus-visible;
+}
 
+.contact__note {
+  @include ds.caption;
+
+  color: var(--color-text-muted);
+}
+
+// A real underline rather than a bottom border: a border draws one line under the
+// whole box, so a wrapped address got a rule through the middle of it.
+.contact__email-link {
   color: var(--color-text-primary);
   text-decoration: underline;
   text-decoration-color: var(--color-border);
@@ -40,14 +49,37 @@
   text-decoration-color: var(--color-text-primary);
 }
 
-.contact__note {
-  @include ds.caption;
-
-  max-inline-size: 56ch;
-  margin-block-start: var(--space-6);
-  color: var(--color-text-muted);
+.contact__link {
+  color: var(--color-text-primary);
+  text-decoration: underline;
+  text-underline-offset: 0.3em;
 }
 
+// -----------------------------------------------------------------------------
+// The address
+//
+// The page's subject. Set large so it is the first thing read after the title — but
+// at heading-1, not display-2: at display scale a 27-character address wraps mid-word
+// ("gmail." / "com") at every width below 1920.
+// -----------------------------------------------------------------------------
+.contact__email {
+  @include ds.heading-1;
+
+  margin-block-start: var(--space-12);
+  font-weight: var(--weight-light);
+  line-height: 1.1;
+  // Only relevant on a phone, where even this scale cannot fit it on one line.
+  overflow-wrap: anywhere;
+}
+
+.contact__note {
+  max-inline-size: 56ch;
+  margin-block-start: var(--space-6);
+}
+
+// -----------------------------------------------------------------------------
+// Facts and sections
+// -----------------------------------------------------------------------------
 .contact__facts {
   margin-block-start: var(--space-12);
 }
@@ -64,8 +96,6 @@
 }
 
 .contact__row dt {
-  @include ds.label;
-
   color: var(--color-text-muted);
 }
 
@@ -82,8 +112,6 @@
 }
 
 .contact__heading {
-  @include ds.label;
-
   padding-block-end: var(--space-3);
   border-block-end: var(--border-hairline) solid var(--color-border-strong);
   color: var(--color-text-primary);
@@ -97,14 +125,8 @@
 }
 
 .contact__link {
-  @include ds.label;
-  @include ds.focus-visible;
-
   display: inline-block;
   margin-block-start: var(--space-3);
-  color: var(--color-text-primary);
-  text-decoration: underline;
-  text-underline-offset: 0.3em;
 }
 
 @include ds.mq-reduced-motion {

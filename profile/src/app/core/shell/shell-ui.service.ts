@@ -1,4 +1,4 @@
-import { DestroyRef, Injectable, effect, inject, signal } from '@angular/core';
+import { DestroyRef, Injectable, computed, effect, inject, signal } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
 import { NavigationEnd, Router } from '@angular/router';
 import { filter } from 'rxjs/operators';
@@ -23,6 +23,9 @@ export class ShellUiService {
 
   readonly menuOpen = this._menuOpen.asReadonly();
 
+  /** Anything that should scope the page behind it. */
+  readonly scoped = computed(() => this._menuOpen());
+
   constructor() {
     // Close on navigation rather than on link click.
     //
@@ -38,9 +41,9 @@ export class ShellUiService {
     // it lives in an effect. That way it cannot drift out of sync however the
     // panel is closed.
     effect(() => {
-      const open = this._menuOpen();
+      const locked = this.scoped();
       if (!this.browser) return;
-      this.doc.documentElement.style.overflow = open ? 'hidden' : '';
+      this.doc.documentElement.style.overflow = locked ? 'hidden' : '';
     });
 
     // A destroyed service must never leave the page unscrollable.

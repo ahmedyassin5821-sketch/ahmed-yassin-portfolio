@@ -19,6 +19,13 @@
 
   <p class="contact__note">{{ c().noFormNote }}</p>
 
+  <!--
+    Phone and WhatsApp: one number, two actions. Its own component because this
+    stylesheet is on a 4 kB budget and the block took it past it — see ContactPhone.
+    Below the address rather than beside it, so email keeps the hierarchy it had.
+  -->
+  <app-contact-phone />
+
   <dl class="contact__facts">
     <div class="contact__row">
       <dt>{{ c().locationLabel }}</dt>

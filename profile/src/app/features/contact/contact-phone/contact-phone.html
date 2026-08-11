@@ -1,0 +1,26 @@
+<p class="phone__label">{{ c().phoneLabel }}</p>
+
+<p class="phone__number">
+  <a class="phone__link" [href]="'tel:' + phone.tel">
+    <span class="ltr-isolate">{{ phone.display }}</span>
+  </a>
+</p>
+
+<p class="phone__actions">
+  <!--
+    Neither is a TextLink. `tel:` and `wa.me` hand off to another application rather
+    than opening a browsing context, and TextLink announces "opens in a new tab" —
+    which would be a lie for the call and misleading for the chat.
+  -->
+  <a class="phone__action" [href]="'tel:' + phone.tel">{{ c().callAction }}</a>
+  <span class="phone__sep" aria-hidden="true">·</span>
+  <a
+    class="phone__action"
+    [href]="'https://wa.me/' + phone.whatsapp"
+    target="_blank"
+    rel="noopener noreferrer"
+    >{{ c().whatsappAction }}</a
+  >
+</p>
+
+<p class="phone__note">{{ c().phoneNote }}</p>

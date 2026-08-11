@@ -73,6 +73,17 @@ export const PROFILE_CONTENT = {
       ar: 'متاح للعمل الحر والدوام الكامل في مجالات الواجهات الأمامية والتجارة الإلكترونية. البريد الإلكتروني هو أسرع وسيلة للتواصل.',
     },
     emailLabel: { en: 'Email', ar: 'البريد الإلكتروني' },
+
+    // One number, two ways to use it. Said explicitly, because a bare number does
+    // not tell anyone whether WhatsApp will reach him.
+    phoneLabel: { en: 'Phone & WhatsApp', ar: 'الهاتف وواتساب' },
+    phoneNote: {
+      en: 'The same number works for calls and WhatsApp.',
+      ar: 'الرقم نفسه يعمل للاتصال والواتساب.',
+    },
+    callAction: { en: 'Call', ar: 'اتصال' },
+    whatsappAction: { en: 'WhatsApp', ar: 'واتساب' },
+
     locationLabel: { en: 'Based in', ar: 'المقر' },
     languagesLabel: { en: 'Languages', ar: 'اللغات' },
     roleLabel: { en: 'Role', ar: 'التخصص' },

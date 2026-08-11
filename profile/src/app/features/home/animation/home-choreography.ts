@@ -1,4 +1,4 @@
-import { DestroyRef, Injectable, inject } from '@angular/core';
+import { DestroyRef, Injectable, inject, signal } from '@angular/core';
 
 import { GsapService } from '@core/animation/gsap.service';
 import { isBrowser } from '@core/platform/is-browser';
@@ -80,6 +80,18 @@ export class HomeChoreography {
   private context: { revert: () => void } | null = null;
   private stage: HTMLElement | null = null;
 
+  private readonly _staged = signal(false);
+
+  /**
+   * Whether the scroll choreography is actually running.
+   *
+   * The same fact as `.is-staged` on the stage element, published as a signal so a
+   * template can ask it. Everything that only makes sense inside the staged journey
+   * — the scroll cue — renders off this rather than guessing from motion preference
+   * and WebGL support separately and getting a different answer.
+   */
+  readonly staged = this._staged.asReadonly();
+
   async setup(targets: ChoreographyTargets): Promise<void> {
     if (!this.browser) return;
 
@@ -97,6 +109,7 @@ export class HomeChoreography {
     // readings of one number instead of two constants that can drift apart.
     targets.stage.style.setProperty('--home-screens', String(this.screens()));
     targets.stage.classList.add('is-staged');
+    this._staged.set(true);
     this.write(0);
 
     this.context = gsap.context(() => {
@@ -154,6 +167,7 @@ export class HomeChoreography {
     this.stage?.classList.remove('is-staged');
     this.stage?.style.removeProperty('--home-progress');
     this.stage = null;
+    this._staged.set(false);
     this.progress.reset();
   }
 }

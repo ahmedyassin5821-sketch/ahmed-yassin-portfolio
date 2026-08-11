@@ -26,7 +26,12 @@
     }
   </dl>
 
-  <p class="mark__scroll" aria-hidden="true">{{ c().scrollHint }}</p>
+  <!--
+    The scroll hint used to sit here as a static line. It moved to `scroll-cue`,
+    which lives at the foot of the hero viewport instead of inside this act, and
+    retires itself from the choreography's own progress. Two hints saying the same
+    thing was one too many.
+  -->
 
   <!-- The visual conveys nothing that is not written above; this describes it
        for anyone who asks, without duplicating the page's information. -->

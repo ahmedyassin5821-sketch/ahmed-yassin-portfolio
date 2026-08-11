@@ -1,0 +1,136 @@
+@use 'index' as ds;
+
+// -----------------------------------------------------------------------------
+// The cue
+//
+// Absolutely positioned at the foot of the sticky hero viewport, centred on the
+// inline axis. `pointer-events: none` throughout: it sits over the acts and must
+// never take a click that was meant for a project link behind it.
+//
+// It is inside the stage's own viewport, not `position: fixed`, so it cannot escape
+// the hero or overlap the content that follows.
+// -----------------------------------------------------------------------------
+// `fixed`, not `absolute`, and the reason is measurable.
+//
+// The stage's viewport is `position: sticky; inset-block-start: 0`, but at scroll 0
+// sticky has not engaged yet — the element is still at its flow position, which
+// begins *below* the sticky site header. Measured: the viewport spans 73→973 in a
+// 900px window, so a cue anchored 32px from ITS bottom landed at 872→941 and its
+// lower 41px sat under the fold, at exactly the moment the cue matters most. It
+// snapped into place only after the reader had scrolled past the header.
+//
+// Fixed anchors it to the window instead, which is what "near the bottom of the
+// viewport" actually means. It cannot leak past the hero because it is retired by
+// 5% of the journey and removed from the DOM when unstaged.
+// In the inline-END bottom corner, not centred.
+//
+// Centred at the foot of the window it printed straight through the hero's own meta
+// list — "FOCUS  Shopify · Angular · Magento" — because that block is left-aligned and
+// reaches low. Rendered and seen, not predicted. The corner is empty paper at every
+// width, and `inset-inline-end` mirrors to the left in Arabic for free.
+:host {
+  position: fixed;
+  z-index: var(--z-raised);
+  inset-block-end: var(--space-8);
+  inset-inline-end: var(--space-8);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  pointer-events: none;
+
+  // The fade, as a function of the choreography's own progress.
+  //
+  // Not a timer and not a second scroll listener: `--home-progress` is already on
+  // the staged ancestor, so this is the same number the camera and every act read.
+  // Full strength until 1.5% of the journey, gone by 5% — long enough that a
+  // deliberate first nudge does not blank it, short enough that it is never still
+  // there once the reader is clearly moving.
+  --cue-fade: clamp(0, calc((0.05 - var(--home-progress, 0)) / 0.035), 1);
+
+  opacity: var(--cue-fade);
+  // Retired for good once spent (see ScrollCue): `visibility` rather than opacity
+  // alone so it is genuinely gone rather than transparent and still hit-testable.
+  transition: opacity var(--dur-base) var(--ease-out);
+}
+
+:host(.is-spent) {
+  visibility: hidden;
+  opacity: 0;
+}
+
+.cue__label {
+  @include ds.label;
+
+  color: var(--color-text-muted);
+  // Uppercase tracking is already in ds.label; nothing else is needed to make two
+  // words read as an instruction rather than as a caption.
+  text-align: center;
+}
+
+// The track the line travels. Fixed height, so the animation moves a child and
+// never the box — no layout thrash, and nothing below can be nudged.
+.cue__rail {
+  position: relative;
+  display: block;
+  inline-size: var(--border-hairline);
+  block-size: var(--space-10);
+  overflow: hidden;
+  background-color: var(--color-border);
+}
+
+.cue__line {
+  position: absolute;
+  inset-inline: 0;
+  inset-block-start: 0;
+  display: block;
+  block-size: 45%;
+  background-color: var(--color-text-primary);
+  animation: cue-travel 2.4s var(--ease-inout) infinite;
+}
+
+// Down the rail and out, then in again from the top. Only `translate` — a
+// compositor-only property, so this costs nothing per frame and cannot reflow.
+//
+// The block axis does not mirror, so this is correct in RTL as written; the whole
+// component is centred and uses logical properties elsewhere.
+@keyframes cue-travel {
+  0% {
+    translate: 0 -100%;
+  }
+
+  60%,
+  100% {
+    translate: 0 220%;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Reduced motion
+//
+// The component is not rendered at all under reduced motion — the stage never
+// stages, so there is no journey to cue (see ScrollCue). These rules are the
+// belt-and-braces case: if it were ever rendered, the line holds still rather than
+// travelling, and the label still reads.
+// -----------------------------------------------------------------------------
+@include ds.mq-reduced-motion {
+  :host {
+    transition: none;
+  }
+
+  .cue__line {
+    animation: none;
+    block-size: 100%;
+    translate: none;
+  }
+}
+
+@include ds.mq-forced-colors {
+  .cue__rail {
+    background-color: ButtonBorder;
+  }
+
+  .cue__line {
+    background-color: ButtonText;
+  }
+}

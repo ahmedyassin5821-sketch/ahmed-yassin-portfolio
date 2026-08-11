@@ -20,19 +20,19 @@ import { Header } from './layout/header/header';
   template: `
     <a class="skip-link" href="#main">Skip to main content</a>
 
-    <app-header />
+    <app-header [attr.inert]="scoped() ? '' : null" />
 
     <!--
       Marked inert while the mobile panel is open. This is what actually scopes
-      the page: it removes both regions from the accessibility tree and from
-      pointer input, so a screen reader cannot wander out of the panel into the
-      page behind it. The focus trap is the keyboard backstop on top of this.
+      the page: it removes the region from the accessibility tree and from
+      pointer input, so a screen reader cannot wander out into the page behind.
+      The focus trap is the keyboard backstop on top of this.
     -->
-    <main id="main" tabindex="-1" [attr.inert]="shell.menuOpen() ? '' : null">
+    <main id="main" tabindex="-1" [attr.inert]="scoped() ? '' : null">
       <router-outlet />
     </main>
 
-    <app-footer [attr.inert]="shell.menuOpen() ? '' : null" />
+    <app-footer [attr.inert]="scoped() ? '' : null" />
 
     <!--
       Route announcements. A client-side navigation is otherwise silent to a
@@ -61,4 +61,7 @@ export class App {
 
   protected readonly locale = this.direction.locale;
   protected readonly announcement = this.routeFocus.announcement;
+
+  /** True while the mobile panel owns the viewport. */
+  protected readonly scoped = this.shell.scoped;
 }

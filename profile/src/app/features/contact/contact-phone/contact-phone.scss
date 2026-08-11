@@ -1,0 +1,81 @@
+@use 'index' as ds;
+
+// Ruled above, not boxed: the page has no cards, and a bordered panel here would be
+// the only one on it. Quieter than the address by a deliberate margin — email is
+// still the fastest route, so the number sits at the h3 step against the email's h1.
+:host {
+  display: block;
+  margin-block-start: var(--space-12);
+  padding-block-start: var(--space-6);
+  border-block-start: var(--border-hairline) solid var(--color-border);
+}
+
+.phone__label,
+.phone__action {
+  @include ds.label;
+}
+
+.phone__label {
+  color: var(--color-text-muted);
+}
+
+.phone__number {
+  margin-block-start: var(--space-2);
+  font-family: var(--font-display);
+  font-size: var(--fs-h3);
+  font-weight: var(--weight-light);
+  line-height: var(--lh-h3);
+  // The number is grouped with spaces and must never break across lines: half a
+  // phone number on each line is unreadable and cannot be dialled.
+  white-space: nowrap;
+}
+
+.phone__link,
+.phone__action {
+  @include ds.focus-visible;
+
+  color: var(--color-text-primary);
+  text-decoration: underline;
+}
+
+// A real underline rather than a bottom border, matching the address above.
+.phone__link {
+  text-decoration-color: var(--color-border);
+  text-underline-offset: 0.18em;
+  transition: text-decoration-color var(--dur-base) var(--ease-out);
+}
+
+.phone__link:hover {
+  text-decoration-color: var(--color-text-primary);
+}
+
+.phone__action {
+  text-underline-offset: 0.3em;
+}
+
+// Flex rather than inline text, so the separator cannot end up orphaned on a wrap
+// at 320px.
+.phone__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-3);
+  margin-block-start: var(--space-4);
+}
+
+.phone__sep {
+  color: var(--color-text-muted);
+}
+
+.phone__note {
+  @include ds.caption;
+
+  margin-block-start: var(--space-3);
+  color: var(--color-text-muted);
+}
+
+@include ds.mq-reduced-motion {
+  .phone__link {
+    transition: none;
+  }
+}

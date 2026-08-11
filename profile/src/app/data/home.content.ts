@@ -100,9 +100,11 @@ export const HOME_CONTENT: HomeContent = {
         value: { en: 'Arabic · English', ar: 'العربية · الإنجليزية' },
       },
     ],
+    // Read by `scroll-cue`, at the foot of the hero. "Scroll" alone was a label on
+    // a static line; the cue is an instruction, so it says what scrolling gets you.
     scrollHint: {
-      en: 'Scroll',
-      ar: 'مرّر',
+      en: 'Scroll to explore',
+      ar: 'مرّر للاستكشاف',
     },
   },
   count: {

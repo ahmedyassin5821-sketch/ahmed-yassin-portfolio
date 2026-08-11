@@ -86,9 +86,6 @@
   justify-self: start;
 }
 
-.mark__scroll {
-  @include ds.label;
-
-  margin-block-start: var(--space-10);
-  color: var(--color-text-muted);
-}
+// `.mark__scroll` was here. The hint moved out of this act into `scroll-cue`, which
+// sits at the foot of the hero viewport and retires itself from the choreography's
+// own progress — so this rule was left styling nothing.

@@ -1,0 +1,13 @@
+<!--
+  Type and one hairline. The line is the whole animation: it travels down its own
+  track, which reads as the direction to scroll without drawing a mouse, a chevron
+  or anything that bounces.
+
+  The rail is fixed height so the moving line changes nothing about layout — it is
+  a transform on a 1px element inside a box that never resizes.
+-->
+<p class="cue__label">{{ label() }}</p>
+
+<span class="cue__rail" aria-hidden="true">
+  <span class="cue__line"></span>
+</span>

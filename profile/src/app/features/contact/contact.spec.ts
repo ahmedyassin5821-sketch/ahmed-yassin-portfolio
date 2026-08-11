@@ -3,7 +3,8 @@ import { provideRouter } from '@angular/router';
 
 import { DirectionService } from '@core/i18n/direction.service';
 import { PROFESSIONAL_TITLE } from '@data/cv.data';
-import { CONTACT_EMAIL, SOCIAL_LINKS } from '../../layout/footer/contact-links';
+import { PROFILE_CONTENT } from '@data/profile.content';
+import { CONTACT_EMAIL, CONTACT_PHONE, SOCIAL_LINKS } from '../../layout/footer/contact-links';
 import { Contact } from './contact';
 
 describe('Contact page', () => {
@@ -48,12 +49,37 @@ describe('Contact page', () => {
     expect(el.querySelector('input')).toBeNull();
   });
 
-  it('never publishes the phone number that is on the CV', async () => {
+  it('offers the number for both calling and WhatsApp, from one constant', async () => {
     const { el } = await render();
 
-    // The document itself discloses it; this page does not do so on his behalf.
-    expect(el.textContent).not.toContain('01111713877');
-    expect(el.innerHTML).not.toContain('tel:');
+    // Earlier sprints withheld the number deliberately; Ahmed has since asked for it
+    // on the site, so this asserts the reverse of what it used to. The number must
+    // come from CONTACT_PHONE and never be retyped into a template.
+    expect(el.textContent).toContain(CONTACT_PHONE.display);
+
+    const tel = el.querySelector<HTMLAnchorElement>('a[href^="tel:"]');
+    expect(tel?.getAttribute('href')).toBe(`tel:${CONTACT_PHONE.tel}`);
+
+    // wa.me needs digits only — no plus, no spaces — or it fails to resolve a chat.
+    const whatsapp = el.querySelector<HTMLAnchorElement>('a[href*="wa.me"]');
+    expect(whatsapp?.getAttribute('href')).toBe(`https://wa.me/${CONTACT_PHONE.whatsapp}`);
+    expect(CONTACT_PHONE.whatsapp).toMatch(/^\d+$/);
+    expect(whatsapp?.getAttribute('rel')).toBe('noopener noreferrer');
+
+    // And it says the number covers both, because a bare number does not.
+    expect(el.textContent).toContain(PROFILE_CONTENT.contact.phoneNote.en);
+  });
+
+  it('protects the number from bidi reordering', async () => {
+    const { el } = await render();
+
+    // A leading "+" inside Arabic copy is reordered by the bidi algorithm, which
+    // would show a number that is not the number. The isolate is what prevents it,
+    // so it is asserted rather than assumed.
+    const isolated = Array.from(el.querySelectorAll('.ltr-isolate')).map((n) =>
+      n.textContent?.trim(),
+    );
+    expect(isolated).toContain(CONTACT_PHONE.display);
   });
 
   it('links every confirmed profile with safe rel attributes', async () => {

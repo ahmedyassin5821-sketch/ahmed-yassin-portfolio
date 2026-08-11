@@ -67,6 +67,20 @@
   gap: var(--space-3);
 }
 
+// The number and its WhatsApp action on one line, wrapping to two only if the
+// column cannot hold them. `nowrap` on the number itself, because half a phone
+// number on each line cannot be dialled.
+.footer__phone {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-2) var(--space-4);
+}
+
+.footer__phone .ltr-isolate {
+  white-space: nowrap;
+}
+
 .footer__link {
   @include ds.body;
   @include ds.focus-visible;

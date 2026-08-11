@@ -12,6 +12,7 @@ import {
 } from '../../layout/footer/contact-links';
 import { PageHead } from '@shared/ui/page-head/page-head';
 import { TextLink } from '@shared/ui/text-link/text-link';
+import { ContactPhone } from './contact-phone/contact-phone';
 
 /**
  * Contact.
@@ -26,15 +27,14 @@ import { TextLink } from '@shared/ui/text-link/text-link';
  *
  * ## Reads the CV
  *
- * Title and languages come from `cv.data.ts`, and the address and profiles from
- * the same `contact-links.ts` the footer uses. Nothing on this page is a second
- * copy of a fact that lives somewhere else — including the phone number on the
- * CV, which is deliberately not surfaced here (see `cv.data.ts`).
+ * Title and languages come from `cv.data.ts`, and the address, phone and profiles
+ * from the same `contact-links.ts` the footer uses. Nothing on this page is a
+ * second copy of a fact that lives somewhere else.
  */
 @Component({
   selector: 'app-contact',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, PageHead, TextLink],
+  imports: [RouterLink, PageHead, TextLink, ContactPhone],
   templateUrl: './contact.html',
   styleUrl: './contact.scss',
 })
