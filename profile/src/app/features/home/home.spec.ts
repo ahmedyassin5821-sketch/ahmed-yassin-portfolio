@@ -136,7 +136,9 @@ describe('Home', () => {
     expect(images.length).toBe(PROJECTS.length);
     // Every project has supplied assets, so nothing renders an empty frame and
     // nothing borrows an image from elsewhere.
-    expect(images.every((i) => (i.getAttribute('src') ?? '').startsWith('/projects/'))).toBe(true);
+    // Base-relative, with no leading slash: resolved against `<base href>` so the
+    // same build serves correctly from a domain root or a Pages sub-path.
+    expect(images.every((i) => (i.getAttribute('src') ?? '').startsWith('projects/'))).toBe(true);
   });
 
   it('states the business, not only the stack, for every project', async () => {

@@ -46,6 +46,22 @@ export const routes: Routes = [
   ...DEV_ROUTES,
 
   {
+    /**
+     * The not-found page at a real address, so it can be prerendered.
+     *
+     * A static host has no Angular engine to render `'**'` on demand: GitHub Pages
+     * answers an unknown path by serving `404.html` with a 404 status. That file has
+     * to exist on disk, so this route gives the not-found page a concrete path to be
+     * prerendered at, and the deploy step copies the result to `404.html`.
+     *
+     * Not a redirect target and not linked from anywhere — `'**'` below still
+     * handles unknown paths in the browser and on the Node server.
+     */
+    path: '404',
+    loadComponent: () => import('./not-found/not-found').then((m) => m.NotFound),
+    title: 'Page not found — Ahmed Yassin',
+  },
+  {
     path: '**',
     loadComponent: () => import('./not-found/not-found').then((m) => m.NotFound),
     title: 'Page not found — Ahmed Yassin',

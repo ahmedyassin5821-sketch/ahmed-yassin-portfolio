@@ -290,7 +290,22 @@ async function emit(input, outPath, width, format) {
   return { width: info.width, height: info.height, bytes: info.size };
 }
 
-const publicPath = (slug, file) => `/projects/${slug}/${file}`;
+/**
+ * Base-relative, with no leading slash. Deliberate, and the reason is hosting.
+ *
+ * A leading slash resolves against the domain root, which is correct only when the
+ * site *is* at the root. Served from a GitHub Pages project path
+ * (`/ahmed-yassin-portfolio/`) every one of these 404s.
+ *
+ * Without the slash the browser resolves against the document's `<base href>`,
+ * which Angular writes from `--base-href` at build time. That works at the root
+ * *and* under a prefix, so the same output can be published either way and the
+ * choice of URL stops being baked into the data.
+ *
+ * The `<base>` element is what makes this safe on a deep route: relative URLs
+ * resolve against the base, not against `/work/vivace/`.
+ */
+const publicPath = (slug, file) => `projects/${slug}/${file}`;
 
 async function run() {
   // The output directory is fully derived, so it is rebuilt from scratch. This

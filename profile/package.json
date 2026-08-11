@@ -11,6 +11,7 @@
     "lint:styles": "stylelint \"src/**/*.scss\"",
     "logo:generate": "node scripts/generate-logo-assets.mjs",
     "lint": "npm run lint:styles",
+    "build:pages": "node scripts/build-pages.mjs",
     "serve:ssr": "node dist/profile/server/server.mjs",
     "serve:ssr:profile": "node dist/profile/server/server.mjs",
     "assets:projects": "node scripts/optimize-project-assets.mjs"

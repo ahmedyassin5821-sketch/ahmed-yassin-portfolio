@@ -42,6 +42,18 @@ export const serverRoutes: ServerRoute[] = [
   { path: 'cv', renderMode: RenderMode.Prerender },
   { path: 'contact', renderMode: RenderMode.Prerender },
 
+  /**
+   * The not-found page, as a file.
+   *
+   * Static hosting has no engine to render `'**'` on demand, so the page has to
+   * exist on disk. This produces `browser/404/index.html`, which the deploy step
+   * copies to `browser/404.html` — the file GitHub Pages serves, with a genuine 404
+   * status, for any path it does not have.
+   *
+   * The `'**'` rule below is unchanged and still serves the Node target.
+   */
+  { path: '404', renderMode: RenderMode.Prerender },
+
   // Empty in production — see dev/dev.routes.prod.ts.
   ...DEV_SERVER_ROUTES,
 

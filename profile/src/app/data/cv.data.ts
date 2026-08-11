@@ -30,7 +30,14 @@ import { Localized } from '@core/i18n/localized';
  */
 
 /** Served straight from `public/`, so the download is the real document. */
-export const CV_FILE = '/Attachments/Ahmed-Yassin FE Reaume.pdf';
+/**
+ * Base-relative, like every other asset path — see `optimize-project-assets.mjs`.
+ *
+ * A leading slash would resolve against the domain root and 404 wherever the site
+ * is served from a sub-path, which is exactly what GitHub Pages does for a project
+ * repository. Resolved against `<base href>` instead, this is correct either way.
+ */
+export const CV_FILE = 'Attachments/Ahmed-Yassin FE Reaume.pdf';
 
 /** Name the browser saves it under. The stored file's own name has a typo. */
 export const CV_DOWNLOAD_NAME = 'Ahmed-Yassin-CV.pdf';
