@@ -293,17 +293,14 @@ async function emit(input, outPath, width, format) {
 /**
  * Base-relative, with no leading slash. Deliberate, and the reason is hosting.
  *
- * A leading slash resolves against the domain root, which is correct only when the
- * site *is* at the root. Served from a GitHub Pages project path
- * (`/ahmed-yassin-portfolio/`) every one of these 404s.
+ * A leading slash resolves against the domain *root*, which is correct only while the
+ * site is served from one. Without the slash the browser resolves against the
+ * document's `<base href>` instead, so the same build is correct at a root — as it is
+ * on Vercel today — and under a sub-path, and the choice of URL is not baked into the
+ * data.
  *
- * Without the slash the browser resolves against the document's `<base href>`,
- * which Angular writes from `--base-href` at build time. That works at the root
- * *and* under a prefix, so the same output can be published either way and the
- * choice of URL stops being baked into the data.
- *
- * The `<base>` element is what makes this safe on a deep route: relative URLs
- * resolve against the base, not against `/work/vivace/`.
+ * The `<base>` element is what makes this safe on a deep route: relative URLs resolve
+ * against the base, not against `/work/vivace/`.
  */
 const publicPath = (slug, file) => `projects/${slug}/${file}`;
 

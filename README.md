@@ -4,37 +4,45 @@ Portfolio of Ahmed Yassin — Front-End Web Developer. Angular 21, prerendered t
 static HTML, with a WebGL hero and per-project brand atmospheres.
 
 The application lives in [`profile/`](profile/); the repository root holds only this
-file and the deployment workflow. Architecture and decisions are documented in
+file. Architecture and decisions are documented in
 [`profile/docs/ARCHITECTURE.md`](profile/docs/ARCHITECTURE.md).
 
 ## Deployment
 
 | | |
 | --- | --- |
-| Production URL | https://ahmedyassin5821-sketch.github.io/ahmed-yassin-portfolio/ |
-| Host | GitHub Pages (GitHub Actions, not a `gh-pages` branch) |
-| Source branch | `main` |
-| Build | `npm run build:pages` in `profile/` |
-| Published directory | `profile/dist/profile/browser` |
+| Host | Vercel |
+| Source | this repository, branch `main` |
+| Root directory | `profile` |
+| Build | `npm run build:static` |
+| Output directory | `dist/profile/browser` |
+| Config | [`profile/vercel.json`](profile/vercel.json) |
 
-Every route is prerendered to static HTML at build time, so GitHub Pages serves real
-HTML for each one — including `/work/:slug` on a direct visit or a refresh — with no
-SPA fallback and no server. Unknown paths get the portfolio's own not-found page with
-a genuine 404 status, from `404.html`.
+Every route is prerendered to static HTML at build time, so the deployment is static
+files served from the domain root — no serverless function and no SPA fallback.
+`/work/:slug` is a real file, so a direct visit or a refresh is a plain static hit.
+Unknown paths get the portfolio's own not-found page from `404.html`.
+
+Asset paths are **base-relative** (`projects/…`, not `/projects/…`), resolved against
+`<base href>`. At the root that is identical to root-relative; it also means the same
+build would be correct under a sub-path, so the hosting choice is not baked into the
+data.
 
 ### How it works
 
-Pushing to `main` runs [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml):
-install with `npm ci`, check styles, run tests, build, publish to Pages. A failing
-test or a budget violation fails the deploy rather than shipping.
+Pushing to `main` triggers a Vercel deployment. Vercel runs, from `profile/`:
 
-`scripts/build-pages.mjs` derives the base href and the site URL from
-`GITHUB_REPOSITORY`, then writes `404.html`, `.nojekyll`, `robots.txt` and a
-`sitemap.xml` generated from the routes Angular actually prerendered. Nothing is
-hard-coded to a machine or a URL.
+```
+npm ci
+npm run lint:styles && npm test && npm run build:static
+```
 
-Asset paths are **base-relative** (`projects/…`, not `/projects/…`) so the same build
-is correct at a domain root or under a repository sub-path.
+A failing stylelint check or unit test fails the deployment rather than shipping.
+`scripts/postbuild-static.mjs` then writes `404.html`, `robots.txt` and a
+`sitemap.xml` generated from the routes Angular actually prerendered, taking the
+production URL from `VERCEL_PROJECT_PRODUCTION_URL`.
+
+Pull requests get their own preview URL automatically.
 
 ### Deploying a change
 
@@ -42,29 +50,20 @@ is correct at a domain root or under a repository sub-path.
 git push origin main      # that is the whole deployment step
 ```
 
-Watch it in the repository's **Actions** tab; the live URL appears on the
-`github-pages` environment. To re-deploy without a commit, run the workflow manually
-from that tab.
-
 ### Running it locally
 
 ```bash
 cd profile
 npm ci
-npm start                                   # dev server
-npm test                                    # unit tests
-npm run build && npm run serve:ssr           # the Node/SSR target, at :4000
-
-# Or reproduce the Pages output exactly:
-GITHUB_REPOSITORY=owner/repo npm run build:pages
+npm start                                  # dev server
+npm test                                   # unit tests
+npm run build:static                       # exactly what Vercel builds
+npm run build && npm run serve:ssr          # the Node/SSR target, at :4000
 ```
 
-The Node server in `profile/src/server.ts` is retained and still works. It is not
-used by GitHub Pages — the only thing it adds over the static output is rendering the
-404 route on demand, which `404.html` covers instead.
+`build:static` skips `robots.txt` and `sitemap.xml` locally, because both need an
+absolute production URL; pass `--site https://example.com` to generate them anyway.
 
-### First-time setup
-
-GitHub Pages has to be pointed at Actions once, by hand: **Settings → Pages → Build
-and deployment → Source → GitHub Actions**. Until that is set, the workflow builds
-successfully and the deploy step fails.
+The Node server in `profile/src/server.ts` is retained and still works. Vercel does
+not use it — the only thing it adds over the static output is rendering the 404 route
+on demand, which `404.html` covers instead.
